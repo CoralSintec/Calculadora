@@ -8,7 +8,6 @@
         :root {
             --coralsintec-primary: #2a2d34;
             --coralsintec-accent: #c49660;
-            --coralsintec-bg: #e5e7eb;
         }
 
         body, h1, h2, span, a, div, header, footer {
@@ -16,7 +15,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* FONDO CREADO CON CÓDIGO (Sin imágenes) */
+        /* FONDO */
         .app-container {
             width: 100vw; height: 100vh;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -24,34 +23,38 @@
             position: relative; overflow: hidden;
         }
 
-        /* PATRÓN DE CUADRÍCULA SUTIL PARA PARECER CONCRETO ARQUITECTÓNICO */
+        /* PATRÓN DE CONCRETO */
         .app-container::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
             background-size: 30px 30px; z-index: 0; pointer-events: none;
         }
 
-        /* CABECERA */
+        /* CABECERA (Usa tu imagen cabecera.jpg) */
         .app-header {
-            width: 100%; padding: 30px 20px 20px 20px;
+            width: 100%; padding: 40px 20px 10px 20px;
             position: relative; z-index: 2;
             display: flex; align-items: center; justify-content: center;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .app-header img {
+            width: 100%; max-width: 320px; height: auto;
+            border-radius: 8px;
+            mix-blend-mode: darken; /* Quita el fondo de la imagen para que se funda con el gris */
         }
 
-        .header-text { text-align: center; }
-        .header-text h1 { font-size: 24px; font-weight: 800; color: var(--coralsintec-primary); letter-spacing: 1px; }
-        .header-text h2 { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 2px; margin-top: 2px;}
-
-        /* MARCA DE AGUA CENTRAL CREADA CON CÓDIGO */
+        /* MARCA DE AGUA (Usa tu imagen marca.jpg) */
         .main-content {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 70%; max-width: 300px;
+            width: 65%; max-width: 280px;
             z-index: 1; pointer-events: none;
             display: flex; flex-direction: column; align-items: center;
-            opacity: 0.08; /* Esto la hace transparente */
+            opacity: 0.12; /* Nivel de transparencia */
         }
-        .main-content svg { width: 100%; height: auto; }
+        .main-content img { 
+            width: 100%; height: auto; 
+            mix-blend-mode: multiply;
+        }
 
         /* BOTONES INFERIORES */
         .app-footer {
@@ -59,14 +62,14 @@
             position: relative; z-index: 2;
         }
 
-        .button-container { display: flex; justify-content: space-around; gap: 15px; }
+        .button-container { display: flex; justify-content: space-around; gap: 12px; }
 
         .app-button {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
             background: linear-gradient(145deg, #ffffff, #e6e6e6);
             border: 1px solid #d1d5db; border-radius: 16px;
-            padding: 20px 10px; text-decoration: none;
-            box-shadow: 5px 5px 10px #c2c5c9, -5px -5px 10px #ffffff; /* Efecto 3D de botón metálico/concreto */
+            padding: 15px 5px; text-decoration: none;
+            box-shadow: 5px 5px 10px #c2c5c9, -5px -5px 10px #ffffff;
             transition: all 0.2s;
         }
 
@@ -75,8 +78,11 @@
             transform: scale(0.98);
         }
 
-        .app-button svg { width: 35px; height: 35px; margin-bottom: 12px; color: var(--coralsintec-primary); }
-        .app-button span { font-size: 11px; font-weight: 800; color: var(--coralsintec-primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .app-button img { 
+            width: 45px; height: 45px; margin-bottom: 10px; 
+            border-radius: 50%; /* Hace que el icono se vea redondito */
+        }
+        .app-button span { font-size: 10px; font-weight: 800; color: var(--coralsintec-primary); text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
@@ -84,39 +90,27 @@
     <div class="app-container">
 
         <header class="app-header">
-            <div class="header-text">
-                <h1>CORALSINTEC</h1>
-                <h2>Architectural Concrete</h2>
-            </div>
+            <img src="cabecera.jpg" alt="Coralsintec Architectural Concrete">
         </header>
 
         <div class="main-content">
-            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round">
-                <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" />
-                <polyline points="50,50 50,95" />
-                <polyline points="50,50 10,25" />
-                <polyline points="50,50 90,25" />
-                <polygon points="50,30 70,40 70,60 50,70 30,60 30,40" />
-                <polyline points="50,50 50,70" />
-                <polyline points="50,50 30,40" />
-                <polyline points="50,50 70,40" />
-            </svg>
+            <img src="marca.jpg" alt="Marca de agua Coralsintec">
         </div>
 
         <footer class="app-footer">
             <div class="button-container">
-                <a href="index.html" class="app-button">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16.01" y2="14"></line><line x1="12" y1="14" x2="12.01" y2="14"></line><line x1="8" y1="14" x2="8.01" y2="14"></line><line x1="16" y1="10" x2="16.01" y2="10"></line><line x1="12" y1="10" x2="12.01" y2="10"></line><line x1="8" y1="10" x2="8.01" y2="10"></line><line x1="16" y1="18" x2="16.01" y2="18"></line><line x1="12" y1="18" x2="12.01" y2="18"></line><line x1="8" y1="18" x2="8.01" y2="18"></line></svg>
+                <a href="cotizador.html" class="app-button">
+                    <img src="icono.png" alt="Icono Calculadora">
                     <span>Calculadora</span>
                 </a>
                 
                 <a href="catalogo.pdf" target="_blank" class="app-button">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <img src="icono.png" alt="Icono Catálogo">
                     <span>Catálogo</span>
                 </a>
 
                 <a href="https://wa.me/tunumerodecelular" target="_blank" class="app-button">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <img src="icono.png" alt="Icono Contacto">
                     <span>Contacto</span>
                 </a>
             </div>
