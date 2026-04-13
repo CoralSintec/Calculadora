@@ -3,210 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coralsintec | Centro de Mando</title>
+    <title>Coralsintec | Acceso</title>
     <style>
-        :root {
-            --bg-color: #d1d5db; 
-            --primary: #1f2937;
-            --accent: #3b82f6;
-            --text-light: #f3f4f6;
-            --danger: #ef4444;
-            --success: #10b981;
-            --warning: #f59e0b;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0; padding: 0;
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-        }
-
-        .screen {
-            display: none; width: 100%; max-width: 600px; padding: 20px; box-sizing: border-box;
-            background: white; border-radius: 12px; margin-top: 2vh; margin-bottom: 2vh;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-
-        #login-screen { display: block; max-width: 350px; text-align: center; margin-top: 10vh;}
-        .logo-placeholder { font-size: 24px; font-weight: bold; color: var(--primary); margin-bottom: 20px; letter-spacing: 2px; }
-        
-        .section-title { 
-            background: var(--primary); color: white; padding: 8px 12px; 
-            border-radius: 6px; font-size: 14px; margin-bottom: 15px; margin-top: 20px;
-        }
-
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--primary); font-size: 13px; }
-        .input-group input, .input-group select, .input-group textarea { 
-            width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 15px; box-sizing: border-box; 
-        }
-
-        .btn { background-color: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 10px;}
-        .btn-success { background-color: var(--success); }
-        .btn-back { background-color: transparent; color: var(--primary); border: 2px solid var(--primary); padding: 10px; margin-bottom: 15px;}
-
-        .cart-item { background: #f9fafb; border-left: 4px solid var(--accent); padding: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 14px;}
-        #loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 1000; text-align: center; padding-top: 40vh; font-size: 20px; font-weight: bold; color: var(--accent); }
+        body { font-family: sans-serif; background: #d1d5db; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); text-align: center; width: 320px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e5e7eb; border-radius: 8px; box-sizing: border-box; text-align: center; }
+        .btn { background: #1e2328; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .menu { display: none; }
+        .menu-btn { background: white; padding: 25px; margin: 10px 0; border-radius: 10px; font-weight: bold; border-left: 6px solid #c49660; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
-
-    <div id="loader-overlay">Sincronizando con el Cerebro...</div>
-
-    <div id="login-screen" class="screen">
-        <div class="logo-placeholder">CORALSINTEC</div>
-        <div class="input-group">
-            <label>USUARIO</label>
-            <input type="text" id="username" placeholder="USUARIO" style="text-transform: uppercase;">
-        </div>
-        <div class="input-group">
-            <label>PIN DE ACCESO</label>
-            <input type="password" id="pin" placeholder="****" maxlength="4">
-        </div>
-        <button class="btn" onclick="iniciarSesion()">ENTRAR</button>
-        <p id="login-error" style="color: var(--danger); font-size: 14px; display: none;">Datos incorrectos</p>
+    <div class="card" id="login">
+        <h2>CORALSINTEC</h2>
+        <input type="text" id="user" placeholder="USUARIO" style="text-transform: uppercase;">
+        <input type="password" id="pin" placeholder="PIN" maxlength="4">
+        <button class="btn" onclick="entrar()">ENTRAR</button>
     </div>
 
-    <div id="dashboard-screen" class="screen">
-        <div class="header" style="display:flex; justify-content: space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0; color: var(--primary);">Menú Principal</h2>
-            <button onclick="cambiarPantalla('login-screen')" style="background:none;border:none;color:var(--danger);font-weight:bold;cursor:pointer;">Cerrar Sesión</button>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div onclick="abrirVentas()" style="padding:30px 10px; border-radius:12px; text-align:center; font-weight:bold; background:var(--text-light); border-left:5px solid var(--accent); cursor:pointer;">🛒 VENTAS</div>
-            <div onclick="alert('Módulo de Planta en Fase 3')" style="padding:30px 10px; border-radius:12px; text-align:center; font-weight:bold; background:var(--text-light); border-left:5px solid var(--warning); cursor:pointer;">🏭 PLANTA</div>
-            <div onclick="alert('Módulo de Gerencia en Fase 3')" style="padding:30px 10px; border-radius:12px; text-align:center; font-weight:bold; background:var(--text-light); border-left:5px solid var(--primary); cursor:pointer; grid-column: span 2;">📊 GERENCIA</div>
-        </div>
-    </div>
-
-    <div id="ventas-screen" class="screen">
-        <button class="btn btn-back" onclick="cambiarPantalla('dashboard-screen')">⬅ Volver</button>
-        <h2 style="color: var(--primary); margin: 0;">Cotizador Completo</h2>
-        
-        <div class="section-title">DATOS DEL CLIENTE</div>
-        <div class="input-group">
-            <label>Nombre y Apellido:</label>
-            <input type="text" id="c-nombre" placeholder="Nombre completo">
-        </div>
-        <div style="display: flex; gap: 10px;">
-            <div class="input-group" style="flex: 1;">
-                <label>Cédula / RIF:</label>
-                <input type="text" id="c-rif" placeholder="V-00000000">
-            </div>
-            <div class="input-group" style="flex: 1;">
-                <label>Teléfono:</label>
-                <input type="tel" id="c-telefono" placeholder="0412-0000000">
-            </div>
-        </div>
-        <div class="input-group">
-            <label>Ubicación de la Obra:</label>
-            <textarea id="c-ubicacion" rows="2" placeholder="Dirección de entrega"></textarea>
-        </div>
-
-        <div class="section-title">DETALLE DEL PEDIDO</div>
-        <div class="input-group">
-            <label>Formato / Color / Textura:</label>
-            <select id="select-producto"><option value="">Cargando...</option></select>
-        </div>
-        <div class="input-group">
-            <label>Cantidad (m²):</label>
-            <input type="number" id="input-m2" placeholder="0.00">
-        </div>
-        <button class="btn" style="background:#4b5563;" onclick="agregarAlCarrito()">+ Añadir Producto</button>
-
-        <div id="lista-carrito" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;"></div>
-        <h3 style="text-align: right; color: var(--primary);">Total Cotizado: $<span id="gran-total">0.00</span></h3>
-        
-        <button class="btn btn-success" onclick="enviarAPlanta()" id="btn-enviar" style="display:none; margin-top:20px;">📤 ENVIAR A PLANTA</button>
+    <div class="card menu" id="menu">
+        <h3>Menú Principal</h3>
+        <div class="menu-btn" onclick="location.href='cotizador.html'">🛒 VENTAS</div>
+        <div class="menu-btn" style="border-left-color: #f59e0b;" onclick="alert('Fase Planta próximamente')">🏭 PLANTA</div>
+        <button class="btn" style="background:#ef4444; margin-top:15px;" onclick="location.reload()">SALIR</button>
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwvASdGE2oeUtvxbAndOzbWEIOpJp5kHVdnxMLJJ6gpAyI4D9v_afU6HBXIwFd8A2V75Q/exec";
-        const usuarios = { "EDUARDO": "1234", "VENTAS": "1111", "PLANTA": "0000" };
-        let catalogoProductos = [];
-        let ordenActual = [];
-        let totalOrden = 0;
-
-        function cambiarPantalla(id) {
-            document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
-            document.getElementById(id).style.display = 'block';
-        }
-
-        function mostrarLoader(m) { document.getElementById('loader-overlay').style.display = m ? 'block' : 'none'; }
-
-        function iniciarSesion() {
-            let u = document.getElementById('username').value.toUpperCase();
+        const users = { "EDUARDO": "1234", "VENTAS": "1111" };
+        function entrar() {
+            let u = document.getElementById('user').value.toUpperCase();
             let p = document.getElementById('pin').value;
-            if(usuarios[u] && usuarios[u] === p) {
-                cambiarPantalla('dashboard-screen');
-                cargarCatalogo();
-            } else { document.getElementById('login-error').style.display = 'block'; }
-        }
-
-        function cargarCatalogo() {
-            mostrarLoader(true);
-            fetch(API_URL + "?action=get_productos").then(r => r.json()).then(data => {
-                catalogoProductos = data;
-                let s = document.getElementById('select-producto');
-                s.innerHTML = '<option value="">Seleccione...</option>';
-                data.forEach((p, i) => {
-                    s.innerHTML += `<option value="${i}">${p.FORMATO} | ${p.COLOR} | ${p.TEXTURA} ($${p.PRECIO_USD})</option>`;
-                });
-                mostrarLoader(false);
-            });
-        }
-
-       function abrirVentas() {
-    // Esto le dice al navegador que se mueva al otro archivo
-    window.location.href = "cotizador.html";
-}
-        function agregarAlCarrito() {
-            let idx = document.getElementById('select-producto').value;
-            let m2 = parseFloat(document.getElementById('input-m2').value);
-            if(idx === "" || isNaN(m2) || m2 <= 0) return alert("Complete los datos del producto.");
-            
-            let p = catalogoProductos[idx];
-            ordenActual.push({ nombre: `${p.FORMATO} ${p.COLOR} ${p.TEXTURA}`, m2: m2, subtotal: p.PRECIO_USD * m2 });
-            document.getElementById('input-m2').value = '';
-            actualizarCarrito();
-        }
-
-        function actualizarCarrito() {
-            let d = document.getElementById('lista-carrito');
-            d.innerHTML = ''; totalOrden = 0;
-            ordenActual.forEach(i => {
-                totalOrden += i.subtotal;
-                d.innerHTML += `<div class="cart-item"><b>${i.nombre}</b><br>${i.m2} m² - $${i.subtotal.toFixed(2)}</div>`;
-            });
-            document.getElementById('gran-total').innerText = totalOrden.toFixed(2);
-            document.getElementById('btn-enviar').style.display = ordenActual.length > 0 ? 'block' : 'none';
-        }
-
-        function enviarAPlanta() {
-            let nombre = document.getElementById('c-nombre').value;
-            let rif = document.getElementById('c-rif').value;
-            let tlf = document.getElementById('c-telefono').value;
-            let ubi = document.getElementById('c-ubicacion').value;
-
-            if(!nombre || !rif || !tlf || !ubi) return alert("Por favor complete todos los datos del cliente.");
-
-            let payload = {
-                cliente: nombre,
-                rif: rif,
-                telefono: tlf,
-                ubicacion: ubi,
-                total: totalOrden,
-                detalles: ordenActual
-            };
-
-            mostrarLoader(true);
-            fetch(API_URL + "?action=nuevo_pedido", { method: "POST", body: JSON.stringify(payload) })
-            .then(r => r.json()).then(data => {
-                mostrarLoader(false);
-                alert("¡Cotización Enviada! Se ha registrado en la cola de producción.");
-                cambiarPantalla('dashboard-screen');
-            });
+            if(users[u] === p) {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('menu').style.display = 'block';
+            } else { alert("PIN incorrecto"); }
         }
     </script>
 </body>
