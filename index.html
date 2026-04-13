@@ -157,8 +157,10 @@
             });
         }
 
-        function abrirVentas() { cambiarPantalla('ventas-screen'); ordenActual = []; actualizarCarrito(); }
-
+       function abrirVentas() {
+    // Esto le dice al navegador que se mueva al otro archivo
+    window.location.href = "cotizador.html";
+}
         function agregarAlCarrito() {
             let idx = document.getElementById('select-producto').value;
             let m2 = parseFloat(document.getElementById('input-m2').value);
