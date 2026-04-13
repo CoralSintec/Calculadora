@@ -130,13 +130,11 @@
     let db = [];
     let carrito = [];
 
-    // CARGA DE DATOS DESDE EXCEL
     window.onload = () => {
         fetch(API_URL + "?action=get_productos")
         .then(r => r.json())
         .then(data => {
             db = data;
-            console.log("Datos cargados:", db.length);
             poblarSelects();
             document.getElementById('loader-overlay').style.display = 'none';
         })
@@ -147,17 +145,35 @@
     };
 
     function poblarSelects() {
-        const getUnicos = (campo) => [...new Set(db.map(item => String(item[campo]).trim()))].filter(v => v && v !== "undefined").sort();
+        // MEMORIA DE ORDEN ORIGINAL DE CORALSINTEC
+        const ordenFormato = ["30x30", "40x40", "50x50", "60x60", "20x60", "30x60", "40x60", "40x70", "15x75", "10x100", "20x100", "30x100", "40x100", "60x100"];
+        const ordenUso = ["Pared", "Piso"];
+        const ordenTextura = ["Media", "Lisa", "Gruesa", "Veta"];
+        const ordenColor = ["Gris Claro", "Beige", "Gris 1%", "Gris 2%", "Gris 3%"];
+
+        const getUnicosYOrdenar = (campo, ordenDeseado) => {
+            let unicos = [...new Set(db.map(item => String(item[campo]).trim()))].filter(v => v && v !== "undefined");
+            
+            // Ordena usando la memoria, si hay algo nuevo lo manda al final
+            unicos.sort((a, b) => {
+                let indexA = ordenDeseado.indexOf(a);
+                let indexB = ordenDeseado.indexOf(b);
+                if (indexA === -1) indexA = 999;
+                if (indexB === -1) indexB = 999;
+                return indexA - indexB;
+            });
+            return unicos;
+        };
         
         const llenar = (id, lista) => {
             const el = document.getElementById(id);
             el.innerHTML = lista.map(v => `<option value="${v}">${v}</option>`).join('');
         };
 
-        llenar('formato', getUnicos('FORMATO'));
-        llenar('uso', getUnicos('USO'));
-        llenar('textura', getUnicos('TEXTURA'));
-        llenar('color', getUnicos('COLOR'));
+        llenar('formato', getUnicosYOrdenar('FORMATO', ordenFormato));
+        llenar('uso', getUnicosYOrdenar('USO', ordenUso));
+        llenar('textura', getUnicosYOrdenar('TEXTURA', ordenTextura));
+        llenar('color', getUnicosYOrdenar('COLOR', ordenColor));
         calcular();
     }
 
@@ -198,7 +214,7 @@
         }
 
         let total = pUnit * m;
-        if(document.getElementById('carateo').checked && m > 0) total += (Math.ceil(m/40) * (c == "Beige" ? 60 : 50));
+        if(document.getElementById('carateo').checked && m > 0) total += (Math.ceil(m/40) * (String(c).includes("Beige") || String(c).includes("Gris") ? 60 : 50));
         if(document.getElementById('sellador').checked && m > 0) total += (Math.ceil(m/35) * 100);
 
         document.getElementById('ui-espesor').innerText = esp;
