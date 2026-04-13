@@ -6,7 +6,7 @@
     <title>Coralsintec | Centro de Mando</title>
     <style>
         :root {
-            --bg-color: #d1d5db; /* El gris neutro de tu logo */
+            --bg-color: #d1d5db; 
             --primary: #1f2937;
             --accent: #3b82f6;
             --text-light: #f3f4f6;
@@ -26,224 +26,220 @@
             min-height: 100vh;
         }
 
-        /* --- PANTALLA DE LOGIN --- */
-        #login-screen {
-            background-color: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            text-align: center;
-            margin-top: 10vh;
-            width: 90%;
-            max-width: 350px;
-        }
-
-        .logo-placeholder {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: var(--primary);
-            font-size: 14px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-            text-align: center;
-            letter-spacing: 2px;
-        }
-
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 15px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.3s;
-        }
-
-        .btn:hover { background-color: #374151; }
-
-        /* --- DASHBOARD PRINCIPAL --- */
-        #dashboard-screen {
-            display: none; /* Oculto hasta poner el PIN */
+        .screen {
+            display: none;
             width: 100%;
             max-width: 600px;
             padding: 20px;
             box-sizing: border-box;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #9ca3af;
-            padding-bottom: 10px;
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .menu-btn {
-            background-color: white;
-            color: var(--primary);
-            padding: 30px 10px;
+            background: white;
             border-radius: 12px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 16px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s;
+            margin-top: 5vh;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        .menu-btn:active { transform: scale(0.98); }
-        .menu-btn:hover { border-color: var(--primary); }
+        /* --- LOGIN --- */
+        #login-screen { display: block; max-width: 350px; text-align: center; }
+        .logo-placeholder { font-size: 24px; font-weight: bold; color: var(--primary); margin-bottom: 20px; letter-spacing: 2px; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--primary); font-size: 14px; }
+        .input-group input, .input-group select { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .btn { background-color: var(--primary); color: white; border: none; padding: 15px 20px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 10px;}
+        .btn-success { background-color: var(--success); }
+        .btn-back { background-color: transparent; color: var(--primary); border: 2px solid var(--primary); padding: 10px; margin-bottom: 15px;}
 
-        /* Colores de los botones del menú */
+        /* --- DASHBOARD --- */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #9ca3af; padding-bottom: 10px; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .menu-btn { padding: 30px 10px; border-radius: 12px; text-align: center; font-weight: bold; font-size: 16px; cursor: pointer; border: 2px solid transparent; background: var(--text-light); }
         .btn-ventas { border-left: 5px solid var(--accent); }
         .btn-planta { border-left: 5px solid var(--warning); }
         .btn-gerencia { border-left: 5px solid var(--primary); grid-column: span 2;}
 
-        #loader {
-            display: none;
-            color: var(--accent);
-            font-weight: bold;
-            margin-top: 15px;
-        }
+        /* --- COTIZADOR --- */
+        .cart-item { background: #f9fafb; border-left: 4px solid var(--accent); padding: 10px; margin-bottom: 10px; border-radius: 6px; }
+        #loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 1000; text-align: center; padding-top: 40vh; font-size: 20px; font-weight: bold; color: var(--accent); }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
+    <div id="loader-overlay">Sincronizando con el Cerebro...</div>
+
+    <div id="login-screen" class="screen">
         <div class="logo-placeholder">CORALSINTEC</div>
-        <p style="color: #6b7280; font-size: 14px; margin-bottom: 25px;">Sistema de Gestión Integrada</p>
-        
         <div class="input-group">
             <label>USUARIO</label>
             <input type="text" id="username" placeholder="Ej: EDUARDO" style="text-transform: uppercase;">
         </div>
-        
         <div class="input-group">
             <label>PIN DE ACCESO</label>
-            <input type="password" id="pin" placeholder="****" maxlength="4" pattern="\d{4}">
+            <input type="password" id="pin" placeholder="****" maxlength="4">
         </div>
-
         <button class="btn" onclick="iniciarSesion()">ENTRAR</button>
-        <p id="login-error" style="color: var(--danger); font-size: 14px; display: none; margin-top: 15px;">Datos incorrectos</p>
+        <p id="login-error" style="color: var(--danger); font-size: 14px; display: none;">Datos incorrectos</p>
     </div>
 
-    <div id="dashboard-screen">
+    <div id="dashboard-screen" class="screen">
         <div class="header">
-            <div>
-                <h2 style="margin:0; color: var(--primary);">Panel de Control</h2>
-                <small id="user-display" style="color: #4b5563;">Usuario Activo</small>
-            </div>
-            <button onclick="cerrarSesion()" style="background: none; border: none; color: var(--danger); font-weight: bold; cursor:pointer;">Salir</button>
+            <div><h2 style="margin:0; color: var(--primary);">Panel de Control</h2></div>
+            <button onclick="cambiarPantalla('login-screen')" style="background:none;border:none;color:var(--danger);font-weight:bold;cursor:pointer;">Salir</button>
+        </div>
+        <div class="menu-grid">
+            <div class="menu-btn btn-ventas" onclick="abrirVentas()">🛒 Cotizador (Ventas)</div>
+            <div class="menu-btn btn-planta" onclick="alert('Módulo de Planta en Fase 3')">🏭 Cola de Planta</div>
+            <div class="menu-btn btn-gerencia" onclick="alert('Inventario y Costos en Fase 3')">📊 Gerencia e Inventario</div>
+        </div>
+    </div>
+
+    <div id="ventas-screen" class="screen">
+        <button class="btn btn-back" onclick="cambiarPantalla('dashboard-screen')">⬅ Volver al Menú</button>
+        <h2 style="color: var(--primary); margin-top: 0;">Nueva Cotización</h2>
+        
+        <div class="input-group">
+            <label>Cliente / Proyecto:</label>
+            <input type="text" id="nombre-cliente" placeholder="Ej: Roderick Romer">
         </div>
 
-        <div class="menu-grid">
-            <div class="menu-btn btn-ventas" onclick="abrirModulo('ventas')">
-                🛒 Cotizador (Ventas)
-            </div>
-            <div class="menu-btn btn-planta" onclick="abrirModulo('planta')">
-                🏭 Cola de Planta
-            </div>
-            <div class="menu-btn btn-gerencia" onclick="probarConexionExcel()">
-                ⚡ PROBAR CONEXIÓN EXCEL
-                <div style="font-size: 12px; font-weight: normal; margin-top: 5px; color: #6b7280;">
-                    Toca aquí para ver si lee tus productos
-                </div>
-            </div>
+        <div class="input-group">
+            <label>Seleccionar Producto:</label>
+            <select id="select-producto">
+                <option value="">Cargando catálogo...</option>
+            </select>
         </div>
-        <div id="loader">Conectando con el Cerebro...</div>
+
+        <div class="input-group">
+            <label>Metros Cuadrados (m²):</label>
+            <input type="number" id="input-m2" placeholder="0">
+        </div>
+
+        <button class="btn" onclick="agregarAlCarrito()">➕ Añadir a la Orden</button>
+
+        <div id="lista-carrito" style="margin-top: 20px;"></div>
+        <h3 style="text-align: right; color: var(--primary);">Total: $<span id="gran-total">0.00</span></h3>
+        
+        <button class="btn btn-success" onclick="enviarAPlanta()" id="btn-enviar" style="display:none;">📤 APROBAR Y ENVIAR A PLANTA</button>
     </div>
 
     <script>
-        // LA LLAVE DE TU CEREBRO (API URL)
         const API_URL = "https://script.google.com/macros/s/AKfycbwvASdGE2oeUtvxbAndOzbWEIOpJp5kHVdnxMLJJ6gpAyI4D9v_afU6HBXIwFd8A2V75Q/exec";
+        
+        const usuarios = { "EDUARDO": "1234", "VENTAS": "1111", "PLANTA": "0000" };
+        let catalogoProductos = [];
+        let ordenActual = [];
+        let totalOrden = 0;
 
-        // Usuarios y Pines Temporales (Luego lo haremos dinámico)
-        const usuarios = {
-            "EDUARDO": "1234",
-            "VENTAS": "1111",
-            "PLANTA": "0000"
-        };
+        function cambiarPantalla(idPantalla) {
+            document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+            document.getElementById(idPantalla).style.display = 'block';
+        }
+
+        function mostrarLoader(mostrar) {
+            document.getElementById('loader-overlay').style.display = mostrar ? 'block' : 'none';
+        }
 
         function iniciarSesion() {
             let user = document.getElementById('username').value.toUpperCase();
             let pin = document.getElementById('pin').value;
-            
             if(usuarios[user] && usuarios[user] === pin) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('dashboard-screen').style.display = 'block';
-                document.getElementById('user-display').innerText = "Hola, " + user;
                 document.getElementById('login-error').style.display = 'none';
+                cambiarPantalla('dashboard-screen');
+                cargarCatalogo(); // Descarga los precios al entrar
             } else {
                 document.getElementById('login-error').style.display = 'block';
             }
         }
 
-        function cerrarSesion() {
-            document.getElementById('username').value = '';
-            document.getElementById('pin').value = '';
-            document.getElementById('dashboard-screen').style.display = 'none';
-            document.getElementById('login-screen').style.display = 'block';
-        }
-
-        function abrirModulo(modulo) {
-            alert("El módulo " + modulo.toUpperCase() + " está en construcción para la Fase 2.");
-        }
-
-        // --- LA PRUEBA DE FUEGO ---
-        function probarConexionExcel() {
-            let loader = document.getElementById('loader');
-            loader.style.display = 'block';
-            
-            // Llama a tu Google Sheet
+        // 1. EL CEREBRO DESCARGA EL CATÁLOGO DE GOOGLE SHEETS
+        function cargarCatalogo() {
+            mostrarLoader(true);
             fetch(API_URL + "?action=get_productos")
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                loader.style.display = 'none';
-                console.log(data); // Muestra los datos en la consola interna
-                
-                if(data.length > 0) {
-                    // Si encuentra productos, te avisa con el primero de la lista
-                    alert("¡CONEXIÓN EXITOSA! 🚀\nEl sistema leyó " + data.length + " productos.\nPrimer producto encontrado: " + data[0].FORMATO + " - " + data[0].COLOR);
-                } else {
-                    alert("Se conectó al Excel, pero la pestaña DB_PRODUCTOS parece estar vacía.");
-                }
+                catalogoProductos = data;
+                let select = document.getElementById('select-producto');
+                select.innerHTML = '<option value="">Seleccione un producto...</option>';
+                data.forEach((prod, index) => {
+                    select.innerHTML += `<option value="${index}">${prod.FORMATO} - ${prod.TEXTURA} - ${prod.COLOR} ($${prod.PRECIO_USD})</option>`;
+                });
+                mostrarLoader(false);
             })
-            .catch(error => {
-                loader.style.display = 'none';
-                alert("Error de conexión. Verifica tu internet o los permisos del Google Script.");
-                console.error(error);
+            .catch(err => {
+                mostrarLoader(false);
+                alert("Error cargando productos. Revisa tu internet.");
+            });
+        }
+
+        function abrirVentas() {
+            cambiarPantalla('ventas-screen');
+            ordenActual = [];
+            actualizarCarrito();
+        }
+
+        // 2. LÓGICA DEL COTIZADOR
+        function agregarAlCarrito() {
+            let select = document.getElementById('select-producto');
+            let m2 = parseFloat(document.getElementById('input-m2').value);
+            let cliente = document.getElementById('nombre-cliente').value;
+            
+            if(!cliente) return alert("Por favor ingresa el nombre del cliente.");
+            if(select.value === "" || isNaN(m2) || m2 <= 0) return alert("Selecciona un producto y los m² válidos.");
+
+            let prod = catalogoProductos[select.value];
+            let subtotal = prod.PRECIO_USD * m2;
+            
+            ordenActual.push({
+                nombre: `${prod.FORMATO} ${prod.TEXTURA} ${prod.COLOR}`,
+                m2: m2,
+                subtotal: subtotal
+            });
+
+            document.getElementById('input-m2').value = '';
+            actualizarCarrito();
+        }
+
+        function actualizarCarrito() {
+            let div = document.getElementById('lista-carrito');
+            div.innerHTML = '';
+            totalOrden = 0;
+
+            ordenActual.forEach((item) => {
+                totalOrden += item.subtotal;
+                div.innerHTML += `
+                    <div class="cart-item">
+                        <b>${item.nombre}</b><br>
+                        ${item.m2} m² | Subtotal: $${item.subtotal.toFixed(2)}
+                    </div>`;
+            });
+
+            document.getElementById('gran-total').innerText = totalOrden.toFixed(2);
+            document.getElementById('btn-enviar').style.display = ordenActual.length > 0 ? 'block' : 'none';
+        }
+
+        // 3. ENVÍO DE LA ORDEN AL EXCEL DE PLANTA
+        function enviarAPlanta() {
+            let cliente = document.getElementById('nombre-cliente').value;
+            let payload = {
+                cliente: cliente,
+                total: totalOrden,
+                detalles: ordenActual
+            };
+
+            mostrarLoader(true);
+            
+            fetch(API_URL + "?action=nuevo_pedido", {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                mostrarLoader(false);
+                alert("¡ÉXITO! La orden de " + cliente + " fue enviada a la Cola de Planta y el calendario de 25 días hábiles se ha activado.");
+                abrirVentas(); // Reinicia la pantalla
+                document.getElementById('nombre-cliente').value = '';
+            })
+            .catch(err => {
+                mostrarLoader(false);
+                alert("Hubo un error enviando la orden.");
             });
         }
     </script>
