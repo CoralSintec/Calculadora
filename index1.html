@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coralsintec | Centro de Mando</title>
+    <style>
+        :root {
+            --bg-color: #d1d5db; /* El gris neutro de tu logo */
+            --primary: #1f2937;
+            --accent: #3b82f6;
+            --text-light: #f3f4f6;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- PANTALLA DE LOGIN --- */
+        #login-screen {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-top: 10vh;
+            width: 90%;
+            max-width: 350px;
+        }
+
+        .logo-placeholder {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .btn:hover { background-color: #374151; }
+
+        /* --- DASHBOARD PRINCIPAL --- */
+        #dashboard-screen {
+            display: none; /* Oculto hasta poner el PIN */
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #9ca3af;
+            padding-bottom: 10px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .menu-btn {
+            background-color: white;
+            color: var(--primary);
+            padding: 30px 10px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .menu-btn:active { transform: scale(0.98); }
+        .menu-btn:hover { border-color: var(--primary); }
+
+        /* Colores de los botones del menú */
+        .btn-ventas { border-left: 5px solid var(--accent); }
+        .btn-planta { border-left: 5px solid var(--warning); }
+        .btn-gerencia { border-left: 5px solid var(--primary); grid-column: span 2;}
+
+        #loader {
+            display: none;
+            color: var(--accent);
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="logo-placeholder">CORALSINTEC</div>
+        <p style="color: #6b7280; font-size: 14px; margin-bottom: 25px;">Sistema de Gestión Integrada</p>
+        
+        <div class="input-group">
+            <label>USUARIO</label>
+            <input type="text" id="username" placeholder="Ej: EDUARDO" style="text-transform: uppercase;">
+        </div>
+        
+        <div class="input-group">
+            <label>PIN DE ACCESO</label>
+            <input type="password" id="pin" placeholder="****" maxlength="4" pattern="\d{4}">
+        </div>
+
+        <button class="btn" onclick="iniciarSesion()">ENTRAR</button>
+        <p id="login-error" style="color: var(--danger); font-size: 14px; display: none; margin-top: 15px;">Datos incorrectos</p>
+    </div>
+
+    <div id="dashboard-screen">
+        <div class="header">
+            <div>
+                <h2 style="margin:0; color: var(--primary);">Panel de Control</h2>
+                <small id="user-display" style="color: #4b5563;">Usuario Activo</small>
+            </div>
+            <button onclick="cerrarSesion()" style="background: none; border: none; color: var(--danger); font-weight: bold; cursor:pointer;">Salir</button>
+        </div>
+
+        <div class="menu-grid">
+            <div class="menu-btn btn-ventas" onclick="abrirModulo('ventas')">
+                🛒 Cotizador (Ventas)
+            </div>
+            <div class="menu-btn btn-planta" onclick="abrirModulo('planta')">
+                🏭 Cola de Planta
+            </div>
+            <div class="menu-btn btn-gerencia" onclick="probarConexionExcel()">
+                ⚡ PROBAR CONEXIÓN EXCEL
+                <div style="font-size: 12px; font-weight: normal; margin-top: 5px; color: #6b7280;">
+                    Toca aquí para ver si lee tus productos
+                </div>
+            </div>
+        </div>
+        <div id="loader">Conectando con el Cerebro...</div>
+    </div>
+
+    <script>
+        // LA LLAVE DE TU CEREBRO (API URL)
+        const API_URL = "https://script.google.com/macros/s/AKfycbwvASdGE2oeUtvxbAndOzbWEIOpJp5kHVdnxMLJJ6gpAyI4D9v_afU6HBXIwFd8A2V75Q/exec";
+
+        // Usuarios y Pines Temporales (Luego lo haremos dinámico)
+        const usuarios = {
+            "EDUARDO": "1234",
+            "VENTAS": "1111",
+            "PLANTA": "0000"
+        };
+
+        function iniciarSesion() {
+            let user = document.getElementById('username').value.toUpperCase();
+            let pin = document.getElementById('pin').value;
+            
+            if(usuarios[user] && usuarios[user] === pin) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dashboard-screen').style.display = 'block';
+                document.getElementById('user-display').innerText = "Hola, " + user;
+                document.getElementById('login-error').style.display = 'none';
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+
+        function cerrarSesion() {
+            document.getElementById('username').value = '';
+            document.getElementById('pin').value = '';
+            document.getElementById('dashboard-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'block';
+        }
+
+        function abrirModulo(modulo) {
+            alert("El módulo " + modulo.toUpperCase() + " está en construcción para la Fase 2.");
+        }
+
+        // --- LA PRUEBA DE FUEGO ---
+        function probarConexionExcel() {
+            let loader = document.getElementById('loader');
+            loader.style.display = 'block';
+            
+            // Llama a tu Google Sheet
+            fetch(API_URL + "?action=get_productos")
+            .then(response => response.json())
+            .then(data => {
+                loader.style.display = 'none';
+                console.log(data); // Muestra los datos en la consola interna
+                
+                if(data.length > 0) {
+                    // Si encuentra productos, te avisa con el primero de la lista
+                    alert("¡CONEXIÓN EXITOSA! 🚀\nEl sistema leyó " + data.length + " productos.\nPrimer producto encontrado: " + data[0].FORMATO + " - " + data[0].COLOR);
+                } else {
+                    alert("Se conectó al Excel, pero la pestaña DB_PRODUCTOS parece estar vacía.");
+                }
+            })
+            .catch(error => {
+                loader.style.display = 'none';
+                alert("Error de conexión. Verifica tu internet o los permisos del Google Script.");
+                console.error(error);
+            });
+        }
+    </script>
+</body>
+</html>
