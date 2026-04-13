@@ -5,585 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cotizador Coralsintec</title>
     <style>
-        :root {
-            --coralsintec-primary: #1e2328; 
-            --coralsintec-accent: #c49660;  
-            --coralsintec-text-main: #334155;
-            --coralsintec-border: #cbd5e1;
-        }
-
-        html, body {
-            min-height: 100vh;
-            margin: 0;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #9baec0 0%, #7a91a6 100%);
-            background-attachment: fixed;
-            color: var(--coralsintec-text-main);
-            padding: 40px 15px 50px 15px; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .app-main {
-            background: rgba(255, 255, 255, 0.90); 
-            backdrop-filter: blur(8px); 
-            -webkit-backdrop-filter: blur(8px);
-            padding: 25px 20px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-            width: 100%;
-            max-width: 400px;
-            box-sizing: border-box;
-            border-top: 6px solid var(--coralsintec-primary);
-        }
-
-        .section-title {
-            font-size: 20px;
-            color: var(--coralsintec-primary);
-            margin: 0 0 5px 0;
-            font-weight: 800;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .section-header-small {
-            font-size: 14px;
-            color: white;
-            background: var(--coralsintec-primary);
-            padding: 6px 10px;
-            border-radius: 6px;
-            margin: 20px 0 15px 0;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .section-subtitle {
-            text-align: center;
-            color: #64748b;
-            font-size: 13px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        .form-row {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 13px;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-        }
-
-        select, input[type="number"], input[type="text"], input[type="tel"], textarea {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid var(--coralsintec-border);
-            border-radius: 10px;
-            font-size: 16px; 
-            background-color: rgba(248, 250, 252, 0.9);
-            color: var(--coralsintec-text-main);
-            box-sizing: border-box;
-            font-weight: 600;
-            font-family: inherit;
-        }
-        select { appearance: none; }
-
-        select:focus, input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--coralsintec-accent);
-            background-color: #fff;
-        }
-
-        .options-group {
-            background: rgba(248, 250, 252, 0.8);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            border: 1px solid var(--coralsintec-border);
-        }
-        
-        .option-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 15px;
-            font-weight: 700;
-            padding: 8px 0;
-            color: var(--coralsintec-primary);
-        }
-        
-        .option-item input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
-            accent-color: var(--coralsintec-accent);
-        }
-
-        .results-card {
-            margin-top: 25px;
-            padding: 20px;
-            background-color: var(--coralsintec-primary);
-            border-radius: 12px;
-            color: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        
-        .breakdown-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: #cbd5e1;
-            align-items: center;
-        }
-        
-        .breakdown-val {
-            font-weight: 700;
-            color: white;
-            font-size: 15px;
-        }
-        
-        .divider {
-            height: 1px;
-            background: rgba(255,255,255,0.2);
-            margin: 12px 0;
-        }
-
-        .total-price-container {
-            text-align: center;
-            margin-top: 15px;
-        }
-        
-        .total-label {
-            font-size: 12px;
-            text-transform: uppercase;
-            color: #94a3b8;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-        
-        .total-price {
-            font-size: 34px;
-            font-weight: 800;
-            color: var(--coralsintec-accent);
-            margin: 5px 0 0 0;
-        }
-
-        .add-btn {
-            width: 100%;
-            background-color: var(--coralsintec-accent);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 800;
-            text-transform: uppercase;
-            margin-top: 20px;
-            box-shadow: 0 4px 12px rgba(196, 150, 96, 0.4);
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.1s;
-            cursor: pointer;
-        }
-        
-        .add-btn:active { transform: scale(0.97); }
-
-        .btn-success { background-color: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4); margin-top: 15px;}
-
-        .cart-section {
-            width: 100%;
-            max-width: 400px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-            margin-top: 20px;
-            box-sizing: border-box;
-        }
-        
-        .cart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 2px solid rgba(0,0,0,0.05);
-            padding-bottom: 10px;
-        }
-        
-        .cart-header h2 { font-size: 16px; margin: 0; color: var(--coralsintec-primary); font-weight: 800;}
-        .cart-header button { background: #fee2e2; border: none; color: #ef4444; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer;}
-
-        .cart-list { margin: 0; padding: 0; list-style: none; }
-        .cart-item {
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .cart-item-header {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 800;
-            color: var(--coralsintec-primary);
-            font-size: 15px;
-        }
-        .cart-item-details {
-            font-size: 13px;
-            color: #64748b;
-            margin-top: 4px;
-            line-height: 1.4;
-            font-weight: 500;
-        }
-        .grand-total {
-            text-align: right;
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--coralsintec-primary);
-            margin-top: 15px;
-        }
-
-        #loader-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9); z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: var(--coralsintec-primary); font-weight: 800; font-size: 18px;
-        }
+        :root { --p: #1e2328; --a: #c49660; --b: #cbd5e1; }
+        body { font-family: sans-serif; background: linear-gradient(135deg, #9baec0 0%, #7a91a6 100%); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .app { background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 16px; width: 100%; max-width: 400px; box-sizing: border-box; border-top: 6px solid var(--p); }
+        .h-small { background: var(--p); color: white; padding: 8px; border-radius: 6px; font-size: 13px; font-weight: bold; margin: 15px 0; text-transform: uppercase; text-align: center; }
+        input, select, textarea { width: 100%; padding: 12px; border: 2px solid var(--b); border-radius: 10px; margin-bottom: 10px; box-sizing: border-box; font-weight: 600; font-family: inherit;}
+        .row { display: flex; gap: 10px; }
+        .card-res { background: var(--p); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-top: 15px; }
+        .btn { width: 100%; background: var(--a); color: white; border: none; padding: 16px; border-radius: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 10px; }
+        .cart { background: white; padding: 15px; border-radius: 12px; width: 100%; max-width: 400px; margin-top: 15px; box-sizing: border-box; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; color: var(--p);}
     </style>
 </head>
 <body>
-
-    <div id="loader-overlay">
-        <span style="font-size: 24px; color: var(--coralsintec-accent); margin-bottom:10px;">⚙️</span>
-        Sincronizando con el Cerebro...
-    </div>
-
-    <main class="app-main">
-        <h1 class="section-title">Coralsintec</h1>
-        <div class="section-subtitle">Cotizador Oficial de Ventas</div>
+    <div id="loader"><span style="font-size: 24px; margin-bottom:10px;">⚙️</span>Sincronizando Cerebro...</div>
+    
+    <main class="app">
+        <h2 style="text-align:center; margin:0; color:var(--p);">CORALSINTEC</h2>
         
-        <div class="section-header-small">1. Datos del Cliente</div>
-        
-        <div class="form-row">
-            <input type="text" id="c-nombre" placeholder="Nombre completo o Proyecto">
+        <div class="h-small">1. Datos del Cliente</div>
+        <input type="text" id="c_nombre" placeholder="Nombre / Proyecto">
+        <div class="row">
+            <input type="text" id="c_rif" placeholder="RIF/CI" style="flex:1;">
+            <input type="tel" id="c_tlf" placeholder="Teléfono" style="flex:1;">
         </div>
-        <div class="form-row" style="display:flex; gap:10px;">
-            <input type="text" id="c-rif" placeholder="Cédula / RIF" style="flex:1;">
-            <input type="tel" id="c-telefono" placeholder="Teléfono" style="flex:1;">
-        </div>
-        <div class="form-row">
-            <textarea id="c-ubicacion" placeholder="Ubicación de la obra..." rows="2"></textarea>
-        </div>
+        <textarea id="c_ubi" placeholder="Ubicación de obra..." rows="2"></textarea>
 
-        <div class="section-header-small">2. Detalles del Pedido</div>
-
-        <div class="form-row">
-            <label>Formato:</label>
-            <select id="formato" onchange="calcularPresupuesto()">
-                <option value="30x30">30x30</option><option value="40x40">40x40</option><option value="50x50">50x50</option><option value="60x60">60x60</option>
-                <option value="20x60">20x60</option><option value="30x60">30x60</option><option value="40x60">40x60</option><option value="40x70">40x70</option>
-                <option value="15x75">15x75</option><option value="10x100">10x100</option><option value="20x100">20x100</option><option value="30x100">30x100</option>
-                <option value="40x100">40x100</option><option value="60x100">60x100</option>
-            </select>
+        <div class="h-small">2. Calculadora</div>
+        <select id="formato" onchange="calc()"><option value="30x30">30x30</option><option value="60x60">60x60</option><option value="30x60">30x60</option></select>
+        <div class="row">
+            <select id="uso" onchange="calc()"><option value="Pared">Pared</option><option value="Piso">Piso</option></select>
+            <select id="textura" onchange="calc()"><option value="Media">Media</option><option value="Lisa">Lisa</option><option value="Gruesa">Gruesa</option></select>
         </div>
+        <select id="color" onchange="calc()"><option value="Gris Claro">Gris Claro</option><option value="Beige">Beige</option><option value="Gris 1%">Gris 1%</option><option value="Gris 3%">Gris 3%</option></select>
+        <input type="number" id="m2" value="10" oninput="calc()">
 
-        <div class="form-row" style="display:flex; gap:10px;">
-            <div style="flex:1;">
-                <label>Uso:</label>
-                <select id="uso" onchange="calcularPresupuesto()">
-                    <option value="Pared">Pared</option>
-                    <option value="Piso">Piso</option>
-                </select>
-            </div>
-            <div style="flex:1;">
-                <label>Textura:</label>
-                <select id="textura" onchange="manejarTexturaColor()">
-                    <option value="Media">Media</option><option value="Lisa">Lisa</option><option value="Gruesa">Gruesa</option><option value="Veta">Veta</option>
-                </select>
-            </div>
+        <div class="card-res">
+            <div style="font-size:12px; color:#94a3b8;">PRECIO DETECTADO</div>
+            <div id="ui_precio" style="font-size:28px; color:var(--a); font-weight:bold;">$0.00</div>
+            <div id="ui_total" style="font-size:14px; margin-top:5px;">Total Item: $0.00</div>
         </div>
-
-        <div class="form-row">
-            <label>Color:</label>
-            <select id="color" onchange="calcularPresupuesto()">
-                <option value="Gris Claro">Gris Claro</option><option value="Beige">Beige</option><option value="Gris 1%">Gris 1%</option><option value="Gris 2%">Gris 2%</option><option value="Gris 3%">Gris 3%</option>
-            </select>
-        </div>
-
-        <div class="form-row">
-            <label>Metros (m²):</label>
-            <input type="number" id="metros" value="10" min="0.1" step="0.1" inputmode="decimal" oninput="calcularPresupuesto()">
-        </div>
-
-        <div class="options-group">
-            <label class="option-item">
-                <span>Incluir Carateo (Sacos)</span>
-                <input type="checkbox" id="carateo" onchange="calcularPresupuesto()">
-            </label>
-            <div style="height:1px; background:rgba(0,0,0,0.05); margin:5px 0;"></div>
-            <label class="option-item">
-                <span>Incluir Sellador (Galones)</span>
-                <input type="checkbox" id="sellador" onchange="calcularPresupuesto()">
-            </label>
-        </div>
-
-        <div class="results-card">
-            <div class="breakdown-row">
-                <span>Revestimiento (<span id="ui-espesor">-</span>)</span>
-                <span class="breakdown-val">$<span id="ui-total-rev">0</span></span>
-            </div>
-            <div class="breakdown-row" id="row-carateo" style="display:none;">
-                <span>Carateo (<span id="ui-sacos">0</span> Sacos)</span>
-                <span class="breakdown-val">$<span id="ui-total-carateo">0</span></span>
-            </div>
-            <div class="breakdown-row" id="row-sellador" style="display:none;">
-                <span>Sellador (<span id="ui-galones">0</span> Galones)</span>
-                <span class="breakdown-val">$<span id="ui-total-sellador">0</span></span>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <div class="total-price-container">
-                <div class="total-label">Presupuesto Estimado</div>
-                <div class="total-price">$<span id="total-presupuesto">0</span></div>
-            </div>
-        </div>
-
-        <button class="add-btn" onclick="agregarAlCarrito()">Agregar a la Lista</button>
+        <button class="btn" onclick="add()">+ Agregar a la Lista</button>
     </main>
 
-    <section class="cart-section" id="cart-section" style="display: none;">
-        <div class="cart-header">
-            <h2>Lista de Pedido</h2>
-            <button onclick="vaciarCarrito()">Limpiar</button>
-        </div>
-        <ul class="cart-list" id="cart-list"></ul>
-        <div class="grand-total">Total: $<span id="grand-total">0</span></div>
-        
-        <button class="add-btn btn-success" id="btn-enviar" onclick="enviarAPlanta()">📤 ENVIAR ORDEN</button>
-    </section>
+    <div class="cart" id="cart_sec" style="display:none;">
+        <h3 style="margin:0; color:var(--p);">Resumen del Pedido</h3>
+        <div id="lista" style="margin-top:10px;"></div>
+        <hr style="border: 1px solid #eee; margin:15px 0;">
+        <div style="text-align:right; font-weight:bold; font-size:20px; color:var(--p);">Total: $<span id="g_total">0</span></div>
+        <button class="btn" style="background:#10b981;" onclick="enviar()">📤 ENVIAR ORDEN</button>
+    </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwvASdGE2oeUtvxbAndOzbWEIOpJp5kHVdnxMLJJ6gpAyI4D9v_afU6HBXIwFd8A2V75Q/exec";
-    let dbProductos = [];
+    // TU LLAVE MAESTRA ESTÁ AQUÍ
+    const API_URL = "https://script.google.com/macros/s/AKfycbxQbx8F5XiFhhQKt9yHEP5a2cU-WBTcQbjHiuqMjaYpXRyxKX_ISz-SIqqJzsn-1V8nCQ/exec";
+    
+    let db = []; let carrito = []; let actual = null;
 
-    // Cargar Catálogo al iniciar
     window.onload = () => {
-        fetch(API_URL + "?action=get_productos")
-        .then(r => r.json())
-        .then(data => {
-            dbProductos = data;
-            document.getElementById('loader-overlay').style.display = 'none';
-            manejarTexturaColor();
-        })
-        .catch(e => {
-            alert("Error conectando con el Cerebro. Intente actualizar la página.");
-            document.getElementById('loader-overlay').style.display = 'none';
+        fetch(API_URL + "?action=get_productos").then(r => r.json()).then(data => {
+            db = data; document.getElementById('loader').style.display = 'none'; calc();
+        }).catch(e => {
+            alert("Error de conexión. Recarga la página."); document.getElementById('loader').style.display = 'none';
         });
     };
 
-    function manejarTexturaColor() {
-        const textura = document.getElementById('textura').value;
-        const colorSelect = document.getElementById('color');
+    function calc() {
+        if(!db.length) return;
+        let f = document.getElementById('formato').value, u = document.getElementById('uso').value,
+            t = document.getElementById('textura').value, c = document.getElementById('color').value,
+            m = parseFloat(document.getElementById('m2').value) || 0;
         
-        if (textura === 'Veta') {
-            colorSelect.value = 'Beige';
-            colorSelect.style.opacity = '0.6';
-            colorSelect.style.pointerEvents = 'none';
-        } else {
-            colorSelect.style.opacity = '1';
-            colorSelect.style.pointerEvents = 'auto';
-        }
-        calcularPresupuesto();
-    }
-
-    function calcularPresupuesto() {
-        if(dbProductos.length === 0) return; // Aún no carga la base de datos
-
-        const formato = document.getElementById('formato').value;
-        const uso = document.getElementById('uso').value;
-        const textura = document.getElementById('textura').value;
-        const color = document.getElementById('color').value;
-        const metros = parseFloat(document.getElementById('metros').value) || 0;
-        
-        const carateoCheck = document.getElementById('carateo').checked;
-        const selladorCheck = document.getElementById('sellador').checked;
-
-        // BÚSQUEDA EN EL CEREBRO
-        let match = dbProductos.find(p => p.FORMATO == formato && p.USO == uso && p.TEXTURA == textura && p.COLOR == color);
-        
-        let precioM2Rev = 0;
-        let espesor = "-";
-        let esValido = false;
-
+        let match = db.find(p => p.FORMATO == f && p.USO == u && p.TEXTURA == t && p.COLOR == c);
         if(match) {
-            precioM2Rev = parseFloat(match.PRECIO_USD);
-            espesor = match.ESPESOR || "-";
-            esValido = true;
-            document.getElementById('ui-total-rev').style.color = "white";
+            actual = match;
+            let p = parseFloat(match.PRECIO_USD);
+            document.getElementById('ui_precio').innerText = "$" + p.toFixed(2);
+            document.getElementById('ui_total').innerText = "Total Item: $" + (p * m).toFixed(2);
         } else {
-            document.getElementById('ui-total-rev').style.color = "#ef4444"; // Rojo de alerta
+            actual = null; 
+            document.getElementById('ui_precio').innerText = "N/D";
+            document.getElementById('ui_total').innerText = "Combinación no disponible";
         }
-
-        const totalRevestimiento = precioM2Rev * metros;
-
-        // CÁLCULOS ADICIONALES
-        let totalCarateo = 0;
-        let cantSacos = 0;
-        if (carateoCheck && metros > 0) {
-            cantSacos = Math.ceil(metros / 40); 
-            let precioSaco = 50; 
-            if (color === "Beige" || color.includes("Gris")) {
-                precioSaco = 60;
-            }
-            totalCarateo = cantSacos * precioSaco;
-        }
-
-        let totalSellador = 0;
-        let cantGalones = 0;
-        if (selladorCheck && metros > 0) {
-            cantGalones = Math.ceil(metros / 35); 
-            totalSellador = cantGalones * 100;
-        }
-
-        const granTotal = totalRevestimiento + totalCarateo + totalSellador;
-
-        // ACTUALIZACIÓN DE UI
-        document.getElementById('ui-espesor').innerText = espesor;
-        document.getElementById('ui-total-rev').innerText = esValido ? totalRevestimiento.toFixed(2) : "N/D";
-        
-        const rowCarateo = document.getElementById('row-carateo');
-        if(carateoCheck) {
-            rowCarateo.style.display = 'flex';
-            document.getElementById('ui-sacos').innerText = cantSacos;
-            document.getElementById('ui-total-carateo').innerText = totalCarateo.toFixed(2);
-        } else {
-            rowCarateo.style.display = 'none';
-        }
-
-        const rowSellador = document.getElementById('row-sellador');
-        if(selladorCheck) {
-            rowSellador.style.display = 'flex';
-            document.getElementById('ui-galones').innerText = cantGalones;
-            document.getElementById('ui-total-sellador').innerText = totalSellador.toFixed(2);
-        } else {
-            rowSellador.style.display = 'none';
-        }
-
-        document.getElementById('total-presupuesto').innerText = esValido ? granTotal.toFixed(2) : "0.00";
-
-        window.ultimoCalculo = {
-            valido: esValido,
-            titulo: `${formato} | ${textura} | ${color}`,
-            detalles: `${metros} m² (${uso} - ${espesor})<br>Rev: $${totalRevestimiento.toFixed(2)}` + 
-                      (carateoCheck ? ` | Carateo (${cantSacos} sx): $${totalCarateo}` : "") +
-                      (selladorCheck ? ` | Sellador (${cantGalones} gl): $${totalSellador}` : ""),
-            total: granTotal,
-            metros: metros
-        };
     }
 
-    let carrito = [];
-
-    function agregarAlCarrito() {
-        if (!window.ultimoCalculo || window.ultimoCalculo.metros <= 0) {
-            alert("Ingresa los metros cuadrados para cotizar.");
-            return;
-        }
-        if (!window.ultimoCalculo.valido) {
-            alert("⚠️ La combinación seleccionada no está disponible en la base de datos.");
-            return;
-        }
-
-        carrito.push({...window.ultimoCalculo});
-        document.getElementById('cart-section').style.display = 'block';
-        actualizarUI_Carrito();
+    function add() {
+        if(!actual) return alert("Producto no disponible en el catálogo.");
+        let m = parseFloat(document.getElementById('m2').value);
+        if(m <= 0 || isNaN(m)) return alert("Ingresa metros válidos.");
         
-        const btn = document.querySelector('.add-btn');
-        btn.innerText = "¡Agregado!";
-        setTimeout(() => btn.innerText = "Agregar a la Lista", 1000);
+        carrito.push({ desc: `${actual.FORMATO} | ${actual.TEXTURA} | ${actual.COLOR}`, m2: m, sub: actual.PRECIO_USD * m });
+        document.getElementById('cart_sec').style.display = 'block';
+        update();
     }
 
-    function actualizarUI_Carrito() {
-        const listaUI = document.getElementById('cart-list');
-        listaUI.innerHTML = ''; 
-        let grandTotal = 0;
-
-        carrito.forEach((item) => {
-            grandTotal += item.total;
-            const li = document.createElement('li');
-            li.className = 'cart-item';
-            li.innerHTML = `
-                <div class="cart-item-header">
-                    <span>${item.titulo}</span>
-                    <span>$${item.total.toFixed(2)}</span>
-                </div>
-                <div class="cart-item-details">${item.detalles}</div>
-            `;
-            listaUI.appendChild(li);
+    function update() {
+        let l = document.getElementById('lista'), t = 0;
+        l.innerHTML = '';
+        carrito.forEach((i, idx) => { 
+            t += i.sub; 
+            l.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                <div><b>${i.desc}</b><br><small>${i.m2} m²</small></div>
+                <div>$${i.sub.toFixed(2)}</div>
+            </div>`; 
         });
-
-        document.getElementById('grand-total').innerText = grandTotal.toFixed(2);
+        document.getElementById('g_total').innerText = t.toFixed(2);
     }
 
-    function vaciarCarrito() {
-        carrito = [];
-        document.getElementById('cart-section').style.display = 'none';
-        actualizarUI_Carrito();
-    }
-
-    function enviarAPlanta() {
-        let nombre = document.getElementById('c-nombre').value;
-        let rif = document.getElementById('c-rif').value;
-        let telefono = document.getElementById('c-telefono').value;
-        let ubicacion = document.getElementById('c-ubicacion').value;
-
-        if(!nombre || !rif || !telefono || !ubicacion) {
-            alert("⚠️ Por favor, completa todos los Datos del Cliente antes de enviar a Planta.");
-            return;
-        }
-
-        document.getElementById('loader-overlay').style.display = 'flex';
+    function enviar() {
+        let n = document.getElementById('c_nombre').value, r = document.getElementById('c_rif').value;
+        if(!n || !r) return alert("Por favor completa Nombre y RIF del cliente.");
         
-        let payload = {
-            cliente: nombre,
-            rif: rif,
-            telefono: telefono,
-            ubicacion: ubicacion,
-            total: parseFloat(document.getElementById('grand-total').innerText),
-            detalles: carrito
+        document.getElementById('loader').style.display = 'flex';
+        
+        let p = { 
+            cliente: n, 
+            rif: r, 
+            telefono: document.getElementById('c_tlf').value, 
+            ubicacion: document.getElementById('c_ubi').value, 
+            total: document.getElementById('g_total').innerText 
         };
-
-        fetch(API_URL + "?action=nuevo_pedido", { 
-            method: "POST", 
-            body: JSON.stringify(payload) 
-        })
-        .then(r => r.json())
-        .then(data => {
-            document.getElementById('loader-overlay').style.display = 'none';
-            alert("¡ÉXITO! La orden de " + nombre + " fue enviada a la Cola de Planta.");
-            
-            // Limpiar formulario y carrito
-            vaciarCarrito();
-            document.getElementById('c-nombre').value = '';
-            document.getElementById('c-rif').value = '';
-            document.getElementById('c-telefono').value = '';
-            document.getElementById('c-ubicacion').value = '';
-            window.scrollTo(0,0);
-        })
-        .catch(err => {
-            document.getElementById('loader-overlay').style.display = 'none';
-            alert("Error enviando el pedido. Verifique su conexión.");
+        
+        fetch(API_URL + "?action=nuevo_pedido", { method: "POST", body: JSON.stringify(p) })
+        .then(() => {
+            alert("¡Orden enviada a Planta con éxito!"); 
+            location.href = 'index.html'; // Devuelve al menú principal
+        }).catch(e => {
+            alert("Error al enviar. Intenta de nuevo.");
+            document.getElementById('loader').style.display = 'none';
         });
     }
 </script>
-
 </body>
 </html>
