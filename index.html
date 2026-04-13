@@ -18,46 +18,35 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
 
         .screen {
-            display: none;
-            width: 100%;
-            max-width: 600px;
-            padding: 20px;
-            box-sizing: border-box;
-            background: white;
-            border-radius: 12px;
-            margin-top: 5vh;
+            display: none; width: 100%; max-width: 600px; padding: 20px; box-sizing: border-box;
+            background: white; border-radius: 12px; margin-top: 2vh; margin-bottom: 2vh;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        /* --- LOGIN --- */
-        #login-screen { display: block; max-width: 350px; text-align: center; }
+        #login-screen { display: block; max-width: 350px; text-align: center; margin-top: 10vh;}
         .logo-placeholder { font-size: 24px; font-weight: bold; color: var(--primary); margin-bottom: 20px; letter-spacing: 2px; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--primary); font-size: 14px; }
-        .input-group input, .input-group select { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        .btn { background-color: var(--primary); color: white; border: none; padding: 15px 20px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 10px;}
+        
+        .section-title { 
+            background: var(--primary); color: white; padding: 8px 12px; 
+            border-radius: 6px; font-size: 14px; margin-bottom: 15px; margin-top: 20px;
+        }
+
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--primary); font-size: 13px; }
+        .input-group input, .input-group select, .input-group textarea { 
+            width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 15px; box-sizing: border-box; 
+        }
+
+        .btn { background-color: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 10px;}
         .btn-success { background-color: var(--success); }
         .btn-back { background-color: transparent; color: var(--primary); border: 2px solid var(--primary); padding: 10px; margin-bottom: 15px;}
 
-        /* --- DASHBOARD --- */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #9ca3af; padding-bottom: 10px; }
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .menu-btn { padding: 30px 10px; border-radius: 12px; text-align: center; font-weight: bold; font-size: 16px; cursor: pointer; border: 2px solid transparent; background: var(--text-light); }
-        .btn-ventas { border-left: 5px solid var(--accent); }
-        .btn-planta { border-left: 5px solid var(--warning); }
-        .btn-gerencia { border-left: 5px solid var(--primary); grid-column: span 2;}
-
-        /* --- COTIZADOR --- */
-        .cart-item { background: #f9fafb; border-left: 4px solid var(--accent); padding: 10px; margin-bottom: 10px; border-radius: 6px; }
+        .cart-item { background: #f9fafb; border-left: 4px solid var(--accent); padding: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 14px;}
         #loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 1000; text-align: center; padding-top: 40vh; font-size: 20px; font-weight: bold; color: var(--accent); }
     </style>
 </head>
@@ -69,7 +58,7 @@
         <div class="logo-placeholder">CORALSINTEC</div>
         <div class="input-group">
             <label>USUARIO</label>
-            <input type="text" id="username" placeholder="Ej: EDUARDO" style="text-transform: uppercase;">
+            <input type="text" id="username" placeholder="USUARIO" style="text-transform: uppercase;">
         </div>
         <div class="input-group">
             <label>PIN DE ACCESO</label>
@@ -80,166 +69,141 @@
     </div>
 
     <div id="dashboard-screen" class="screen">
-        <div class="header">
-            <div><h2 style="margin:0; color: var(--primary);">Panel de Control</h2></div>
-            <button onclick="cambiarPantalla('login-screen')" style="background:none;border:none;color:var(--danger);font-weight:bold;cursor:pointer;">Salir</button>
+        <div class="header" style="display:flex; justify-content: space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="margin:0; color: var(--primary);">Menú Principal</h2>
+            <button onclick="cambiarPantalla('login-screen')" style="background:none;border:none;color:var(--danger);font-weight:bold;cursor:pointer;">Cerrar Sesión</button>
         </div>
-        <div class="menu-grid">
-            <div class="menu-btn btn-ventas" onclick="abrirVentas()">🛒 Cotizador (Ventas)</div>
-            <div class="menu-btn btn-planta" onclick="alert('Módulo de Planta en Fase 3')">🏭 Cola de Planta</div>
-            <div class="menu-btn btn-gerencia" onclick="alert('Inventario y Costos en Fase 3')">📊 Gerencia e Inventario</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div onclick="abrirVentas()" style="padding:30px 10px; border-radius:12px; text-align:center; font-weight:bold; background:var(--text-light); border-left:5px solid var(--accent); cursor:pointer;">🛒 VENTAS</div>
+            <div onclick="alert('Módulo de Planta en Fase 3')" style="padding:30px 10px; border-radius:12px; text-align:center; font-weight:bold; background:var(--text-light); border-left:5px solid var(--warning); cursor:pointer;">🏭 PLANTA</div>
+            <div onclick="alert('Módulo de Gerencia en Fase 3')" style="padding:30px 10px; border-radius:12px; text-align:center; font-weight:bold; background:var(--text-light); border-left:5px solid var(--primary); cursor:pointer; grid-column: span 2;">📊 GERENCIA</div>
         </div>
     </div>
 
     <div id="ventas-screen" class="screen">
-        <button class="btn btn-back" onclick="cambiarPantalla('dashboard-screen')">⬅ Volver al Menú</button>
-        <h2 style="color: var(--primary); margin-top: 0;">Nueva Cotización</h2>
+        <button class="btn btn-back" onclick="cambiarPantalla('dashboard-screen')">⬅ Volver</button>
+        <h2 style="color: var(--primary); margin: 0;">Cotizador Completo</h2>
         
+        <div class="section-title">DATOS DEL CLIENTE</div>
         <div class="input-group">
-            <label>Cliente / Proyecto:</label>
-            <input type="text" id="nombre-cliente" placeholder="Ej: Roderick Romer">
+            <label>Nombre y Apellido:</label>
+            <input type="text" id="c-nombre" placeholder="Nombre completo">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <div class="input-group" style="flex: 1;">
+                <label>Cédula / RIF:</label>
+                <input type="text" id="c-rif" placeholder="V-00000000">
+            </div>
+            <div class="input-group" style="flex: 1;">
+                <label>Teléfono:</label>
+                <input type="tel" id="c-telefono" placeholder="0412-0000000">
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Ubicación de la Obra:</label>
+            <textarea id="c-ubicacion" rows="2" placeholder="Dirección de entrega"></textarea>
         </div>
 
+        <div class="section-title">DETALLE DEL PEDIDO</div>
         <div class="input-group">
-            <label>Seleccionar Producto:</label>
-            <select id="select-producto">
-                <option value="">Cargando catálogo...</option>
-            </select>
+            <label>Formato / Color / Textura:</label>
+            <select id="select-producto"><option value="">Cargando...</option></select>
         </div>
-
         <div class="input-group">
-            <label>Metros Cuadrados (m²):</label>
-            <input type="number" id="input-m2" placeholder="0">
+            <label>Cantidad (m²):</label>
+            <input type="number" id="input-m2" placeholder="0.00">
         </div>
+        <button class="btn" style="background:#4b5563;" onclick="agregarAlCarrito()">+ Añadir Producto</button>
 
-        <button class="btn" onclick="agregarAlCarrito()">➕ Añadir a la Orden</button>
-
-        <div id="lista-carrito" style="margin-top: 20px;"></div>
-        <h3 style="text-align: right; color: var(--primary);">Total: $<span id="gran-total">0.00</span></h3>
+        <div id="lista-carrito" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;"></div>
+        <h3 style="text-align: right; color: var(--primary);">Total Cotizado: $<span id="gran-total">0.00</span></h3>
         
-        <button class="btn btn-success" onclick="enviarAPlanta()" id="btn-enviar" style="display:none;">📤 APROBAR Y ENVIAR A PLANTA</button>
+        <button class="btn btn-success" onclick="enviarAPlanta()" id="btn-enviar" style="display:none; margin-top:20px;">📤 ENVIAR A PLANTA</button>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwvASdGE2oeUtvxbAndOzbWEIOpJp5kHVdnxMLJJ6gpAyI4D9v_afU6HBXIwFd8A2V75Q/exec";
-        
         const usuarios = { "EDUARDO": "1234", "VENTAS": "1111", "PLANTA": "0000" };
         let catalogoProductos = [];
         let ordenActual = [];
         let totalOrden = 0;
 
-        function cambiarPantalla(idPantalla) {
+        function cambiarPantalla(id) {
             document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
-            document.getElementById(idPantalla).style.display = 'block';
+            document.getElementById(id).style.display = 'block';
         }
 
-        function mostrarLoader(mostrar) {
-            document.getElementById('loader-overlay').style.display = mostrar ? 'block' : 'none';
-        }
+        function mostrarLoader(m) { document.getElementById('loader-overlay').style.display = m ? 'block' : 'none'; }
 
         function iniciarSesion() {
-            let user = document.getElementById('username').value.toUpperCase();
-            let pin = document.getElementById('pin').value;
-            if(usuarios[user] && usuarios[user] === pin) {
-                document.getElementById('login-error').style.display = 'none';
+            let u = document.getElementById('username').value.toUpperCase();
+            let p = document.getElementById('pin').value;
+            if(usuarios[u] && usuarios[u] === p) {
                 cambiarPantalla('dashboard-screen');
-                cargarCatalogo(); // Descarga los precios al entrar
-            } else {
-                document.getElementById('login-error').style.display = 'block';
-            }
+                cargarCatalogo();
+            } else { document.getElementById('login-error').style.display = 'block'; }
         }
 
-        // 1. EL CEREBRO DESCARGA EL CATÁLOGO DE GOOGLE SHEETS
         function cargarCatalogo() {
             mostrarLoader(true);
-            fetch(API_URL + "?action=get_productos")
-            .then(res => res.json())
-            .then(data => {
+            fetch(API_URL + "?action=get_productos").then(r => r.json()).then(data => {
                 catalogoProductos = data;
-                let select = document.getElementById('select-producto');
-                select.innerHTML = '<option value="">Seleccione un producto...</option>';
-                data.forEach((prod, index) => {
-                    select.innerHTML += `<option value="${index}">${prod.FORMATO} - ${prod.TEXTURA} - ${prod.COLOR} ($${prod.PRECIO_USD})</option>`;
+                let s = document.getElementById('select-producto');
+                s.innerHTML = '<option value="">Seleccione...</option>';
+                data.forEach((p, i) => {
+                    s.innerHTML += `<option value="${i}">${p.FORMATO} | ${p.COLOR} | ${p.TEXTURA} ($${p.PRECIO_USD})</option>`;
                 });
                 mostrarLoader(false);
-            })
-            .catch(err => {
-                mostrarLoader(false);
-                alert("Error cargando productos. Revisa tu internet.");
             });
         }
 
-        function abrirVentas() {
-            cambiarPantalla('ventas-screen');
-            ordenActual = [];
-            actualizarCarrito();
-        }
+        function abrirVentas() { cambiarPantalla('ventas-screen'); ordenActual = []; actualizarCarrito(); }
 
-        // 2. LÓGICA DEL COTIZADOR
         function agregarAlCarrito() {
-            let select = document.getElementById('select-producto');
+            let idx = document.getElementById('select-producto').value;
             let m2 = parseFloat(document.getElementById('input-m2').value);
-            let cliente = document.getElementById('nombre-cliente').value;
+            if(idx === "" || isNaN(m2) || m2 <= 0) return alert("Complete los datos del producto.");
             
-            if(!cliente) return alert("Por favor ingresa el nombre del cliente.");
-            if(select.value === "" || isNaN(m2) || m2 <= 0) return alert("Selecciona un producto y los m² válidos.");
-
-            let prod = catalogoProductos[select.value];
-            let subtotal = prod.PRECIO_USD * m2;
-            
-            ordenActual.push({
-                nombre: `${prod.FORMATO} ${prod.TEXTURA} ${prod.COLOR}`,
-                m2: m2,
-                subtotal: subtotal
-            });
-
+            let p = catalogoProductos[idx];
+            ordenActual.push({ nombre: `${p.FORMATO} ${p.COLOR} ${p.TEXTURA}`, m2: m2, subtotal: p.PRECIO_USD * m2 });
             document.getElementById('input-m2').value = '';
             actualizarCarrito();
         }
 
         function actualizarCarrito() {
-            let div = document.getElementById('lista-carrito');
-            div.innerHTML = '';
-            totalOrden = 0;
-
-            ordenActual.forEach((item) => {
-                totalOrden += item.subtotal;
-                div.innerHTML += `
-                    <div class="cart-item">
-                        <b>${item.nombre}</b><br>
-                        ${item.m2} m² | Subtotal: $${item.subtotal.toFixed(2)}
-                    </div>`;
+            let d = document.getElementById('lista-carrito');
+            d.innerHTML = ''; totalOrden = 0;
+            ordenActual.forEach(i => {
+                totalOrden += i.subtotal;
+                d.innerHTML += `<div class="cart-item"><b>${i.nombre}</b><br>${i.m2} m² - $${i.subtotal.toFixed(2)}</div>`;
             });
-
             document.getElementById('gran-total').innerText = totalOrden.toFixed(2);
             document.getElementById('btn-enviar').style.display = ordenActual.length > 0 ? 'block' : 'none';
         }
 
-        // 3. ENVÍO DE LA ORDEN AL EXCEL DE PLANTA
         function enviarAPlanta() {
-            let cliente = document.getElementById('nombre-cliente').value;
+            let nombre = document.getElementById('c-nombre').value;
+            let rif = document.getElementById('c-rif').value;
+            let tlf = document.getElementById('c-telefono').value;
+            let ubi = document.getElementById('c-ubicacion').value;
+
+            if(!nombre || !rif || !tlf || !ubi) return alert("Por favor complete todos los datos del cliente.");
+
             let payload = {
-                cliente: cliente,
+                cliente: nombre,
+                rif: rif,
+                telefono: tlf,
+                ubicacion: ubi,
                 total: totalOrden,
                 detalles: ordenActual
             };
 
             mostrarLoader(true);
-            
-            fetch(API_URL + "?action=nuevo_pedido", {
-                method: "POST",
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(data => {
+            fetch(API_URL + "?action=nuevo_pedido", { method: "POST", body: JSON.stringify(payload) })
+            .then(r => r.json()).then(data => {
                 mostrarLoader(false);
-                alert("¡ÉXITO! La orden de " + cliente + " fue enviada a la Cola de Planta y el calendario de 25 días hábiles se ha activado.");
-                abrirVentas(); // Reinicia la pantalla
-                document.getElementById('nombre-cliente').value = '';
-            })
-            .catch(err => {
-                mostrarLoader(false);
-                alert("Hubo un error enviando la orden.");
+                alert("¡Cotización Enviada! Se ha registrado en la cola de producción.");
+                cambiarPantalla('dashboard-screen');
             });
         }
     </script>
