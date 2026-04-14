@@ -21,7 +21,11 @@
         td { padding: 8px; border-bottom: 1px solid #f1f5f9; color: #1e293b; font-weight: 600; }
         .qty-badge { background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-weight: 800; display: inline-block;}
         .pcs-badge { color: #166534; font-weight: 900; font-size: 15px;}
-        .extras-box { background: #fffbeb; padding: 12px; border-radius: 8px; margin-top: 15px; border: 1px dashed #fcd34d; display: flex; flex-direction: column; gap: 8px; }
+        
+        /* ESTILO PARA LA CAJA DE MATERIALES EXTRA */
+        .extras-box { background: #fffbeb; padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px dashed #fcd34d; }
+        .extras-title { margin: 0 0 10px 0; color: #92400e; border-bottom: 1px solid #fde68a; padding-bottom: 5px; font-size: 12px; text-transform: uppercase;}
+        
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f3f4f6; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: var(--coralsintec-primary); font-size: 18px;}
     </style>
 </head>
@@ -61,6 +65,7 @@
             let items = [];
             try { items = JSON.parse(p.DETALLES_JSON); } catch(e) { return; }
             
+            // VARIABLES PARA SUMAR LOS MATERIALES
             let totalSacosCarateo = 0;
             let totalGalonesSellador = 0;
 
@@ -87,7 +92,7 @@
                 let metros = parseFloat(i.m2) || parseFloat(i.m) || 0; 
                 let piezas = calcularPiezas(i.formato, metros);
                 
-                // Sumamos los materiales de instalación
+                // AQUÍ SUMAMOS LO QUE EL COTIZADOR NOS ENVIÓ
                 totalSacosCarateo += i.carateo || 0;
                 totalGalonesSellador += i.sellador || 0;
                 
@@ -104,14 +109,22 @@
 
             html += `</tbody></table></div>`;
 
-            // SI HAY MATERIALES EXTRA, LOS MOSTRAMOS EN UN RECUADRO
+            // CAJA DE MATERIALES EXTRA (SOLO SE MUESTRA SI HAY ALGO QUE ENVIAR)
             if(totalSacosCarateo > 0 || totalGalonesSellador > 0) {
-                html += `<div class="extras-box">`;
+                html += `<div class="extras-box">
+                            <h4 class="extras-title">📦 Materiales de Instalación</h4>`;
+                
                 if(totalSacosCarateo > 0) {
-                    html += `<div><span style="font-size:11px; font-weight:bold; color:#92400e;">SELLADOR DE JUNTAS (CARATEO):</span> <b style="font-size:15px; color:#b45309; float:right;">${totalSacosCarateo} SACOS</b></div>`;
+                    html += `<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="font-size:13px; font-weight:bold; color:#92400e;">SELLADOR DE JUNTAS (CARATEO):</span> 
+                                <b style="font-size:16px; color:#b45309;">${totalSacosCarateo} SACOS</b>
+                             </div>`;
                 }
                 if(totalGalonesSellador > 0) {
-                    html += `<div><span style="font-size:11px; font-weight:bold; color:#92400e;">SELLADOR HIDROREPELENTE:</span> <b style="font-size:15px; color:#b45309; float:right;">${totalGalonesSellador} GALONES</b></div>`;
+                    html += `<div style="display: flex; justify-content: space-between;">
+                                <span style="font-size:13px; font-weight:bold; color:#92400e;">SELLADOR HIDROREPELENTE:</span> 
+                                <b style="font-size:16px; color:#b45309;">${totalGalonesSellador} GALONES</b>
+                             </div>`;
                 }
                 html += `</div>`;
             }
