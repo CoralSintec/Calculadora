@@ -20,7 +20,6 @@
             align-items: center;
         }
         
-        /* Contenedor principal para centrar en móviles */
         .app-main {
             width: 100%;
             max-width: 600px;
@@ -28,7 +27,6 @@
             flex-direction: column;
         }
 
-        /* BOTÓN VOLVER */
         .btn-volver {
             background: none; border: 1px solid var(--coralsintec-border); color: var(--coralsintec-primary);
             padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer;
@@ -70,7 +68,6 @@
     </main>
 
 <script>
-    // TU LLAVE MAESTRA
     const API_URL = "https://script.google.com/macros/s/AKfycbzEy7UwhlGAOfl-X0vBuI05-qJYJ6KKPcdDwqgSckQ2bvEpxj4dLKYthqpeH5Tvv6mSng/exec";
 
     window.onload = () => {
@@ -86,11 +83,11 @@
         });
     };
 
-    function calcularPiezas(formato, m2) {
+    function calcularPiezas(formato, metros) {
         try {
             let dim = formato.toLowerCase().split('x');
             let areaPieza = (parseFloat(dim[0]) * parseFloat(dim[1])) / 10000;
-            return Math.ceil(m2 / areaPieza);
+            return Math.ceil(metros / areaPieza);
         } catch(e) { return "N/D"; }
     }
 
@@ -102,9 +99,7 @@
             return;
         }
 
-        // Mostrar los pedidos más recientes primero
         pedidos.reverse().forEach(p => {
-            // Solo procesamos si hay detalles desglosados en formato JSON
             if(!p.DETALLES_JSON) return; 
             
             let items = [];
@@ -139,8 +134,10 @@
                             <tbody>`;
             
             items.forEach(i => {
-                // Prevenir que intente calcular piezas de carateo o sellador si se cuelan
                 if(!i.formato) return; 
+                
+                // AQUÍ ESTÁ LA CORRECCIÓN: Leemos "i.m" en lugar de "i.m2"
+                let metros = parseFloat(i.m) || parseFloat(i.m2) || 0; 
                 
                 html += `
                     <tr>
@@ -148,8 +145,8 @@
                         <td>${i.uso}</td>
                         <td>${i.color}</td>
                         <td>${i.textura}</td>
-                        <td><span class="qty-badge">${i.m2} m²</span></td>
-                        <td><span class="pcs-badge">${calcularPiezas(i.formato, i.m2)} pcs</span></td>
+                        <td><span class="qty-badge">${metros} m²</span></td>
+                        <td><span class="pcs-badge">${calcularPiezas(i.formato, metros)} pcs</span></td>
                     </tr>`;
             });
 
