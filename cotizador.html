@@ -37,7 +37,10 @@
 </head>
 <body>
 
-    <div id="loader-overlay"><span style="font-size: 35px; margin-bottom:10px;">⚙️</span>Sincronizando Cerebro Coralsintec...</div>
+    <div id="loader-overlay">
+        <span style="font-size: 35px; margin-bottom:10px;">⚙️</span>
+        Sincronizando Cerebro Coralsintec...
+    </div>
 
     <main class="app-main">
         <button class="btn-volver" onclick="window.location.href='index.html'">⬅ VOLVER AL MENÚ</button>
@@ -92,10 +95,20 @@
     let db = []; let carrito = [];
 
     window.onload = () => {
-        fetch(API_URL + "?action=get_productos").then(r => r.json()).then(data => {
-            db = data; poblarSelects(); document.getElementById('loader-overlay').style.display = 'none';
-        }).catch(e => {
-            alert("Error cargando base de datos. Recargue la página."); document.getElementById('loader-overlay').style.display = 'none';
+        // TRUCO ANTICONGELANTE APLICADO AQUÍ
+        const urlFresca = API_URL + "?action=get_productos&t=" + new Date().getTime();
+
+        fetch(urlFresca)
+        .then(r => r.json())
+        .then(data => {
+            if(!Array.isArray(data)) throw new Error("Google bloqueó la lectura");
+            db = data; 
+            poblarSelects(); 
+            document.getElementById('loader-overlay').style.display = 'none';
+        })
+        .catch(e => {
+            alert("⚠️ Error de conexión: Revisa que tu Google Apps Script tenga acceso para 'Cualquier persona'."); 
+            document.getElementById('loader-overlay').style.display = 'none';
         });
     };
 
@@ -132,4 +145,30 @@
 
         document.getElementById('ui-espesor').innerText = esp; document.getElementById('ui-unitario').innerText = "$" + pUnit.toFixed(2);
         document.getElementById('ui-unitario').style.color = ok ? "white" : "#ef4444"; document.getElementById('total-presupuesto').innerText = subtotal.toFixed(2);
-        window.calcActual =
+        
+        // LA LÍNEA QUE SE HABÍA CORTADO ESTÁ AQUÍ COMPLETA:
+        window.calcActual = { ok, desc: `${f} | ${t} | ${c}`, m2: m, total: subtotal, det: `${m}m² (${u})`, formato: f, uso: u, textura: t, color: c, carateo: cantCarateo, sellador: cantSellador };
+    }
+
+    function agregar() {
+        if(!window.calcActual || !window.calcActual.ok || window.calcActual.m2 <= 0) return alert("Selección no válida o cantidad en cero.");
+        carrito.push({...window.calcActual}); document.getElementById('cart-section').style.display = 'block'; render();
+    }
+
+    function render() {
+        const l = document.getElementById('cart-list'); let g = 0;
+        l.innerHTML = carrito.map(i => { g += i.total; return `<div class="cart-item"><div style="display:flex; justify-content:space-between;"><b>${i.desc}</b><b>$${i.total.toFixed(2)}</b></div><small>${i.det} ${i.carateo > 0 ? '+ Carateo' : ''} ${i.sellador > 0 ? '+ Sellador' : ''}</small></div>`; }).join('');
+        document.getElementById('grand-total').innerText = g.toFixed(2);
+    }
+    function vaciar() { carrito = []; document.getElementById('cart-section').style.display = 'none'; render(); }
+
+    function enviar() {
+        const n = document.getElementById('c-nombre').value, r = document.getElementById('c-rif').value;
+        if(!n || !r || !carrito.length) return alert("Complete los datos del cliente y agregue productos.");
+        document.getElementById('loader-overlay').style.display = 'flex';
+        const payload = { cliente: n.toUpperCase(), rif: r.toUpperCase(), telefono: document.getElementById('c-telefono').value, ubicacion: document.getElementById('c-ubicacion').value, total: document.getElementById('grand-total').innerText, detalles: carrito };
+        fetch(API_URL + "?action=nuevo_pedido", { method: "POST", body: JSON.stringify(payload) }).then(() => { alert("¡ORDEN ENVIADA A PLANTA CON ÉXITO!"); location.href = 'index.html'; }).catch(e => { alert("Error de conexión al enviar."); document.getElementById('loader-overlay').style.display = 'none'; });
+    }
+</script>
+</body>
+</html>
