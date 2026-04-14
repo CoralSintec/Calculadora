@@ -27,17 +27,16 @@
         .qty-badge { background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-weight: 800; display: inline-block;}
         .pcs-badge { color: #166534; font-weight: 900; font-size: 15px;}
         
-        /* Caja Materiales */
         .extras-box { background: #fffbeb; padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px dashed #fcd34d; }
         .extras-title { margin: 0 0 10px 0; color: #92400e; border-bottom: 1px solid #fde68a; padding-bottom: 5px; font-size: 12px; text-transform: uppercase;}
 
-        /* Botones de Acción */
         .btn-group { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 15px;}
         .btn-action { border: none; padding: 14px; border-radius: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; font-size: 12px; transition: transform 0.1s;}
         .btn-action:active { transform: scale(0.98); }
         .btn-aceptar { background: #1e2328; }
         .btn-aviso { background: #3b82f6; }
         .btn-entregado { background: #10b981; }
+        .btn-eliminar { background: #ef4444; margin-top: 10px; }
 
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(243, 244, 246, 0.95); z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: var(--p); font-size: 18px;}
     </style>
@@ -55,8 +54,8 @@
     </main>
 
 <script>
-    // TU NUEVA LLAVE MAESTRA
-    const API_URL = "https://script.google.com/macros/s/AKfycbycCQABTEIO3-sEjR3DqBHIJCKNyVQW6E-Z3fODSrP8Pwr9T5d2epu0KRWy6hKwYSCRhw/exec";
+    // NUEVA URL MAESTRA
+    const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
 
     window.onload = loadData;
 
@@ -91,7 +90,6 @@
             let items = [];
             try { items = JSON.parse(p.DETALLES_JSON); } catch(e) { return; }
             
-            // Lógica de colores para los estados
             let stClass = "st-nuevo";
             let estadoTexto = p.ESTADO || "NUEVO / POR ACEPTAR";
             if(estadoTexto == "ACEPTADO / EN FABRICACIÓN") stClass = "st-proceso";
@@ -124,49 +122,4 @@
             
             items.forEach(i => {
                 if(!i.formato) return;
-                let m = parseFloat(i.m2) || parseFloat(i.m) || 0;
-                let pcs = calcularPiezas(i.formato, m);
-                totalSacosCarateo += i.carateo || 0;
-                totalGalonesSellador += i.sellador || 0;
-                
-                html += `<tr><td>${i.formato}</td><td>${i.color}</td><td>${i.textura}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
-            });
-
-            html += `</tbody></table></div>`;
-
-            // CAJA DE EXTRAS
-            if(totalSacosCarateo > 0 || totalGalonesSellador > 0) {
-                html += `<div class="extras-box">
-                            <h4 class="extras-title">📦 Materiales de Instalación</h4>`;
-                if(totalSacosCarateo > 0) html += `<div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span style="font-size:12px; font-weight:bold; color:#92400e;">CARATEO:</span> <b style="font-size:15px; color:#b45309;">${totalSacosCarateo} SACOS</b></div>`;
-                if(totalGalonesSellador > 0) html += `<div style="display: flex; justify-content: space-between;"><span style="font-size:12px; font-weight:bold; color:#92400e;">SELLADOR:</span> <b style="font-size:15px; color:#b45309;">${totalGalonesSellador} GALONES</b></div>`;
-                html += `</div>`;
-            }
-                    
-            html += `<div class="btn-group">
-                        <button class="btn-action btn-aceptar" onclick="actualizar('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN FABRICACIÓN')">✅ ACEPTAR E INICIAR</button>
-                        <button class="btn-action btn-aviso" onclick="actualizar('${p.CLIENTE}', '${p.FECHA_ORDEN}', '1 SEMANA: COORDINAR ENTREGA')">🚚 AVISAR: FALTA 1 SEMANA</button>
-                        <button class="btn-action btn-entregado" onclick="actualizar('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'LISTO Y ENTREGADO')">📦 MARCAR COMO ENTREGADO</button>
-                    </div>
-                </div>`;
-            container.innerHTML += html;
-        });
-    }
-
-    function actualizar(cliente, fecha, estado) {
-        if(!confirm("¿Confirmas que deseas cambiar el estado a: " + estado + "?")) return;
-        
-        document.getElementById('loader-overlay').style.display = 'flex';
-        fetch(API_URL + "?action=actualizar_estado", {
-            method: "POST",
-            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, nuevo_estado: estado })
-        }).then(() => {
-            loadData();
-        }).catch(() => {
-            alert("Error al actualizar. Intente de nuevo.");
-            document.getElementById('loader-overlay').style.display = 'none';
-        });
-    }
-</script>
-</body>
-</html>
+                let m = parseFloat(i.m
