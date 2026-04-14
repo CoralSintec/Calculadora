@@ -31,7 +31,24 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
             width: 100%; max-width: 400px; box-sizing: border-box;
             border-top: 6px solid var(--coralsintec-primary);
+            display: flex; flex-direction: column;
         }
+
+        /* BOTÓN VOLVER */
+        .btn-volver {
+            background: none;
+            border: 1px solid var(--coralsintec-border);
+            color: var(--coralsintec-primary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+            align-self: flex-start;
+            transition: 0.2s;
+        }
+        .btn-volver:active { background: #e2e8f0; transform: translateX(-3px); }
 
         .section-title { font-size: 20px; color: var(--coralsintec-primary); margin: 0 0 5px 0; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
         .section-header-small { font-size: 14px; color: white; background: var(--coralsintec-primary); padding: 8px; border-radius: 6px; margin: 20px 0 15px 0; font-weight: bold; text-transform: uppercase; text-align: center;}
@@ -73,6 +90,8 @@
     </div>
 
     <main class="app-main">
+        <button class="btn-volver" onclick="window.location.href='index.html'">⬅ VOLVER AL MENÚ</button>
+
         <h1 class="section-title">Coralsintec</h1>
         
         <div class="section-header-small">1. Datos del Cliente</div>
@@ -145,7 +164,6 @@
     };
 
     function poblarSelects() {
-        // MEMORIA DE ORDEN ORIGINAL DE CORALSINTEC
         const ordenFormato = ["30x30", "40x40", "50x50", "60x60", "20x60", "30x60", "40x60", "40x70", "15x75", "10x100", "20x100", "30x100", "40x100", "60x100"];
         const ordenUso = ["Pared", "Piso"];
         const ordenTextura = ["Media", "Lisa", "Gruesa", "Veta"];
@@ -153,8 +171,6 @@
 
         const getUnicosYOrdenar = (campo, ordenDeseado) => {
             let unicos = [...new Set(db.map(item => String(item[campo]).trim()))].filter(v => v && v !== "undefined");
-            
-            // Ordena usando la memoria, si hay algo nuevo lo manda al final
             unicos.sort((a, b) => {
                 let indexA = ordenDeseado.indexOf(a);
                 let indexB = ordenDeseado.indexOf(b);
