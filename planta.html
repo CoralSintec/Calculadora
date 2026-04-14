@@ -3,63 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coralsintec | Producción</title>
+    <title>Producción Coralsintec</title>
     <style>
-        :root { --p: #1e2328; --w: #f59e0b; --bg: #f3f4f6; }
-        body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        :root { --p: #1e2328; --accent: #f59e0b; }
+        body { font-family: sans-serif; background: #f3f4f6; margin: 0; padding: 15px; }
         .header { background: var(--p); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
-        .pedido-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 8px solid var(--w); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .label { font-weight: bold; color: #64748b; text-transform: uppercase; font-size: 11px; }
-        .status { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
-        #loader { text-align: center; padding: 50px; font-weight: bold; }
+        .order-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 5px solid var(--accent); }
+        .client-info { font-size: 14px; margin-bottom: 15px; color: #475569; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th { background: #f8fafc; color: var(--p); text-align: left; padding: 8px; border-bottom: 2px solid #e2e8f0; font-size: 11px;}
+        td { padding: 8px; border-bottom: 1px solid #f1f5f9; color: #1e293b; font-weight: 600; }
+        
+        .qty-badge { background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-weight: 800; display: inline-block;}
+        .pcs-badge { color: #166534; font-weight: 900; font-size: 15px;}
+        .btn-volver { background: white; border: 1px solid #cbd5e1; color: var(--p); padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
     </style>
 </head>
 <body>
-
+    <button class="btn-volver" onclick="location.href='index.html'">⬅ Volver al Menú</button>
     <div class="header">
-        <h2 style="margin:0;">COLA DE PRODUCCIÓN</h2>
-        <small>Coralsintec - Solo Información Técnica</small>
+        <h2 style="margin:0;">HOJAS DE RUTA TÉCNICA</h2>
+        <p style="margin:5px 0 0 0; font-size:12px; color:#cbd5e1;">Departamento de Producción</p>
     </div>
 
-    <div id="loader">Cargando pedidos pendientes...</div>
-    <div id="contenedor-pedidos"></div>
+    <div id="loader" style="text-align:center; padding: 40px; font-weight: bold; color: var(--p);">⏳ Sincronizando con el Cerebro...</div>
+    <div id="lista-pedidos"></div>
 
 <script>
-    // USAMOS TU MISMA LLAVE MAESTRA
-    const API_URL = "https://script.google.com/macros/s/AKfycbxQbx8F5XiFhhQKt9yHEP5a2cU-WBTcQbjHiuqMjaYpXRyxKX_ISz-SIqqJzsn-1V8nCQ/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzEy7UwhlGAOfl-X0vBuI05-qJYJ6KKPcdDwqgSckQ2bvEpxj4dLKYthqpeH5Tvv6mSng/exec";
 
     window.onload = () => {
         fetch(API_URL + "?action=get_pedidos")
         .then(r => r.json())
         .then(data => {
             document.getElementById('loader').style.display = 'none';
-            render(data);
+            renderPedidos(data);
         });
     };
 
-    function render(pedidos) {
-        const cont = document.getElementById('contenedor-pedidos');
-        // Filtramos para mostrar solo lo que está en proceso o recibido
+    function calcularPiezas(formato, m2) {
+        try {
+            let dim = formato.toLowerCase().split('x');
+            let areaPieza = (parseFloat(dim[0]) * parseFloat(dim[1])) / 10000;
+            return Math.ceil(m2 / areaPieza);
+        } catch(e) { return "N/D"; }
+    }
+
+    function renderPedidos(pedidos) {
+        const container = document.getElementById('lista-pedidos');
+        // Mostrar los pedidos más recientes primero
         pedidos.reverse().forEach(p => {
-            cont.innerHTML += `
-                <div class="pedido-card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <span class="status">${p.ESTADO}</span>
-                        <span style="font-size:12px; color:#94a3b8;">Entrega: <b>${p.FECHA_LIMITE_HABIL}</b></span>
-                    </div>
-                    <div class="info-row"><span class="label">Proyecto:</span> <span>${p.CLIENTE}</span></div>
-                    <div class="info-row"><span class="label">RIF/CI:</span> <span>${p.RIF_CI}</span></div>
-                    <div class="info-row"><span class="label">Ubicación:</span> <span>${p.UBICACION}</span></div>
-                    
-                    <div style="background:#f8fafc; padding:10px; border-radius:8px; margin-top:10px;">
-                        <span class="label">Instrucciones:</span>
-                        <div style="font-size:14px; color:var(--p); font-weight:bold; margin-top:5px;">
-                            Consultar orden detallada en Carpeta Física
+            // Solo procesamos si hay detalles en formato JSON
+            if(!p.DETALLES_JSON) return; 
+            
+            let items = [];
+            try { items = JSON.parse(p.DETALLES_JSON); } catch(e) { return; }
+            
+            let html = `
+                <div class="order-card">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div class="client-info">
+                            <b style="font-size:18px; color:var(--p); text-transform:uppercase;">${p.CLIENTE}</b><br>
+                            <span style="color:#64748b;">RIF: ${p.RIF_CI}</span><br>
+                            <span style="color:#64748b;">Obra: ${p.UBICACION}</span>
+                        </div>
+                        <div style="text-align:right; background: #fffbeb; padding: 8px 12px; border-radius: 8px; border: 1px solid #fef3c7;">
+                            <span style="font-size:10px; font-weight:bold; color:#b45309;">ENTREGA ESTIMADA:</span><br>
+                            <b style="color:#b45309; font-size: 15px;">${p.FECHA_LIMITE_HABIL}</b>
                         </div>
                     </div>
-                </div>
-            `;
+                    
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>FORMATO</th>
+                                    <th>USO</th>
+                                    <th>COLOR</th>
+                                    <th>TEXTURA</th>
+                                    <th>ÁREA</th>
+                                    <th>FABRICAR</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+            
+            items.forEach(i => {
+                // Prevenir que intente calcular piezas de carateo o sellador si se cuelan
+                if(!i.formato) return; 
+                
+                html += `
+                    <tr>
+                        <td>${i.formato}</td>
+                        <td>${i.uso}</td>
+                        <td>${i.color}</td>
+                        <td>${i.textura}</td>
+                        <td><span class="qty-badge">${i.m2} m²</span></td>
+                        <td><span class="pcs-badge">${calcularPiezas(i.formato, i.m2)} pcs</span></td>
+                    </tr>`;
+            });
+
+            html += `</tbody></table></div></div>`;
+            container.innerHTML += html;
         });
     }
 </script>
