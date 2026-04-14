@@ -5,193 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coralsintec | Centro de Mando</title>
     <style>
-        :root {
-            --coralsintec-primary: #1e2328; 
-            --coralsintec-accent: #c49660;  
-            --bg-color: #d1d5db;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
-            box-sizing: border-box;
-            border-top: 8px solid var(--coralsintec-primary);
-        }
-
-        h1 {
-            color: var(--coralsintec-primary);
-            letter-spacing: 3px;
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            color: #64748b;
-            font-size: 13px;
-            margin-bottom: 30px;
-            font-weight: 500;
-        }
-
-        /* Pantallas */
+        :root { --p: #1e2328; --a: #c49660; --bg: #d1d5db; }
+        body { font-family: -apple-system, sans-serif; background-color: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 100%; max-width: 380px; text-align: center; box-sizing: border-box; border-top: 8px solid var(--p); }
+        .btn-main { background: var(--p); color: white; border: none; padding: 16px; width: 100%; border-radius: 10px; font-weight: 800; font-size: 16px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; }
+        .menu-card { background: #f8fafc; padding: 25px; border-radius: 15px; border-left: 6px solid var(--a); cursor: pointer; text-align: left; margin-bottom: 15px; }
+        input { width: 100%; padding: 14px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 16px; box-sizing: border-box; text-align: center; margin-bottom: 10px; }
         .screen { display: none; }
         .active { display: block; }
-
-        /* Estilos de Formulario */
-        .input-group { text-align: left; margin-bottom: 15px; }
-        label { display: block; font-size: 12px; font-weight: bold; color: #475569; margin-bottom: 5px; text-transform: uppercase; }
-        input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #cbd5e1;
-            border-radius: 10px;
-            font-size: 16px;
-            box-sizing: border-box;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .btn-main {
-            background: var(--coralsintec-primary);
-            color: white;
-            border: none;
-            padding: 16px;
-            width: 100%;
-            border-radius: 10px;
-            font-weight: 800;
-            font-size: 16px;
-            cursor: pointer;
-            text-transform: uppercase;
-            margin-top: 10px;
-            transition: 0.2s;
-        }
-
-        .btn-main:active { transform: scale(0.98); }
-
-        /* Estilos de Menú Dashboard */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .menu-card {
-            background: #f8fafc;
-            padding: 25px;
-            border-radius: 15px;
-            border-left: 6px solid var(--coralsintec-accent);
-            cursor: pointer;
-            text-align: left;
-            position: relative;
-            transition: 0.2s;
-        }
-
-        .menu-card:active { background: #f1f5f9; transform: translateX(5px); }
-
-        .menu-card h3 { margin: 0; font-size: 18px; color: var(--coralsintec-primary); }
-        .menu-card p { margin: 5px 0 0 0; font-size: 12px; color: #64748b; }
-
-        .logout-btn {
-            background: none;
-            border: none;
-            color: #ef4444;
-            font-weight: bold;
-            margin-top: 25px;
-            cursor: pointer;
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
-
     <div class="container">
         <div id="login-screen" class="screen active">
-            <h1>CORALSINTEC</h1>
-            <div class="subtitle">SISTEMA DE GESTIÓN INTERNA</div>
-
-            <div class="input-group">
-                <label>Usuario</label>
-                <input type="text" id="username" placeholder="EJ: EDUARDO" style="text-transform: uppercase;">
-            </div>
-
-            <div class="input-group">
-                <label>PIN de Acceso</label>
-                <input type="password" id="pin" placeholder="****" maxlength="4" inputmode="numeric">
-            </div>
-
-            <button class="btn-main" onclick="validarAcceso()">Entrar</button>
-            <p id="error-msg" style="color: #ef4444; font-size: 13px; margin-top: 15px; display: none; font-weight: bold;">PIN o Usuario incorrecto</p>
+            <h1 style="color:var(--p);">CORALSINTEC</h1>
+            <input type="text" id="username" placeholder="USUARIO" style="text-transform: uppercase;">
+            <input type="password" id="pin" placeholder="PIN" maxlength="4">
+            <button class="btn-main" onclick="validar()">ENTRAR</button>
         </div>
 
         <div id="dashboard-screen" class="screen">
-            <h1 id="welcome-text">HOLA</h1>
-            <div class="subtitle">Panel de Control Principal</div>
-
-            <div class="menu-grid">
-                <div class="menu-card" onclick="location.href='cotizador.html'">
-                    <h3>🛒 VENTAS</h3>
-                    <p>Cotizador y envío de órdenes a planta.</p>
-                </div>
-
-                <div class="menu-card" style="border-left-color: #f59e0b;" onclick="location.href='planta.html'">
-                    <h3>🏭 PLANTA</h3>
-                    <p>Cola de producción y control de despacho.</p>
-                </div>
-
-                <div class="menu-card" style="border-left-color: #6366f1; opacity: 0.6;" onclick="alert('Módulo de Gerencia en Desarrollo')">
-                    <h3>📊 GERENCIA</h3>
-                    <p>Métricas, costos y balance de pagos.</p>
-                </div>
-            </div>
-
-            <button class="logout-btn" onclick="location.reload()">Cerrar Sesión Segura</button>
+            <h2 id="welcome">HOLA</h2>
+            <div onclick="location.href='cotizador.html'" class="menu-card" id="v-btn"><h3>🛒 VENTAS</h3></div>
+            <div onclick="location.href='planta.html'" class="menu-card" style="border-left-color: #f59e0b;"><h3>🏭 PLANTA</h3></div>
+            <div onclick="alert('Desarrollo')" class="menu-card" id="g-btn" style="border-left-color: #6366f1;"><h3>📊 GERENCIA</h3></div>
+            <button onclick="logout()" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold;">Cerrar Sesión</button>
         </div>
     </div>
 
     <script>
-        // LISTA DE ACCESOS AUTORIZADOS
-        const dbUsuarios = {
-            "EDUARDO": "1234",
-            "VENTAS": "1111",
-            "PLANTA": "0000"
+        const dbu = {"EDUARDO": "1234", "VENTAS": "1111", "PLANTA": "0000"};
+        
+        window.onload = () => {
+            const s = localStorage.getItem('usuarioCoralsintec');
+            if(s) ui(s);
         };
 
-        function validarAcceso() {
-            const user = document.getElementById('username').value.toUpperCase().trim();
-            const pin = document.getElementById('pin').value;
-            const error = document.getElementById('error-msg');
+        function validar() {
+            const u = document.getElementById('username').value.toUpperCase().trim();
+            const p = document.getElementById('pin').value;
+            if(dbu[u] && dbu[u] === p) {
+                localStorage.setItem('usuarioCoralsintec', u);
+                ui(u);
+            } else { alert("Error"); }
+        }
 
-            if (dbUsuarios[user] && dbUsuarios[user] === pin) {
-                // Éxito: Guardar sesión y cambiar pantalla
-                error.style.display = 'none';
-                document.getElementById('login-screen').classList.remove('active');
-                document.getElementById('dashboard-screen').classList.add('active');
-                document.getElementById('welcome-text').innerText = "HOLA, " + user;
-            } else {
-                // Error
-                error.style.display = 'block';
-                document.getElementById('pin').value = '';
+        function ui(u) {
+            document.getElementById('login-screen').classList.remove('active');
+            document.getElementById('dashboard-screen').classList.add('active');
+            document.getElementById('welcome').innerText = "HOLA " + u;
+            if(u === "PLANTA") {
+                document.getElementById('v-btn').style.display = 'none';
+                document.getElementById('g-btn').style.display = 'none';
             }
         }
 
-        // Permitir entrar con la tecla Enter
-        document.getElementById('pin').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') validarAcceso();
-        });
+        function logout() {
+            localStorage.clear();
+            location.reload();
+        }
     </script>
 </body>
 </html>
