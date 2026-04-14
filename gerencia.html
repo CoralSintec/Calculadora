@@ -5,65 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerencia Coralsintec</title>
     <style>
-        :root { --p: #1e2328; --a: #c49660; --bg: #f1f5f9; }
+        :root { --p: #1e2328; --a: #c49660; --bg: #f1f5f9; --blue: #3b82f6; --green: #10b981; --red: #ef4444; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .app-main { width: 100%; max-width: 500px; margin: 0 auto; }
         
-        /* TABS */
-        .tabs { display: flex; background: white; border-radius: 12px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; color: #64748b; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .btn-volver { background: white; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--p);}
+        .user-badge { background: #fef08a; color: #854d0e; border: 1px solid #fde047; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; }
+        
+        /* TARJETAS FIJAS DE RESUMEN FINANCIERO */
+        .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .kpi-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 4px solid var(--p);}
+        .kpi-card.blue { border-top-color: var(--blue); }
+        .kpi-card.red { border-top-color: var(--red); }
+        .kpi-title { font-size: 11px; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
+        .kpi-val { font-size: 22px; font-weight: 900; }
+        .val-blue { color: var(--blue); }
+        .val-red { color: var(--red); }
+        
+        .kpi-full { grid-column: span 2; background: var(--p); color: white; border: none;}
+        .kpi-full .kpi-title { color: #cbd5e1; }
+        .kpi-full .kpi-val { color: #fde047; font-size: 28px; }
+
+        /* PESTAÑAS (TABS) */
+        .tabs { display: flex; background: white; border-radius: 10px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;}
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-size: 12px; font-weight: 800; text-transform: uppercase; cursor: pointer; color: #64748b; transition: 0.2s;}
         .tab-btn.active { background: var(--p); color: white; }
 
-        .header { background: var(--p); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
         .section { display: none; }
         .section.active { display: block; }
 
-        .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .info b { display: block; font-size: 14px; color: var(--p); }
+        .card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); border-left: 4px solid #cbd5e1;}
+        .info b { display: block; font-size: 14px; color: var(--p); text-transform: uppercase; }
         .info span { font-size: 11px; color: #64748b; }
-        .price { font-size: 16px; font-weight: 900; color: #10b981; margin-right: 10px; }
+        .price { font-size: 16px; font-weight: 900; color: #10b981; margin-right: 15px; }
         
-        .btn-edit { background: #f1f5f9; border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .btn-edit { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: 0.2s;}
+        .btn-edit:active { background: #e2e8f0; transform: scale(0.95); }
         
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: flex; justify-content: center; align-items: center; font-weight: bold; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 100; display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--p); flex-direction: column; font-size: 18px;}
     </style>
 </head>
 <body>
-    <div id="loader">📊 Sincronizando Finanzas...</div>
+    <div id="loader"><span style="font-size:30px; margin-bottom:10px;">📊</span>Sincronizando Finanzas...</div>
 
     <main class="app-main">
-        <button onclick="location.href='index.html'" style="margin-bottom:10px; background:none; border:none; font-weight:bold; cursor:pointer;">⬅ MENÚ PRINCIPAL</button>
-        
         <div class="header">
-            <h2 style="margin:0;">CORALSINTEC</h2>
-            <div style="font-size:12px; opacity:0.8;">Panel Administrativo de Control</div>
+            <button class="btn-volver" onclick="location.href='index.html'">⬅ MENÚ</button>
+            <div class="user-badge">👑 GERENCIA</div>
         </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('resumen', this)">Resumen</button>
-            <button class="tab-btn" onclick="showTab('nomina', this)">Nómina</button>
-            <button class="tab-btn" onclick="showTab('materiales', this)">Materiales</button>
-            <button class="tab-btn" onclick="showTab('gastos', this)">Gastos</button>
-        </div>
-
-        <div id="resumen" class="section active">
-            <div class="card" style="background: var(--p); color: white;">
-                <div><b>Caja Estimada (Ventas)</b><span>Basado en pedidos activos</span></div>
-                <div class="price" id="total-ventas" style="color:#fde047;">$0</div>
+        <div class="kpi-grid">
+            <div class="kpi-card blue">
+                <div class="kpi-title">Ventas Acumuladas</div>
+                <div class="kpi-val val-blue" id="kpi-ventas">$0.00</div>
+            </div>
+            <div class="kpi-card red">
+                <div class="kpi-title">Costo Operativo</div>
+                <div class="kpi-val val-red" id="kpi-costos">$0.00</div>
+            </div>
+            <div class="kpi-card kpi-full">
+                <div class="kpi-title">Monto de lo que queda (Balance)</div>
+                <div class="kpi-val" id="kpi-balance">$0.00</div>
             </div>
         </div>
 
-        <div id="nomina" class="section">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('nomina', this)">Nómina</button>
+            <button class="tab-btn" onclick="showTab('gastos', this)">Gastos</button>
+            <button class="tab-btn" onclick="showTab('materiales', this)">Materia Prima</button>
+        </div>
+
+        <div id="nomina" class="section active">
             <div id="list-nomina"></div>
+        </div>
+
+        <div id="gastos" class="section">
+            <div id="list-gastos"></div>
         </div>
 
         <div id="materiales" class="section">
             <div id="list-materiales"></div>
         </div>
 
-        <div id="gastos" class="section">
-            <div id="list-gastos"></div>
-        </div>
     </main>
 
 <script>
@@ -71,6 +95,7 @@
 
     window.onload = () => {
         if(localStorage.getItem('usuarioCoralsintec') !== 'EDUARDO') {
+            alert("Acceso Denegado. Solo para gerencia.");
             location.href = 'index.html';
             return;
         }
@@ -86,64 +111,85 @@
 
     async function cargarTodo() {
         document.getElementById('loader').style.display = 'flex';
-        const [rP, rN, rI] = await Promise.all([
-            fetch(API_URL + "?action=get_pedidos&t=" + Date.now()).then(r => r.json()),
-            fetch(API_URL + "?action=get_nomina&t=" + Date.now()).then(r => r.json()),
-            fetch(API_URL + "?action=get_inventario&t=" + Date.now()).then(r => r.json())
-        ]);
+        try {
+            const [rP, rN, rI] = await Promise.all([
+                fetch(API_URL + "?action=get_pedidos&t=" + Date.now()).then(r => r.json()),
+                fetch(API_URL + "?action=get_nomina&t=" + Date.now()).then(r => r.json()),
+                fetch(API_URL + "?action=get_inventario&t=" + Date.now()).then(r => r.json())
+            ]);
 
-        // Ventas
-        let v = rP.reduce((acc, p) => acc + parseFloat(p.TOTAL_USD || 0), 0);
-        document.getElementById('total-ventas').innerText = "$" + v.toFixed(2);
+            // 1. Calcular Ventas
+            let ventas = rP.reduce((acc, p) => acc + parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0), 0);
+            document.getElementById('kpi-ventas').innerText = "$" + ventas.toFixed(2);
 
-        // Nómina
-        document.getElementById('list-nomina').innerHTML = rN.filter(n => n.CATEGORIA === 'Nomina').map(n => `
-            <div class="card">
-                <div class="info"><b>${n.NOMBRE}</b><span>Sueldo Mensual</span></div>
-                <div style="display:flex; align-items:center;">
-                    <div class="price">$${n.MONTO_MENSUAL_USD}</div>
-                    <button class="btn-edit" onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 2, '${n.MONTO_MENSUAL_USD}')">✏️</button>
+            // 2. Calcular Costos Operativos (Nómina + Gastos Fijos)
+            let costos = rN.reduce((acc, n) => acc + parseFloat(n.MONTO_MENSUAL_USD || 0), 0);
+            document.getElementById('kpi-costos').innerText = "$" + costos.toFixed(2);
+
+            // 3. Calcular lo que queda
+            let balance = ventas - costos;
+            document.getElementById('kpi-balance').innerText = "$" + balance.toFixed(2);
+            if(balance < 0) document.getElementById('kpi-balance').style.color = "#ef4444"; else document.getElementById('kpi-balance').style.color = "#fde047";
+
+            // 4. Llenar Nómina
+            document.getElementById('list-nomina').innerHTML = rN.filter(n => n.CATEGORIA === 'Nomina').map(n => `
+                <div class="card" style="border-left-color: #3b82f6;">
+                    <div class="info"><b>👷‍♂️ ${n.NOMBRE}</b><span>Sueldo Mensual</span></div>
+                    <div style="display:flex; align-items:center;">
+                        <div class="price">$${n.MONTO_MENSUAL_USD}</div>
+                        <button class="btn-edit" onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 2, '${n.MONTO_MENSUAL_USD}')">✏️ Edit</button>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
 
-        // Gastos Operativos
-        document.getElementById('list-gastos').innerHTML = rN.filter(n => n.CATEGORIA === 'Operativo').map(n => `
-            <div class="card">
-                <div class="info"><b>${n.NOMBRE}</b><span>Gasto Fijo</span></div>
-                <div style="display:flex; align-items:center;">
-                    <div class="price">$${n.MONTO_MENSUAL_USD}</div>
-                    <button class="btn-edit" onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 2, '${n.MONTO_MENSUAL_USD}')">✏️</button>
+            // 5. Llenar Gastos Operativos
+            document.getElementById('list-gastos').innerHTML = rN.filter(n => n.CATEGORIA === 'Operativo').map(n => `
+                <div class="card" style="border-left-color: #ef4444;">
+                    <div class="info"><b>🏢 ${n.NOMBRE}</b><span>Costo Fijo Mensual</span></div>
+                    <div style="display:flex; align-items:center;">
+                        <div class="price">$${n.MONTO_MENSUAL_USD}</div>
+                        <button class="btn-edit" onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 2, '${n.MONTO_MENSUAL_USD}')">✏️ Edit</button>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
 
-        // Materiales
-        document.getElementById('list-materiales').innerHTML = rI.map(m => `
-            <div class="card">
-                <div class="info"><b>${m.MATERIAL}</b><span>Costo por ${m.UNIDAD_MEDIDA}</span></div>
-                <div style="display:flex; align-items:center;">
-                    <div class="price">$${m.COSTO_UNITARIO_USD}</div>
-                    <button class="btn-edit" onclick="editar('INVENTARIO_COSTOS', 'MATERIAL', '${m.MATERIAL}', 2, '${m.COSTO_UNITARIO_USD}')">✏️</button>
+            // 6. Llenar Materia Prima
+            document.getElementById('list-materiales').innerHTML = rI.map(m => `
+                <div class="card" style="border-left-color: #10b981;">
+                    <div class="info"><b>📦 ${m.MATERIAL}</b><span>Costo por ${m.UNIDAD_MEDIDA}</span></div>
+                    <div style="display:flex; align-items:center;">
+                        <div class="price">$${m.COSTO_UNITARIO_USD}</div>
+                        <button class="btn-edit" onclick="editar('INVENTARIO_COSTOS', 'MATERIAL', '${m.MATERIAL}', 2, '${m.COSTO_UNITARIO_USD}')">✏️ Edit</button>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
 
-        document.getElementById('loader').style.display = 'none';
+            document.getElementById('loader').style.display = 'none';
+
+        } catch (error) {
+            alert("Error al cargar la información. Revisa tu internet.");
+            document.getElementById('loader').style.display = 'none';
+        }
     }
 
     async function editar(hoja, colBusqueda, id, colEditar, actual) {
-        let nuevo = prompt("Actualizar valor para " + id + ":", actual);
-        if(nuevo === null || nuevo === actual || isNaN(nuevo)) return;
+        let nuevo = prompt("Modificar monto en Dólares ($) para: " + id, actual);
+        
+        // Validaciones para que no envíen letras ni se queden en blanco
+        if(nuevo === null || nuevo === actual) return;
+        nuevo = nuevo.replace(',', '.'); // Por si escriben con coma
+        if(isNaN(nuevo) || nuevo.trim() === '') return alert("Por favor ingresa un número válido.");
 
         document.getElementById('loader').style.display = 'flex';
+        
         await fetch(API_URL + "?action=editar_registro", {
             method: "POST",
             mode: "no-cors",
             body: JSON.stringify({ hoja, col_busqueda: (colBusqueda === 'NOMBRE' ? 1 : 0), id, col_editar: colEditar, nuevo_valor: nuevo })
+        }).finally(() => {
+            // Le damos 1.5 seg a Google para que escriba en Excel y recargamos
+            setTimeout(() => { cargarTodo(); }, 1500);
         });
-        
-        setTimeout(() => { cargarTodo(); }, 1500);
     }
 </script>
 </body>
