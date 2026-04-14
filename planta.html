@@ -8,57 +8,45 @@
     <meta http-equiv="Expires" content="0">
     <title>Producción Coralsintec</title>
     <style>
-        :root { --p: #1e2328; --border: #cbd5e1; --accent: #f59e0b; }
+        :root { --p: #1e2328; --border: #cbd5e1; --accent: #f59e0b; --blue: #3b82f6; --green: #10b981; --red: #ef4444; }
         body { font-family: -apple-system, sans-serif; background: #f3f4f6; margin: 0; padding: 15px; }
         .app-main { width: 100%; max-width: 600px; margin: 0 auto; }
-        
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .btn-volver { background: white; border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); color: var(--p);}
-        
+        .btn-volver { background: white; border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--p); box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
         .user-badge { background: #e2e8f0; color: #475569; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
         .user-eduardo { background: #fef08a; color: #854d0e; border: 1px solid #fde047; }
-        
         .header { background: var(--p); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .order-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--accent); }
-        
         .status-tag { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
         .st-nuevo { background: #fee2e2; color: #991b1b; border: 1px solid #f87171;}
         .st-proceso { background: #fef3c7; color: #92400e; border: 1px solid #fbbf24;}
         .st-coordinar { background: #dbeafe; color: #1e40af; border: 1px solid #60a5fa;}
         .st-listo { background: #dcfce7; color: #166534; border: 1px solid #4ade80;}
-
         table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0; }
         th { text-align: left; padding: 8px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; font-size: 11px; color: var(--p);}
         td { padding: 8px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #334155;}
-        
         .qty-badge { background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-weight: 800; display: inline-block;}
         .pcs-badge { color: #166534; font-weight: 900; font-size: 15px;}
-        
         .extras-box { background: #fffbeb; padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px dashed #fcd34d; }
         .extras-title { margin: 0 0 10px 0; color: #92400e; border-bottom: 1px solid #fde68a; padding-bottom: 5px; font-size: 12px; text-transform: uppercase;}
-
         .btn-group { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 15px;}
         .btn-action { border: none; padding: 14px; border-radius: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; font-size: 12px; transition: transform 0.1s;}
-        .btn-action:active { transform: scale(0.98); }
         .btn-aceptar { background: #1e2328; }
         .btn-aviso { background: #3b82f6; }
         .btn-entregado { background: #10b981; }
         .btn-eliminar { background: #ef4444; margin-top: 5px; }
-
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(243, 244, 246, 0.95); z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: var(--p); font-size: 18px;}
     </style>
 </head>
 <body>
-    <div id="loader-overlay"><span style="font-size: 30px; margin-bottom:10px;">⏳</span>Sincronizando Planta...</div>
-    
+    <div id="loader-overlay">⏳ Sincronizando Planta...</div>
     <main class="app-main">
         <div class="top-bar">
             <button class="btn-volver" onclick="location.href='index.html'">⬅ MENÚ</button>
             <div id="badge-usuario" class="user-badge">👤 PLANTA</div>
         </div>
-
         <div class="header">
-            <h2 style="margin:0; letter-spacing: 1px;">HOJAS DE RUTA</h2>
+            <h2 style="margin:0;">HOJAS DE RUTA</h2>
             <p style="margin:5px 0 0 0; font-size:12px; color:#cbd5e1;" id="header-user">Departamento de Producción</p>
         </div>
         <div id="lista-pedidos"></div>
@@ -66,20 +54,17 @@
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
-    
     const usuarioActual = localStorage.getItem('usuarioCoralsintec') || 'PLANTA';
 
     window.onload = () => {
         const badge = document.getElementById('badge-usuario');
         const headerSub = document.getElementById('header-user');
-
         if(usuarioActual === 'EDUARDO') {
             headerSub.innerText = "⭐ VISTA GERENCIAL (Datos Completos)";
             headerSub.style.color = "#fef08a";
             badge.innerText = "👑 MODO GERENTE";
             badge.classList.add('user-eduardo');
         }
-
         loadData();
     }
 
@@ -90,136 +75,80 @@
         .then(data => {
             document.getElementById('loader-overlay').style.display = 'none';
             render(data);
-        })
-        .catch(e => {
-            alert("Error al cargar la lista. Revisa tu internet.");
+        }).catch(() => {
             document.getElementById('loader-overlay').style.display = 'none';
         });
-    }
-
-    function calcularPiezas(formato, metros) {
-        if (!formato || !metros || metros <= 0) return 0;
-        try { let dim = formato.toLowerCase().split('x'); let areaPieza = (parseFloat(dim[0]) * parseFloat(dim[1])) / 10000; return Math.ceil(metros / areaPieza); } 
-        catch(e) { return "N/D"; }
     }
 
     function render(pedidos) {
         const container = document.getElementById('lista-pedidos');
         container.innerHTML = '';
-        
-        if(pedidos.length === 0) { 
-            container.innerHTML = "<p style='text-align:center; color:#64748b; font-weight:bold; margin-top:20px;'>No hay órdenes activas.</p>"; 
-            return; 
-        }
-
         pedidos.reverse().forEach(p => {
             if(!p.DETALLES_JSON) return;
-            let items = [];
-            try { items = JSON.parse(p.DETALLES_JSON); } catch(e) { return; }
-            
-            let stClass = "st-nuevo";
-            let estadoTexto = p.ESTADO || "NUEVO / POR ACEPTAR";
+            let items = JSON.parse(p.DETALLES_JSON);
+            let estado = p.ESTADO || "NUEVO / POR ACEPTAR";
+            let stClass = estado === "ACEPTADO / EN PROCESO" ? "st-proceso" : 
+                          estado === "PROCESANDO / COORDINAR ENTREGA" ? "st-coordinar" : 
+                          estado === "ENTREGADO" ? "st-listo" : "st-nuevo";
 
-            if(estadoTexto === "ACEPTADO / EN PROCESO") stClass = "st-proceso";
-            else if(estadoTexto === "PROCESANDO / COORDINAR ENTREGA") stClass = "st-coordinar";
-            else if(estadoTexto === "ENTREGADO") stClass = "st-listo";
-
-            let totalSacosCarateo = 0;
-            let totalGalonesSellador = 0;
-
-            let etiquetaPrecio = "";
-            if(usuarioActual === 'EDUARDO') {
-                let monto = p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || '0.00';
-                etiquetaPrecio = `
-                <div style="background: #ecfccb; padding: 6px 10px; border-radius: 6px; border: 1px solid #bef264; margin-top: 10px; display: inline-block;">
-                    <span style="font-size:10px; font-weight:bold; color:#3f6212;">MONTO DEL PEDIDO:</span>
-                    <b style="color:#166534; font-size: 15px; margin-left: 5px;">$${monto}</b>
-                </div>`;
-            }
+            let totalCarateo = 0, totalSellador = 0;
+            let precioHtml = usuarioActual === 'EDUARDO' ? `<div style="background:#ecfccb;padding:6px;border-radius:6px;margin-top:10px;display:inline-block;font-size:14px;">💰 <b>$${p.TOTAL_USD || '0.00'}</b></div>` : "";
 
             let html = `
                 <div class="order-card">
-                    <div style="text-align:center;"><span class="status-tag ${stClass}">${estadoTexto}</span></div>
-                    
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
+                    <div style="text-align:center;"><span class="status-tag ${stClass}">${estado}</span></div>
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                         <div>
-                            <div style="font-size:18px; font-weight:900; color:var(--p); text-transform:uppercase;">${p.CLIENTE}</div>
-                            <div style="font-size:12px; color:#64748b; margin-top:3px;"><b>RIF:</b> ${p.RIF_CI}</div>
-                            <div style="font-size:12px; color:#64748b; margin-top:2px;"><b>OBRA:</b> ${p.UBICACION}</div>
-                            ${etiquetaPrecio}
+                            <b style="font-size:18px;text-transform:uppercase;">${p.CLIENTE}</b><br>
+                            <small>OBRA: ${p.UBICACION}</small><br>
+                            ${precioHtml}
                         </div>
-                        <div style="text-align:right; background: #f1f5f9; padding: 8px; border-radius: 8px;">
-                            <span style="font-size:10px; font-weight:bold; color:#64748b;">ENTREGA:</span><br>
-                            <b style="color:#ef4444; font-size: 14px;">${p.FECHA_LIMITE_HABIL}</b>
+                        <div style="text-align:right;background:#f1f5f9;padding:8px;border-radius:8px;">
+                            <small>ENTREGA:</small><br><b style="color:#ef4444;">${p.FECHA_LIMITE_HABIL}</b>
                         </div>
                     </div>
-                    
-                    <div style="overflow-x: auto;">
-                        <table>
-                            <thead><tr><th>FORMATO</th><th>COLOR</th><th>TEXTURA</th><th>ÁREA</th><th>FABRICAR</th></tr></thead>
-                            <tbody>`;
+                    <table>
+                        <thead><tr><th>FORMATO</th><th>COLOR</th><th>ÁREA</th><th>PIEZAS</th></tr></thead>
+                        <tbody>`;
             
             items.forEach(i => {
-                if(!i.formato) return;
-                let m = parseFloat(i.m2) || parseFloat(i.m) || 0;
-                let pcs = calcularPiezas(i.formato, m);
-                totalSacosCarateo += i.carateo || 0;
-                totalGalonesSellador += i.sellador || 0;
-                
-                html += `<tr><td>${i.formato}</td><td>${i.color}</td><td>${i.textura}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
+                let m = parseFloat(i.m2 || 0);
+                let dim = i.formato.toLowerCase().split('x');
+                let pcs = Math.ceil(m / ((dim[0]*dim[1])/10000));
+                totalCarateo += i.carateo || 0; totalSellador += i.sellador || 0;
+                let consumoEst = (i.textura === 'Gruesa' ? 15 : 10) * m;
+                html += `<tr><td>${i.formato}</td><td>${i.color}</td><td>${m}m²</td><td class="pcs-badge">${pcs} pcs<br><small style="font-weight:400;color:#64748b;">~${consumoEst}kg Cem.</small></td></tr>`;
             });
 
-            html += `</tbody></table></div>`;
-
-            if(totalSacosCarateo > 0 || totalGalonesSellador > 0) {
-                html += `<div class="extras-box">
-                            <h4 class="extras-title">📦 Materiales de Instalación</h4>`;
-                if(totalSacosCarateo > 0) html += `<div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span style="font-size:12px; font-weight:bold; color:#92400e;">CARATEO:</span> <b style="font-size:15px; color:#b45309;">${totalSacosCarateo} SACOS</b></div>`;
-                if(totalGalonesSellador > 0) html += `<div style="display: flex; justify-content: space-between;"><span style="font-size:12px; font-weight:bold; color:#92400e;">SELLADOR:</span> <b style="font-size:15px; color:#b45309;">${totalGalonesSellador} GALONES</b></div>`;
-                html += `</div>`;
+            html += `</tbody></table>`;
+            if(totalCarateo > 0 || totalSellador > 0) {
+                html += `<div class="extras-box"><h4 class="extras-title">📦 Instalación</h4>
+                    ${totalCarateo > 0 ? `<div>CARATEO: <b>${totalCarateo} SACOS</b></div>` : ''}
+                    ${totalSellador > 0 ? `<div>SELLADOR: <b>${totalSellador} GALONES</b></div>` : ''}
+                </div>`;
             }
-                    
             html += `<div class="btn-group">
-                        <button class="btn-action btn-aceptar" onclick="actualizar('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN PROCESO')">✅ ACEPTAR E INICIAR</button>
-                        <button class="btn-action btn-aviso" onclick="actualizar('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'PROCESANDO / COORDINAR ENTREGA')">🚚 AVISAR: FALTA 1 SEMANA</button>
-                        <button class="btn-action btn-entregado" onclick="actualizar('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 MARCAR COMO ENTREGADO</button>`;
-            
-            if(usuarioActual === 'EDUARDO') {
-                html += `<button class="btn-action btn-eliminar" onclick="eliminarPedido('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR PEDIDO (ERROR / ANULADO)</button>`;
-            }
-
-            html += `</div></div>`;
+                <button class="btn-action btn-aceptar" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN PROCESO')">✅ ACEPTAR E INICIAR</button>
+                <button class="btn-action btn-aviso" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'PROCESANDO / COORDINAR ENTREGA')">🚚 AVISAR: 1 SEMANA</button>
+                <button class="btn-action btn-entregado" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 ENTREGADO</button>
+                ${usuarioActual === 'EDUARDO' ? `<button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR</button>` : ''}
+            </div></div>`;
             container.innerHTML += html;
         });
     }
 
-    // BOTONES BLINDADOS ANTI-BLOQUEO CORS
-    function actualizar(cliente, fecha, estado) {
-        if(!confirm("¿Confirmas el cambio a: " + estado + "?")) return;
+    function accion(c, f, e) {
+        if(!confirm("¿Confirmar cambio a: " + e + "?")) return;
         document.getElementById('loader-overlay').style.display = 'flex';
-        
-        fetch(API_URL + "?action=actualizar_estado", { 
-            method: "POST", 
-            mode: "no-cors", 
-            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, nuevo_estado: estado }) 
-        }).finally(() => { 
-            // Espera 2 segundos y recarga la pantalla sola
-            setTimeout(() => { loadData(); }, 2000);
-        });
+        fetch(API_URL + "?action=actualizar_estado", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: c, fecha_orden: f, nuevo_estado: e }) })
+        .finally(() => { setTimeout(() => { loadData(); }, 2000); });
     }
 
-    function eliminarPedido(cliente, fecha) {
-        if(!confirm("⚠️ ¿BORRAR pedido de " + cliente + " permanentemente?")) return;
+    function eliminar(c, f) {
+        if(!confirm("⚠️ ¿BORRAR pedido permanentemente?")) return;
         document.getElementById('loader-overlay').style.display = 'flex';
-        
-        fetch(API_URL + "?action=eliminar_pedido", { 
-            method: "POST", 
-            mode: "no-cors", 
-            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha }) 
-        }).finally(() => { 
-            // Espera 2 segundos y recarga la pantalla sola
-            setTimeout(() => { loadData(); }, 2000);
-        });
+        fetch(API_URL + "?action=eliminar_pedido", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: c, fecha_orden: f }) })
+        .finally(() => { setTimeout(() => { loadData(); }, 2000); });
     }
 </script>
 </body>
