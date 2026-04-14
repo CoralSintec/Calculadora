@@ -122,4 +122,64 @@
             
             items.forEach(i => {
                 if(!i.formato) return;
-                let m = parseFloat(i.m
+                let m = parseFloat(i.m2) || parseFloat(i.m) || 0;
+                let pcs = calcularPiezas(i.formato, m);
+                totalSacosCarateo += i.carateo || 0;
+                totalGalonesSellador += i.sellador || 0;
+                
+                html += `<tr><td>${i.formato}</td><td>${i.color}</td><td>${i.textura}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
+            });
+
+            html += `</tbody></table></div>`;
+
+            if(totalSacosCarateo > 0 || totalGalonesSellador > 0) {
+                html += `<div class="extras-box">
+                            <h4 class="extras-title">📦 Materiales de Instalación</h4>`;
+                if(totalSacosCarateo > 0) html += `<div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span style="font-size:12px; font-weight:bold; color:#92400e;">CARATEO:</span> <b style="font-size:15px; color:#b45309;">${totalSacosCarateo} SACOS</b></div>`;
+                if(totalGalonesSellador > 0) html += `<div style="display: flex; justify-content: space-between;"><span style="font-size:12px; font-weight:bold; color:#92400e;">SELLADOR:</span> <b style="font-size:15px; color:#b45309;">${totalGalonesSellador} GALONES</b></div>`;
+                html += `</div>`;
+            }
+                    
+            html += `<div class="btn-group">
+                        <button class="btn-action btn-aceptar" onclick="actualizar('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN FABRICACIÓN')">✅ ACEPTAR E INICIAR</button>
+                        <button class="btn-action btn-aviso" onclick="actualizar('${p.CLIENTE}', '${p.FECHA_ORDEN}', '1 SEMANA: COORDINAR ENTREGA')">🚚 AVISAR: FALTA 1 SEMANA</button>
+                        <button class="btn-action btn-entregado" onclick="actualizar('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'LISTO Y ENTREGADO')">📦 MARCAR COMO ENTREGADO</button>
+                        <button class="btn-action btn-eliminar" onclick="eliminarPedido('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR PEDIDO (ERROR / ANULADO)</button>
+                    </div>
+                </div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    function actualizar(cliente, fecha, estado) {
+        if(!confirm("¿Confirmas que deseas cambiar el estado a: " + estado + "?")) return;
+        
+        document.getElementById('loader-overlay').style.display = 'flex';
+        fetch(API_URL + "?action=actualizar_estado", {
+            method: "POST",
+            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, nuevo_estado: estado })
+        }).then(() => {
+            loadData();
+        }).catch(() => {
+            alert("Error al actualizar. Intente de nuevo.");
+            document.getElementById('loader-overlay').style.display = 'none';
+        });
+    }
+
+    function eliminarPedido(cliente, fecha) {
+        if(!confirm("⚠️ ATENCIÓN: ¿Estás seguro de que deseas ELIMINAR el pedido de " + cliente + "? \n\nEsta acción borrará el pedido del sistema y de la base de datos para siempre.")) return;
+
+        document.getElementById('loader-overlay').style.display = 'flex';
+        fetch(API_URL + "?action=eliminar_pedido", {
+            method: "POST",
+            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha })
+        }).then(() => {
+            loadData();
+        }).catch(() => {
+            alert("Error al eliminar. Intente de nuevo.");
+            document.getElementById('loader-overlay').style.display = 'none';
+        });
+    }
+</script>
+</body>
+</html>
