@@ -3,41 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coralsintec | Acceso</title>
+    <title>Coralsintec | Centro de Mando</title>
     <style>
-        body { font-family: sans-serif; background: #d1d5db; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); text-align: center; width: 320px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e5e7eb; border-radius: 8px; box-sizing: border-box; text-align: center; }
-        .btn { background: #1e2328; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .menu { display: none; }
-        .menu-btn { background: white; padding: 25px; margin: 10px 0; border-radius: 10px; font-weight: bold; border-left: 6px solid #c49660; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        :root {
+            --coralsintec-primary: #1e2328; 
+            --coralsintec-accent: #c49660;  
+            --bg-color: #d1d5db;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            box-sizing: border-box;
+            border-top: 8px solid var(--coralsintec-primary);
+        }
+
+        h1 {
+            color: var(--coralsintec-primary);
+            letter-spacing: 3px;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        /* Pantallas */
+        .screen { display: none; }
+        .active { display: block; }
+
+        /* Estilos de Formulario */
+        .input-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; font-size: 12px; font-weight: bold; color: #475569; margin-bottom: 5px; text-transform: uppercase; }
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .btn-main {
+            background: var(--coralsintec-primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-main:active { transform: scale(0.98); }
+
+        /* Estilos de Menú Dashboard */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .menu-card {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 6px solid var(--coralsintec-accent);
+            cursor: pointer;
+            text-align: left;
+            position: relative;
+            transition: 0.2s;
+        }
+
+        .menu-card:active { background: #f1f5f9; transform: translateX(5px); }
+
+        .menu-card h3 { margin: 0; font-size: 18px; color: var(--coralsintec-primary); }
+        .menu-card p { margin: 5px 0 0 0; font-size: 12px; color: #64748b; }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-weight: bold;
+            margin-top: 25px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-    <div class="card" id="login">
-        <h2>CORALSINTEC</h2>
-        <input type="text" id="user" placeholder="USUARIO" style="text-transform: uppercase;">
-        <input type="password" id="pin" placeholder="PIN" maxlength="4">
-        <button class="btn" onclick="entrar()">ENTRAR</button>
-    </div>
 
-    <div class="card menu" id="menu">
-        <h3>Menú Principal</h3>
-        <div class="menu-btn" onclick="location.href='cotizador.html'">🛒 VENTAS</div>
-        <div class="menu-btn" style="border-left-color: #f59e0b;" onclick="alert('Fase Planta próximamente')">🏭 PLANTA</div>
-        <button class="btn" style="background:#ef4444; margin-top:15px;" onclick="location.reload()">SALIR</button>
+    <div class="container">
+        <div id="login-screen" class="screen active">
+            <h1>CORALSINTEC</h1>
+            <div class="subtitle">SISTEMA DE GESTIÓN INTERNA</div>
+
+            <div class="input-group">
+                <label>Usuario</label>
+                <input type="text" id="username" placeholder="EJ: EDUARDO" style="text-transform: uppercase;">
+            </div>
+
+            <div class="input-group">
+                <label>PIN de Acceso</label>
+                <input type="password" id="pin" placeholder="****" maxlength="4" inputmode="numeric">
+            </div>
+
+            <button class="btn-main" onclick="validarAcceso()">Entrar</button>
+            <p id="error-msg" style="color: #ef4444; font-size: 13px; margin-top: 15px; display: none; font-weight: bold;">PIN o Usuario incorrecto</p>
+        </div>
+
+        <div id="dashboard-screen" class="screen">
+            <h1 id="welcome-text">HOLA</h1>
+            <div class="subtitle">Panel de Control Principal</div>
+
+            <div class="menu-grid">
+                <div class="menu-card" onclick="location.href='cotizador.html'">
+                    <h3>🛒 VENTAS</h3>
+                    <p>Cotizador y envío de órdenes a planta.</p>
+                </div>
+
+                <div class="menu-card" style="border-left-color: #f59e0b;" onclick="location.href='planta.html'">
+                    <h3>🏭 PLANTA</h3>
+                    <p>Cola de producción y control de despacho.</p>
+                </div>
+
+                <div class="menu-card" style="border-left-color: #6366f1; opacity: 0.6;" onclick="alert('Módulo de Gerencia en Desarrollo')">
+                    <h3>📊 GERENCIA</h3>
+                    <p>Métricas, costos y balance de pagos.</p>
+                </div>
+            </div>
+
+            <button class="logout-btn" onclick="location.reload()">Cerrar Sesión Segura</button>
+        </div>
     </div>
 
     <script>
-        const users = { "EDUARDO": "1234", "VENTAS": "1111" };
-        function entrar() {
-            let u = document.getElementById('user').value.toUpperCase();
-            let p = document.getElementById('pin').value;
-            if(users[u] === p) {
-                document.getElementById('login').style.display = 'none';
-                document.getElementById('menu').style.display = 'block';
-            } else { alert("PIN incorrecto"); }
+        // LISTA DE ACCESOS AUTORIZADOS
+        const dbUsuarios = {
+            "EDUARDO": "1234",
+            "VENTAS": "1111",
+            "PLANTA": "0000"
+        };
+
+        function validarAcceso() {
+            const user = document.getElementById('username').value.toUpperCase().trim();
+            const pin = document.getElementById('pin').value;
+            const error = document.getElementById('error-msg');
+
+            if (dbUsuarios[user] && dbUsuarios[user] === pin) {
+                // Éxito: Guardar sesión y cambiar pantalla
+                error.style.display = 'none';
+                document.getElementById('login-screen').classList.remove('active');
+                document.getElementById('dashboard-screen').classList.add('active');
+                document.getElementById('welcome-text').innerText = "HOLA, " + user;
+            } else {
+                // Error
+                error.style.display = 'block';
+                document.getElementById('pin').value = '';
+            }
         }
+
+        // Permitir entrar con la tecla Enter
+        document.getElementById('pin').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') validarAcceso();
+        });
     </script>
 </body>
 </html>
