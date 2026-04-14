@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coralsintec | Producción</title>
+    <style>
+        :root { --p: #1e2328; --w: #f59e0b; --bg: #f3f4f6; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .header { background: var(--p); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
+        .pedido-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 8px solid var(--w); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .label { font-weight: bold; color: #64748b; text-transform: uppercase; font-size: 11px; }
+        .status { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+        #loader { text-align: center; padding: 50px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2 style="margin:0;">COLA DE PRODUCCIÓN</h2>
+        <small>Coralsintec - Solo Información Técnica</small>
+    </div>
+
+    <div id="loader">Cargando pedidos pendientes...</div>
+    <div id="contenedor-pedidos"></div>
+
+<script>
+    // USAMOS TU MISMA LLAVE MAESTRA
+    const API_URL = "https://script.google.com/macros/s/AKfycbxQbx8F5XiFhhQKt9yHEP5a2cU-WBTcQbjHiuqMjaYpXRyxKX_ISz-SIqqJzsn-1V8nCQ/exec";
+
+    window.onload = () => {
+        fetch(API_URL + "?action=get_pedidos")
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('loader').style.display = 'none';
+            render(data);
+        });
+    };
+
+    function render(pedidos) {
+        const cont = document.getElementById('contenedor-pedidos');
+        // Filtramos para mostrar solo lo que está en proceso o recibido
+        pedidos.reverse().forEach(p => {
+            cont.innerHTML += `
+                <div class="pedido-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span class="status">${p.ESTADO}</span>
+                        <span style="font-size:12px; color:#94a3b8;">Entrega: <b>${p.FECHA_LIMITE_HABIL}</b></span>
+                    </div>
+                    <div class="info-row"><span class="label">Proyecto:</span> <span>${p.CLIENTE}</span></div>
+                    <div class="info-row"><span class="label">RIF/CI:</span> <span>${p.RIF_CI}</span></div>
+                    <div class="info-row"><span class="label">Ubicación:</span> <span>${p.UBICACION}</span></div>
+                    
+                    <div style="background:#f8fafc; padding:10px; border-radius:8px; margin-top:10px;">
+                        <span class="label">Instrucciones:</span>
+                        <div style="font-size:14px; color:var(--p); font-weight:bold; margin-top:5px;">
+                            Consultar orden detallada en Carpeta Física
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+</script>
+</body>
+</html>
