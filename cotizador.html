@@ -35,19 +35,13 @@
     </style>
 </head>
 <body>
-
     <div id="loader-overlay"><span style="font-size: 30px; margin-bottom:10px;">⚙️</span>Sincronizando con Coralsintec...</div>
-
     <main class="app-main">
         <button class="btn-volver" onclick="window.location.href='index.html'">⬅ VOLVER AL MENÚ</button>
         <h1 class="section-title">Coralsintec</h1>
-        
         <div class="section-header-small">1. Datos del Cliente</div>
         <div class="form-row"><input type="text" id="c-nombre" placeholder="Nombre completo"></div>
-        <div class="form-row" style="display:flex; gap:8px;">
-            <input type="text" id="c-rif" placeholder="RIF/CI" style="flex:1;">
-            <input type="tel" id="c-telefono" placeholder="Teléfono" style="flex:1;">
-        </div>
+        <div class="form-row" style="display:flex; gap:8px;"><input type="text" id="c-rif" placeholder="RIF/CI" style="flex:1;"><input type="tel" id="c-telefono" placeholder="Teléfono" style="flex:1;"></div>
         <div class="form-row"><textarea id="c-ubicacion" placeholder="Ubicación de la obra..." rows="2"></textarea></div>
 
         <div class="section-header-small">2. Detalles del Pedido</div>
@@ -86,71 +80,55 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzEy7UwhlGAOfl-X0vBuI05-qJYJ6KKPcdDwqgSckQ2bvEpxj4dLKYthqpeH5Tvv6mSng/exec";
     let db = []; let carrito = [];
 
-    window.onload = () => {
-        fetch(API_URL + "?action=get_productos").then(r => r.json()).then(data => {
-            db = data; poblarSelects(); document.getElementById('loader-overlay').style.display = 'none';
-        }).catch(e => {
-            alert("Error de conexión. Recargue la página."); document.getElementById('loader-overlay').style.display = 'none';
-        });
-    };
+    window.onload = () => { fetch(API_URL + "?action=get_productos").then(r => r.json()).then(data => { db = data; poblarSelects(); document.getElementById('loader-overlay').style.display = 'none'; }).catch(e => { alert("Error de conexión. Recargue."); document.getElementById('loader-overlay').style.display = 'none'; }); };
 
     function poblarSelects() {
         const ordenFormato = ["30x30", "40x40", "50x50", "60x60", "20x60", "30x60", "40x60", "40x70", "15x75", "10x100", "20x100", "30x100", "40x100", "60x100"];
-        const ordenUso = ["Pared", "Piso"];
-        const ordenTextura = ["Media", "Lisa", "Gruesa", "Veta"];
-        const ordenColor = ["Gris Claro", "Beige", "Gris 1%", "Gris 2%", "Gris 3%"];
-
+        const ordenUso = ["Pared", "Piso"]; const ordenTextura = ["Media", "Lisa", "Gruesa", "Veta"]; const ordenColor = ["Gris Claro", "Beige", "Gris 1%", "Gris 2%", "Gris 3%"];
         const getUnicosYOrdenar = (campo, ordenDeseado) => {
             let unicos = [...new Set(db.map(item => String(item[campo]).trim()))].filter(v => v && v !== "undefined");
-            unicos.sort((a, b) => {
-                let indexA = ordenDeseado.indexOf(a); let indexB = ordenDeseado.indexOf(b);
-                if (indexA === -1) indexA = 999; if (indexB === -1) indexB = 999;
-                return indexA - indexB;
-            });
+            unicos.sort((a, b) => { let iA = ordenDeseado.indexOf(a); let iB = ordenDeseado.indexOf(b); return (iA === -1 ? 999 : iA) - (iB === -1 ? 999 : iB); });
             return unicos;
         };
-        
-        const llenar = (id, lista) => {
-            const el = document.getElementById(id);
-            el.innerHTML = lista.map(v => `<option value="${v}">${v}</option>`).join('');
-        };
-
-        llenar('formato', getUnicosYOrdenar('FORMATO', ordenFormato));
-        llenar('uso', getUnicosYOrdenar('USO', ordenUso));
-        llenar('textura', getUnicosYOrdenar('TEXTURA', ordenTextura));
-        llenar('color', getUnicosYOrdenar('COLOR', ordenColor));
+        const llenar = (id, lista) => { document.getElementById(id).innerHTML = lista.map(v => `<option value="${v}">${v}</option>`).join(''); };
+        llenar('formato', getUnicosYOrdenar('FORMATO', ordenFormato)); llenar('uso', getUnicosYOrdenar('USO', ordenUso)); llenar('textura', getUnicosYOrdenar('TEXTURA', ordenTextura)); llenar('color', getUnicosYOrdenar('COLOR', ordenColor));
         calcular();
     }
 
     function manejarTextura() {
         const t = document.getElementById('textura').value; const c = document.getElementById('color');
-        if (t === 'Veta') { c.value = 'Beige'; c.style.opacity = '0.6'; c.style.pointerEvents = 'none'; } 
-        else { c.style.opacity = '1'; c.style.pointerEvents = 'auto'; }
+        if (t === 'Veta') { c.value = 'Beige'; c.style.opacity = '0.6'; c.style.pointerEvents = 'none'; } else { c.style.opacity = '1'; c.style.pointerEvents = 'auto'; }
         calcular();
     }
 
     function calcular() {
         if(!db.length) return;
-        const f = document.getElementById('formato').value, u = document.getElementById('uso').value,
-              t = document.getElementById('textura').value, c = document.getElementById('color').value,
-              m = parseFloat(document.getElementById('metros').value) || 0;
-
+        const f = document.getElementById('formato').value, u = document.getElementById('uso').value, t = document.getElementById('textura').value, c = document.getElementById('color').value, m = parseFloat(document.getElementById('metros').value) || 0;
         let match = db.find(p => String(p.FORMATO).trim() == f && String(p.USO).trim() == u && String(p.TEXTURA).trim() == t && String(p.COLOR).trim() == c);
         let pUnit = 0, esp = "-", ok = false;
         
         if(match) { pUnit = parseFloat(match.PRECIO_USD); esp = match.ESPESOR || "-"; ok = true; }
 
         let total = pUnit * m;
-        if(document.getElementById('carateo').checked && m > 0) total += (Math.ceil(m/40) * (String(c).includes("Beige") || String(c).includes("Gris") ? 60 : 50));
-        if(document.getElementById('sellador').checked && m > 0) total += (Math.ceil(m/35) * 100);
+        
+        // AQUÍ GUARDAMOS LAS CANTIDADES FÍSICAS DE MATERIAL
+        let cantCarateo = 0; let cantSellador = 0;
+        if(document.getElementById('carateo').checked && m > 0) {
+            cantCarateo = Math.ceil(m/40);
+            total += (cantCarateo * (String(c).includes("Beige") || String(c).includes("Gris") ? 60 : 50));
+        }
+        if(document.getElementById('sellador').checked && m > 0) {
+            cantSellador = Math.ceil(m/35);
+            total += (cantSellador * 100);
+        }
 
         document.getElementById('ui-espesor').innerText = esp;
         document.getElementById('ui-unitario').innerText = "$" + pUnit.toFixed(2);
         document.getElementById('ui-unitario').style.color = ok ? "white" : "#ef4444";
         document.getElementById('total-presupuesto').innerText = total.toFixed(2);
 
-        // AQUÍ ESTÁ EL CANDADO: Enviamos m2 asegurados
-        window.calcActual = { ok, desc: `${f} | ${t} | ${c}`, m2: m, total, det: `${m}m² (${u})`, formato: f, uso: u, textura: t, color: c };
+        // ENVIAMOS EL CARATEO Y SELLADOR AL CEREBRO
+        window.calcActual = { ok, desc: `${f} | ${t} | ${c}`, m2: m, total, det: `${m}m² (${u})`, formato: f, uso: u, textura: t, color: c, carateo: cantCarateo, sellador: cantSellador };
     }
 
     function agregar() {
@@ -160,22 +138,17 @@
 
     function render() {
         const l = document.getElementById('cart-list'); let g = 0;
-        l.innerHTML = carrito.map((i, idx) => { g += i.total; return `<div class="cart-item"><b>${i.desc}</b><br>${i.det} - $${i.total.toFixed(2)}</div>`; }).join('');
+        l.innerHTML = carrito.map(i => { g += i.total; return `<div class="cart-item"><b>${i.desc}</b><br>${i.det} - $${i.total.toFixed(2)}</div>`; }).join('');
         document.getElementById('grand-total').innerText = g.toFixed(2);
     }
-
     function vaciar() { carrito = []; document.getElementById('cart-section').style.display = 'none'; render(); }
 
     function enviar() {
         const n = document.getElementById('c-nombre').value, r = document.getElementById('c-rif').value;
         if(!n || !r || !carrito.length) return alert("Faltan datos del cliente o productos.");
-
         document.getElementById('loader-overlay').style.display = 'flex';
         const p = { cliente: n, rif: r, telefono: document.getElementById('c-telefono').value, ubicacion: document.getElementById('c-ubicacion').value, total: document.getElementById('grand-total').innerText, detalles: carrito };
-
-        fetch(API_URL + "?action=nuevo_pedido", { method: "POST", body: JSON.stringify(p) })
-        .then(() => { alert("¡Orden enviada a Planta!"); location.href = 'index.html'; })
-        .catch(() => { alert("Error al enviar."); document.getElementById('loader-overlay').style.display = 'none'; });
+        fetch(API_URL + "?action=nuevo_pedido", { method: "POST", body: JSON.stringify(p) }).then(() => { alert("¡Orden enviada a Planta!"); location.href = 'index.html'; }).catch(() => { alert("Error al enviar."); document.getElementById('loader-overlay').style.display = 'none'; });
     }
 </script>
 </body>
