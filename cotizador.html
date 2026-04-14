@@ -8,81 +8,36 @@
     <meta http-equiv="Expires" content="0">
     <title>Cotizador Coralsintec</title>
     <style>
-        :root {
-            --coralsintec-primary: #1e2328; 
-            --coralsintec-accent: #c49660;  
-            --coralsintec-text-main: #334155;
-            --coralsintec-border: #cbd5e1;
-        }
-
+        :root { --coralsintec-primary: #1e2328; --coralsintec-accent: #c49660; --coralsintec-text-main: #334155; --coralsintec-border: #cbd5e1; }
         html, body { min-height: 100vh; margin: 0; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #9baec0 0%, #7a91a6 100%);
-            background-attachment: fixed;
-            color: var(--coralsintec-text-main);
-            padding: 20px 15px 50px 15px; 
-            display: flex; flex-direction: column; align-items: center;
-        }
-
-        .app-main {
-            background: rgba(255, 255, 255, 0.90); 
-            backdrop-filter: blur(8px); 
-            -webkit-backdrop-filter: blur(8px);
-            padding: 25px 20px; border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-            width: 100%; max-width: 400px; box-sizing: border-box;
-            border-top: 6px solid var(--coralsintec-primary);
-            display: flex; flex-direction: column;
-        }
-
-        .btn-volver {
-            background: white; border: 1px solid var(--coralsintec-border); color: var(--coralsintec-primary);
-            padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer;
-            margin-bottom: 15px; align-self: flex-start; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: linear-gradient(135deg, #9baec0 0%, #7a91a6 100%); background-attachment: fixed; color: var(--coralsintec-text-main); padding: 20px 15px 50px 15px; display: flex; flex-direction: column; align-items: center; }
+        .app-main { background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 25px 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 400px; box-sizing: border-box; border-top: 6px solid var(--coralsintec-primary); display: flex; flex-direction: column; }
+        .btn-volver { background: white; border: 1px solid var(--coralsintec-border); color: var(--coralsintec-primary); padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; align-self: flex-start; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .btn-volver:active { background: #e2e8f0; transform: translateX(-3px); }
-
         .section-title { font-size: 20px; color: var(--coralsintec-primary); margin: 0 0 5px 0; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
         .section-header-small { font-size: 14px; color: white; background: var(--coralsintec-primary); padding: 8px; border-radius: 6px; margin: 20px 0 15px 0; font-weight: bold; text-transform: uppercase; text-align: center;}
-
         .form-row { margin-bottom: 12px; }
         label { display: block; margin-bottom: 5px; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; }
-        
-        select, input, textarea {
-            width: 100%; padding: 12px; border: 2px solid var(--coralsintec-border); border-radius: 10px;
-            font-size: 16px; background-color: rgba(248, 250, 252, 0.9); color: var(--coralsintec-text-main);
-            box-sizing: border-box; font-weight: 600; font-family: inherit;
-        }
+        select, input, textarea { width: 100%; padding: 12px; border: 2px solid var(--coralsintec-border); border-radius: 10px; font-size: 16px; background-color: rgba(248, 250, 252, 0.9); color: var(--coralsintec-text-main); box-sizing: border-box; font-weight: 600; font-family: inherit; }
         select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%231e2328' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1.45 1.45 0 0 1 1.104 2.404l-4.796 5.481a1 1 0 0 1-1.557 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: calc(100% - 12px) center; }
-
         .options-group { background: rgba(248, 250, 252, 0.8); border-radius: 10px; padding: 12px; margin-top: 15px; border: 1px solid var(--coralsintec-border); }
         .option-item { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 700; padding: 5px 0; color: var(--coralsintec-primary); }
         .option-item input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--coralsintec-accent); }
-
         .results-card { margin-top: 20px; padding: 15px; background-color: var(--coralsintec-primary); border-radius: 12px; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .breakdown-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; color: #cbd5e1; }
         .breakdown-val { font-weight: 700; color: white; }
-
         .total-price { font-size: 32px; font-weight: 800; color: var(--coralsintec-accent); text-align: center; margin-top: 10px; }
-
         .add-btn { width: 100%; background-color: var(--coralsintec-accent); color: white; border: none; padding: 16px; border-radius: 10px; font-size: 16px; font-weight: 800; text-transform: uppercase; margin-top: 15px; cursor: pointer; transition: 0.2s; }
         .add-btn:active { transform: scale(0.98); }
         .btn-success { background-color: #10b981; margin-top: 10px; }
-
         .cart-section { width: 100%; max-width: 400px; background: white; padding: 20px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); margin-top: 20px; box-sizing: border-box; }
         .cart-item { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 14px; }
-
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: var(--coralsintec-primary); }
     </style>
 </head>
 <body>
 
-    <div id="loader-overlay">
-        <span style="font-size: 35px; margin-bottom:10px;">⚙️</span>
-        Sincronizando Cerebro Coralsintec...
-    </div>
+    <div id="loader-overlay"><span style="font-size: 35px; margin-bottom:10px;">⚙️</span>Sincronizando Cerebro Coralsintec...</div>
 
     <main class="app-main">
         <button class="btn-volver" onclick="window.location.href='index.html'">⬅ VOLVER AL MENÚ</button>
@@ -98,22 +53,13 @@
         <div class="form-row"><textarea id="c-ubicacion" placeholder="Dirección u obra..." rows="2"></textarea></div>
 
         <div class="section-header-small">2. Configurar Producto</div>
-        <div class="form-row">
-            <label>Formato:</label>
-            <select id="formato" onchange="calcular()"></select>
-        </div>
+        <div class="form-row"><label>Formato:</label><select id="formato" onchange="calcular()"></select></div>
         <div class="form-row" style="display:flex; gap:8px;">
             <div style="flex:1;"><label>Uso:</label><select id="uso" onchange="calcular()"></select></div>
             <div style="flex:1;"><label>Textura:</label><select id="textura" onchange="manejarTextura()"></select></div>
         </div>
-        <div class="form-row">
-            <label>Color:</label>
-            <select id="color" onchange="calcular()"></select>
-        </div>
-        <div class="form-row">
-            <label>Cantidad (m²):</label>
-            <input type="number" id="metros" value="10" step="0.1" min="0" oninput="calcular()">
-        </div>
+        <div class="form-row"><label>Color:</label><select id="color" onchange="calcular()"></select></div>
+        <div class="form-row"><label>Cantidad (m²):</label><input type="number" id="metros" value="10" step="0.1" min="0" oninput="calcular()"></div>
 
         <div class="options-group">
             <label class="option-item"><span>Incluir Carateo (Sacos)</span><input type="checkbox" id="carateo" onchange="calcular()"></label>
@@ -140,184 +86,50 @@
     </section>
 
 <script>
-    // URL MAESTRA ACTUALIZADA
-    const API_URL = "https://script.google.com/macros/s/AKfycbycCQABTEIO3-sEjR3DqBHIJCKNyVQW6E-Z3fODSrP8Pwr9T5d2epu0KRWy6hKwYSCRhw/exec";
+    // NUEVA URL MAESTRA
+    const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
     
-    let db = [];
-    let carrito = [];
+    let db = []; let carrito = [];
 
     window.onload = () => {
-        fetch(API_URL + "?action=get_productos")
-        .then(r => r.json())
-        .then(data => {
-            db = data;
-            poblarSelects();
-            document.getElementById('loader-overlay').style.display = 'none';
-        })
-        .catch(e => {
-            alert("Error cargando base de datos. Recargue la página.");
-            document.getElementById('loader-overlay').style.display = 'none';
+        fetch(API_URL + "?action=get_productos").then(r => r.json()).then(data => {
+            db = data; poblarSelects(); document.getElementById('loader-overlay').style.display = 'none';
+        }).catch(e => {
+            alert("Error cargando base de datos. Recargue la página."); document.getElementById('loader-overlay').style.display = 'none';
         });
     };
 
     function poblarSelects() {
         const ordenFormato = ["30x30", "40x40", "50x50", "60x60", "20x60", "30x60", "40x60", "40x70", "15x75", "10x100", "20x100", "30x100", "40x100", "60x100"];
-        const ordenUso = ["Pared", "Piso"];
-        const ordenTextura = ["Media", "Lisa", "Gruesa", "Veta"];
-        const ordenColor = ["Gris Claro", "Beige", "Gris 1%", "Gris 2%", "Gris 3%"];
-
+        const ordenUso = ["Pared", "Piso"]; const ordenTextura = ["Media", "Lisa", "Gruesa", "Veta"]; const ordenColor = ["Gris Claro", "Beige", "Gris 1%", "Gris 2%", "Gris 3%"];
         const getUnicosYOrdenar = (campo, ordenDeseado) => {
             let unicos = [...new Set(db.map(item => String(item[campo]).trim()))].filter(v => v && v !== "undefined");
-            unicos.sort((a, b) => {
-                let indexA = ordenDeseado.indexOf(a);
-                let indexB = ordenDeseado.indexOf(b);
-                return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-            });
+            unicos.sort((a, b) => { let indexA = ordenDeseado.indexOf(a); let indexB = ordenDeseado.indexOf(b); return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB); });
             return unicos;
         };
-        
-        const llenar = (id, lista) => {
-            const el = document.getElementById(id);
-            el.innerHTML = lista.map(v => `<option value="${v}">${v}</option>`).join('');
-        };
-
-        llenar('formato', getUnicosYOrdenar('FORMATO', ordenFormato));
-        llenar('uso', getUnicosYOrdenar('USO', ordenUso));
-        llenar('textura', getUnicosYOrdenar('TEXTURA', ordenTextura));
-        llenar('color', getUnicosYOrdenar('COLOR', ordenColor));
+        const llenar = (id, lista) => { document.getElementById(id).innerHTML = lista.map(v => `<option value="${v}">${v}</option>`).join(''); };
+        llenar('formato', getUnicosYOrdenar('FORMATO', ordenFormato)); llenar('uso', getUnicosYOrdenar('USO', ordenUso)); llenar('textura', getUnicosYOrdenar('TEXTURA', ordenTextura)); llenar('color', getUnicosYOrdenar('COLOR', ordenColor));
         calcular();
     }
 
     function manejarTextura() {
-        const t = document.getElementById('textura').value;
-        const c = document.getElementById('color');
-        if (t === 'Veta') {
-            c.value = 'Beige';
-            c.style.opacity = '0.6';
-            c.style.pointerEvents = 'none';
-        } else {
-            c.style.opacity = '1';
-            c.style.pointerEvents = 'auto';
-        }
+        const t = document.getElementById('textura').value; const c = document.getElementById('color');
+        if (t === 'Veta') { c.value = 'Beige'; c.style.opacity = '0.6'; c.style.pointerEvents = 'none'; } else { c.style.opacity = '1'; c.style.pointerEvents = 'auto'; }
         calcular();
     }
 
     function calcular() {
         if(!db.length) return;
-        const f = document.getElementById('formato').value;
-        const u = document.getElementById('uso').value;
-        const t = document.getElementById('textura').value;
-        const c = document.getElementById('color').value;
-        const m = parseFloat(document.getElementById('metros').value) || 0;
-
-        let match = db.find(p => 
-            String(p.FORMATO).trim() == f && 
-            String(p.USO).trim() == u && 
-            String(p.TEXTURA).trim() == t && 
-            String(p.COLOR).trim() == c
-        );
-
+        const f = document.getElementById('formato').value, u = document.getElementById('uso').value, t = document.getElementById('textura').value, c = document.getElementById('color').value, m = parseFloat(document.getElementById('metros').value) || 0;
+        let match = db.find(p => String(p.FORMATO).trim() == f && String(p.USO).trim() == u && String(p.TEXTURA).trim() == t && String(p.COLOR).trim() == c);
         let pUnit = 0, esp = "-", ok = false;
-        if(match) {
-            pUnit = parseFloat(match.PRECIO_USD);
-            esp = match.ESPESOR || "-";
-            ok = true;
-        }
-
-        let subtotal = pUnit * m;
-        let cantCarateo = 0;
-        let cantSellador = 0;
-
-        if(document.getElementById('carateo').checked && m > 0) {
-            cantCarateo = Math.ceil(m / 40);
-            subtotal += (cantCarateo * (String(c).includes("Beige") || String(c).includes("Gris") ? 60 : 50));
-        }
         
-        if(document.getElementById('sellador').checked && m > 0) {
-            cantSellador = Math.ceil(m / 35);
-            subtotal += (cantSellador * 100);
-        }
+        if(match) { pUnit = parseFloat(match.PRECIO_USD); esp = match.ESPESOR || "-"; ok = true; }
 
-        document.getElementById('ui-espesor').innerText = esp;
-        document.getElementById('ui-unitario').innerText = "$" + pUnit.toFixed(2);
-        document.getElementById('ui-unitario').style.color = ok ? "white" : "#ef4444";
-        document.getElementById('total-presupuesto').innerText = subtotal.toFixed(2);
+        let subtotal = pUnit * m; let cantCarateo = 0; let cantSellador = 0;
+        if(document.getElementById('carateo').checked && m > 0) { cantCarateo = Math.ceil(m / 40); subtotal += (cantCarateo * (String(c).includes("Beige") || String(c).includes("Gris") ? 60 : 50)); }
+        if(document.getElementById('sellador').checked && m > 0) { cantSellador = Math.ceil(m / 35); subtotal += (cantSellador * 100); }
 
-        window.calcActual = { 
-            ok, 
-            desc: `${f} | ${t} | ${c}`, 
-            m2: m, 
-            total: subtotal, 
-            det: `${m}m² (${u})`,
-            formato: f,
-            uso: u,
-            textura: t,
-            color: c,
-            carateo: cantCarateo,
-            sellador: cantSellador
-        };
-    }
-
-    function agregar() {
-        if(!window.calcActual || !window.calcActual.ok || window.calcActual.m2 <= 0) {
-            return alert("Selección no válida o cantidad en cero.");
-        }
-        carrito.push({...window.calcActual});
-        document.getElementById('cart-section').style.display = 'block';
-        render();
-    }
-
-    function render() {
-        const l = document.getElementById('cart-list');
-        let g = 0;
-        l.innerHTML = carrito.map(i => {
-            g += i.total;
-            return `<div class="cart-item">
-                        <div style="display:flex; justify-content:space-between;">
-                            <b>${i.desc}</b>
-                            <b>$${i.total.toFixed(2)}</b>
-                        </div>
-                        <small>${i.det} ${i.carateo > 0 ? '+ Carateo' : ''} ${i.sellador > 0 ? '+ Sellador' : ''}</small>
-                    </div>`;
-        }).join('');
-        document.getElementById('grand-total').innerText = g.toFixed(2);
-    }
-
-    function vaciar() {
-        carrito = [];
-        document.getElementById('cart-section').style.display = 'none';
-        render();
-    }
-
-    function enviar() {
-        const n = document.getElementById('c-nombre').value;
-        const r = document.getElementById('c-rif').value;
-        if(!n || !r || !carrito.length) return alert("Complete los datos del cliente y agregue productos.");
-
-        document.getElementById('loader-overlay').style.display = 'flex';
-        
-        const payload = {
-            cliente: n.toUpperCase(),
-            rif: r.toUpperCase(),
-            telefono: document.getElementById('c-telefono').value,
-            ubicacion: document.getElementById('c-ubicacion').value,
-            total: document.getElementById('grand-total').innerText,
-            detalles: carrito
-        };
-
-        fetch(API_URL + "?action=nuevo_pedido", { 
-            method: "POST", 
-            body: JSON.stringify(payload) 
-        })
-        .then(() => {
-            alert("¡ORDEN ENVIADA A PLANTA CON ÉXITO!");
-            location.href = 'index.html';
-        })
-        .catch(e => {
-            alert("Error de conexión al enviar.");
-            document.getElementById('loader-overlay').style.display = 'none';
-        });
-    }
-</script>
-</body>
-</html>
+        document.getElementById('ui-espesor').innerText = esp; document.getElementById('ui-unitario').innerText = "$" + pUnit.toFixed(2);
+        document.getElementById('ui-unitario').style.color = ok ? "white" : "#ef4444"; document.getElementById('total-presupuesto').innerText = subtotal.toFixed(2);
+        window.calcActual =
