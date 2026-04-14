@@ -34,19 +34,10 @@
             display: flex; flex-direction: column;
         }
 
-        /* BOTÓN VOLVER */
         .btn-volver {
-            background: none;
-            border: 1px solid var(--coralsintec-border);
-            color: var(--coralsintec-primary);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 15px;
-            align-self: flex-start;
-            transition: 0.2s;
+            background: none; border: 1px solid var(--coralsintec-border); color: var(--coralsintec-primary);
+            padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer;
+            margin-bottom: 15px; align-self: flex-start; transition: 0.2s;
         }
         .btn-volver:active { background: #e2e8f0; transform: translateX(-3px); }
 
@@ -103,22 +94,13 @@
         <div class="form-row"><textarea id="c-ubicacion" placeholder="Ubicación de la obra..." rows="2"></textarea></div>
 
         <div class="section-header-small">2. Detalles del Pedido</div>
-        <div class="form-row">
-            <label>Formato:</label>
-            <select id="formato" onchange="calcular()"></select>
-        </div>
+        <div class="form-row"><label>Formato:</label><select id="formato" onchange="calcular()"></select></div>
         <div class="form-row" style="display:flex; gap:8px;">
             <div style="flex:1;"><label>Uso:</label><select id="uso" onchange="calcular()"></select></div>
             <div style="flex:1;"><label>Textura:</label><select id="textura" onchange="manejarTextura()"></select></div>
         </div>
-        <div class="form-row">
-            <label>Color:</label>
-            <select id="color" onchange="calcular()"></select>
-        </div>
-        <div class="form-row">
-            <label>Metros (m²):</label>
-            <input type="number" id="metros" value="10" step="0.1" oninput="calcular()">
-        </div>
+        <div class="form-row"><label>Color:</label><select id="color" onchange="calcular()"></select></div>
+        <div class="form-row"><label>Metros (m²):</label><input type="number" id="metros" value="10" step="0.1" oninput="calcular()"></div>
 
         <div class="options-group">
             <label class="option-item"><span>Incluir Carateo</span><input type="checkbox" id="carateo" onchange="calcular()"></label>
@@ -145,7 +127,7 @@
     </section>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxQbx8F5XiFhhQKt9yHEP5a2cU-WBTcQbjHiuqMjaYpXRyxKX_ISz-SIqqJzsn-1V8nCQ/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzEy7UwhlGAOfl-X0vBuI05-qJYJ6KKPcdDwqgSckQ2bvEpxj4dLKYthqpeH5Tvv6mSng/exec";
     let db = [];
     let carrito = [];
 
@@ -238,7 +220,18 @@
         document.getElementById('ui-unitario').style.color = ok ? "white" : "#ef4444";
         document.getElementById('total-presupuesto').innerText = total.toFixed(2);
 
-        window.calcActual = { ok, desc: `${f} | ${t} | ${c}`, m, total, det: `${m}m² (${u})` };
+        // AQUI GUARDAMOS LOS DATOS DESGLOSADOS PARA LA PLANTA
+        window.calcActual = { 
+            ok, 
+            desc: `${f} | ${t} | ${c}`, 
+            m, 
+            total, 
+            det: `${m}m² (${u})`,
+            formato: f,
+            uso: u,
+            textura: t,
+            color: c
+        };
     }
 
     function agregar() {
@@ -273,7 +266,8 @@
         const p = { 
             cliente: n, rif: r, telefono: document.getElementById('c-telefono').value, 
             ubicacion: document.getElementById('c-ubicacion').value, 
-            total: document.getElementById('grand-total').innerText 
+            total: document.getElementById('grand-total').innerText,
+            detalles: carrito // ESTO ES LO QUE LLEGA A PLANTA
         };
 
         fetch(API_URL + "?action=nuevo_pedido", { method: "POST", body: JSON.stringify(p) })
