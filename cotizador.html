@@ -267,7 +267,7 @@
             cliente: n, rif: r, telefono: document.getElementById('c-telefono').value, 
             ubicacion: document.getElementById('c-ubicacion').value, 
             total: document.getElementById('grand-total').innerText,
-            detalles: carrito // ESTO ES LO QUE LLEGA A PLANTA
+            detalles: carrito // ESTO ES LO QUE LLEGA A PLANTA DESGLOSADO
         };
 
         fetch(API_URL + "?action=nuevo_pedido", { method: "POST", body: JSON.stringify(p) })
