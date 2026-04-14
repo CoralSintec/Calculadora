@@ -116,7 +116,10 @@
                 let dim = i.formato.toLowerCase().split('x');
                 let pcs = Math.ceil(m / ((dim[0]*dim[1])/10000));
                 totalCarateo += i.carateo || 0; totalSellador += i.sellador || 0;
+                
+                // Cálculo de consumo estimado basado en m2 y textura
                 let consumoEst = (i.textura === 'Gruesa' ? 15 : 10) * m;
+
                 html += `<tr><td>${i.formato}</td><td>${i.color}</td><td>${m}m²</td><td class="pcs-badge">${pcs} pcs<br><small style="font-weight:400;color:#64748b;">~${consumoEst}kg Cem.</small></td></tr>`;
             });
 
