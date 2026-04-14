@@ -27,7 +27,8 @@
         .info b { display: block; font-size: 14px; text-transform: uppercase; }
         .info span { font-size: 11px; color: #64748b; }
         .price { font-size: 16px; font-weight: 900; color: var(--green); margin-right: 15px; }
-        .btn-edit { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .btn-edit { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-left: 5px; }
+        .btn-add { background: var(--p); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 800; }
         #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:100; display:flex; flex-direction:column; justify-content:center; align-items:center; font-weight:bold; }
     </style>
 </head>
@@ -41,7 +42,7 @@
         <div class="kpi-grid">
             <div class="kpi-card" style="border-top-color:var(--blue);"><div class="kpi-title">Ventas Acumuladas</div><div class="kpi-val" id="k-v" style="color:var(--blue);">$0</div></div>
             <div class="kpi-card" style="border-top-color:var(--red);"><div class="kpi-title">Costo Operativo</div><div class="kpi-val" id="k-c" style="color:var(--red);">$0</div></div>
-            <div class="kpi-card kpi-full"><div class="kpi-title">Lo que queda (Balance)</div><div class="kpi-val" id="k-b">$0</div></div>
+            <div class="kpi-card kpi-full"><div class="kpi-title">Monto de lo que queda (Balance)</div><div class="kpi-val" id="k-b">$0</div></div>
         </div>
         <div class="tabs">
             <button class="tab-btn active" onclick="showTab('nomina', this)">Nómina</button>
@@ -100,6 +101,7 @@
                 return `<div class="card" style="border-left-color:${color};"><div class="card-row">
                 <div class="info"><b>📦 ${m.MATERIAL}</b><span>$${m.COSTO_UNITARIO_USD}/${m.UNIDAD_MEDIDA}</span></div>
                 <div style="display:flex;align-items:center;"><div class="price" style="color:${color}">${stock}</div>
+                <button class="btn-add" onclick="sumarStock('${m.MATERIAL}', ${stock})">➕</button>
                 <button class="btn-edit" onclick="edit('INVENTARIO_COSTOS','MATERIAL','${m.MATERIAL}',2,'${m.COSTO_UNITARIO_USD}')">✏️ $</button></div></div>
                 <div style="width:100%;background:#eee;height:6px;border-radius:3px;margin-top:8px;"><div style="width:${Math.min((stock/2000)*100,100)}%;background:${color};height:100%;"></div></div></div>`;
             }).join('');
@@ -113,6 +115,21 @@
         if(!n || n == a || isNaN(n)) return;
         document.getElementById('loader').style.display = 'flex';
         fetch(API_URL + "?action=editar_registro", { method: "POST", mode: "no-cors", body: JSON.stringify({ hoja: h, col_busqueda: (cb=='NOMBRE'?1:0), id: id, col_editar: ce, nuevo_valor: n }) })
+        .finally(() => { setTimeout(() => { cargarTodo(); }, 2000); });
+    }
+
+    function sumarStock(material, actual) {
+        let cuanto = prompt("¿Cuánta cantidad de " + material + " está entrando al galpón?", "0");
+        if(!cuanto || isNaN(cuanto) || cuanto <= 0) return;
+        
+        let nuevoTotal = parseFloat(actual) + parseFloat(cuanto);
+        
+        document.getElementById('loader').style.display = 'flex';
+        fetch(API_URL + "?action=editar_registro", { 
+            method: "POST", 
+            mode: "no-cors", 
+            body: JSON.stringify({ hoja: 'INVENTARIO_COSTOS', col_busqueda: 0, id: material, col_editar: 3, nuevo_valor: nuevoTotal }) 
+        })
         .finally(() => { setTimeout(() => { cargarTodo(); }, 2000); });
     }
 </script>
