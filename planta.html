@@ -5,40 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Producción Coralsintec</title>
     <style>
-        :root { --p: #1e2328; --accent: #f59e0b; }
-        body { font-family: sans-serif; background: #f3f4f6; margin: 0; padding: 15px; }
-        .header { background: var(--p); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
-        .order-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 5px solid var(--accent); }
+        :root { 
+            --coralsintec-primary: #1e2328; 
+            --coralsintec-border: #cbd5e1;
+            --accent: #f59e0b; 
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f3f4f6; 
+            margin: 0; 
+            padding: 20px 15px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        /* Contenedor principal para centrar en móviles */
+        .app-main {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* BOTÓN VOLVER */
+        .btn-volver {
+            background: none; border: 1px solid var(--coralsintec-border); color: var(--coralsintec-primary);
+            padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer;
+            margin-bottom: 15px; align-self: flex-start; transition: 0.2s;
+        }
+        .btn-volver:active { background: #e2e8f0; transform: translateX(-3px); }
+
+        .header { background: var(--coralsintec-primary); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+        
+        .order-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--accent); }
         .client-info { font-size: 14px; margin-bottom: 15px; color: #475569; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        th { background: #f8fafc; color: var(--p); text-align: left; padding: 8px; border-bottom: 2px solid #e2e8f0; font-size: 11px;}
+        th { background: #f8fafc; color: var(--coralsintec-primary); text-align: left; padding: 8px; border-bottom: 2px solid #e2e8f0; font-size: 11px;}
         td { padding: 8px; border-bottom: 1px solid #f1f5f9; color: #1e293b; font-weight: 600; }
         
         .qty-badge { background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-weight: 800; display: inline-block;}
         .pcs-badge { color: #166534; font-weight: 900; font-size: 15px;}
-        .btn-volver { background: white; border: 1px solid #cbd5e1; color: var(--p); padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+        
+        #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f3f4f6; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: var(--coralsintec-primary); font-size: 18px;}
     </style>
 </head>
 <body>
-    <button class="btn-volver" onclick="location.href='index.html'">⬅ Volver al Menú</button>
-    <div class="header">
-        <h2 style="margin:0;">HOJAS DE RUTA TÉCNICA</h2>
-        <p style="margin:5px 0 0 0; font-size:12px; color:#cbd5e1;">Departamento de Producción</p>
+
+    <div id="loader-overlay">
+        <span style="font-size: 30px; margin-bottom:10px;">⏳</span>
+        Sincronizando Órdenes...
     </div>
 
-    <div id="loader" style="text-align:center; padding: 40px; font-weight: bold; color: var(--p);">⏳ Sincronizando con el Cerebro...</div>
-    <div id="lista-pedidos"></div>
+    <main class="app-main">
+        <button class="btn-volver" onclick="window.location.href='index.html'">⬅ VOLVER AL MENÚ</button>
+
+        <div class="header">
+            <h2 style="margin:0; letter-spacing: 1px;">HOJAS DE RUTA</h2>
+            <p style="margin:5px 0 0 0; font-size:12px; color:#cbd5e1;">Departamento de Producción</p>
+        </div>
+
+        <div id="lista-pedidos"></div>
+    </main>
 
 <script>
+    // TU LLAVE MAESTRA
     const API_URL = "https://script.google.com/macros/s/AKfycbzEy7UwhlGAOfl-X0vBuI05-qJYJ6KKPcdDwqgSckQ2bvEpxj4dLKYthqpeH5Tvv6mSng/exec";
 
     window.onload = () => {
         fetch(API_URL + "?action=get_pedidos")
         .then(r => r.json())
         .then(data => {
-            document.getElementById('loader').style.display = 'none';
+            document.getElementById('loader-overlay').style.display = 'none';
             renderPedidos(data);
+        })
+        .catch(e => {
+            alert("Error de conexión. Recargue la página.");
+            document.getElementById('loader-overlay').style.display = 'none';
         });
     };
 
@@ -52,9 +96,15 @@
 
     function renderPedidos(pedidos) {
         const container = document.getElementById('lista-pedidos');
+        
+        if(pedidos.length === 0) {
+            container.innerHTML = "<p style='text-align:center; color:#64748b;'>No hay órdenes pendientes en Planta.</p>";
+            return;
+        }
+
         // Mostrar los pedidos más recientes primero
         pedidos.reverse().forEach(p => {
-            // Solo procesamos si hay detalles en formato JSON
+            // Solo procesamos si hay detalles desglosados en formato JSON
             if(!p.DETALLES_JSON) return; 
             
             let items = [];
@@ -64,9 +114,9 @@
                 <div class="order-card">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <div class="client-info">
-                            <b style="font-size:18px; color:var(--p); text-transform:uppercase;">${p.CLIENTE}</b><br>
-                            <span style="color:#64748b;">RIF: ${p.RIF_CI}</span><br>
-                            <span style="color:#64748b;">Obra: ${p.UBICACION}</span>
+                            <b style="font-size:18px; color:var(--coralsintec-primary); text-transform:uppercase;">${p.CLIENTE}</b><br>
+                            <span style="color:#64748b; font-size:12px;"><b>RIF:</b> ${p.RIF_CI}</span><br>
+                            <span style="color:#64748b; font-size:12px;"><b>OBRA:</b> ${p.UBICACION}</span>
                         </div>
                         <div style="text-align:right; background: #fffbeb; padding: 8px 12px; border-radius: 8px; border: 1px solid #fef3c7;">
                             <span style="font-size:10px; font-weight:bold; color:#b45309;">ENTREGA ESTIMADA:</span><br>
