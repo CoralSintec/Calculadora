@@ -16,7 +16,6 @@
         
         .order-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--accent); position: relative;}
         
-        /* BOTONES DE DOCUMENTOS PDF */
         .doc-buttons { position: absolute; top: 12px; right: 12px; display: flex; gap: 5px; }
         .btn-doc { background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 5px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
         .btn-doc:hover { background: #e2e8f0; color: var(--p); border-color: #94a3b8; }
@@ -58,7 +57,6 @@
         
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(243, 244, 246, 0.95); z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: var(--p); font-size: 18px;}
         
-        /* MODAL DE DESPACHO */
         .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; justify-content: center; align-items: center; }
         .modal-card { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-card h3 { margin: 0 0 15px 0; color: var(--p); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;}
@@ -102,7 +100,7 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
     const usuarioActual = localStorage.getItem('usuarioCoralsintec') || 'PLANTA';
-    let pedidosGlobal = []; // Para los PDF
+    let pedidosGlobal = [];
 
     window.onload = () => {
         const badge = document.getElementById('badge-usuario');
@@ -185,7 +183,7 @@
             items.forEach(i => {
                 let m = parseFloat(i.m2 || 0);
                 let dim = i.formato.toLowerCase().split('x');
-                let pcs = Math.ceil(m / ((dim[0]*dim[1])/10000));
+                let pcs = Math.ceil(parseFloat(i.m2) / ((dim[0]*dim[1])/10000));
                 totalCarateo += i.carateo || 0; totalSellador += i.sellador || 0;
                 
                 tablaDetallesHtml += `<tr><td>${i.formato}</td><td><b>${i.uso}</b></td><td>${i.color}</td><td>${i.textura}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
@@ -280,7 +278,6 @@
         });
     }
 
-    // --- MOTOR GENERADOR DE PDF --- //
     function prepararPDF(fechaOrden, tipo) {
         if(tipo === 'entrega') {
             document.getElementById('ch-id-pedido').value = fechaOrden;
@@ -323,20 +320,25 @@
             <meta charset="UTF-8">
             <title>${tituloDoc} - ${p.CLIENTE}</title>
             <style>
-                body { font-family: Arial, sans-serif; color: #333; margin: 40px; font-size: 14px; }
-                .header { border-bottom: 3px solid #1e2328; padding-bottom: 15px; margin-bottom: 30px; display:flex; justify-content:space-between; align-items:flex-end;}
-                .empresa h1 { margin: 0 0 5px 0; color: #1e2328; font-size:22px; text-transform:uppercase;}
-                .empresa p { margin: 0; color: #666; font-size:12px;}
+                body { font-family: Arial, sans-serif; color: #333; margin: 40px; font-size: 13px; line-height: 1.4; }
+                .header { border-bottom: 3px solid #1e2328; padding-bottom: 15px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:flex-end;}
+                .empresa h1 { margin: 0 0 5px 0; color: #1e2328; font-size:20px; text-transform:uppercase; letter-spacing: 1px;}
+                .empresa p { margin: 2px 0; color: #475569; font-size:11px; font-weight: bold;}
+                .empresa .slogan { font-style: italic; color: #f59e0b; margin-top: 4px; font-weight: normal;}
                 .titulo-doc { text-align: right;}
-                .titulo-doc h2 { margin: 0; color: #f59e0b; font-size:20px;}
-                .info-grid { display: flex; justify-content: space-between; margin-bottom: 30px; background: #f8fafc; padding: 15px; border-radius: 8px;}
+                .titulo-doc h2 { margin: 0 0 5px 0; color: #1e2328; font-size:18px;}
+                .info-grid { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;}
                 .info-box p { margin: 5px 0; }
-                table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-                th { background: #1e2328; color: white; padding: 10px; text-align: left; font-size:12px;}
-                td { border-bottom: 1px solid #ddd; padding: 10px; font-size:13px;}
-                .total-box { text-align: right; font-size: 18px; font-weight: bold; margin-top: 20px; }
-                .firmas { margin-top: 80px; display: flex; justify-content: space-around; text-align: center; }
-                .firma-linea { border-top: 1px solid #000; width: 200px; padding-top: 5px; font-weight: bold; }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                th { background: #1e2328; color: white; padding: 10px; text-align: left; font-size:11px; text-transform: uppercase;}
+                td { border-bottom: 1px solid #e2e8f0; padding: 10px; font-size:12px;}
+                .total-box { text-align: right; font-size: 16px; font-weight: 900; margin-top: 15px; padding: 10px; background: #ecfccb; display: inline-block; float: right; border-radius: 6px;}
+                .terminos { clear: both; margin-top: 40px; font-size: 10px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 10px;}
+                .terminos h4 { margin: 0 0 8px 0; color: #1e2328; font-size: 11px; text-transform: uppercase;}
+                .terminos ul { margin: 0; padding-left: 15px; }
+                .terminos li { margin-bottom: 4px; }
+                .firmas { margin-top: 60px; display: flex; justify-content: space-around; text-align: center; }
+                .firma-linea { border-top: 1px solid #000; width: 200px; padding-top: 5px; font-weight: bold; font-size: 11px; }
                 @media print { body { margin: 0; } .no-print { display: none; } }
             </style>
         </head>
@@ -344,7 +346,10 @@
             <div class="header">
                 <div class="empresa">
                     <h1>REVESTIMIENTOS CORALROCK C.A.</h1>
-                    <p>Coralsintec | Caracas, Distrito Capital</p>
+                    <p>RIF: J-50317540-0</p>
+                    <p>by Coralsintec</p>
+                    <p class="slogan">Playing with concrete since 1986</p>
+                    <p>Caracas - Venezuela</p>
                 </div>
                 <div class="titulo-doc">
                     <h2>${tituloDoc}</h2>
@@ -357,18 +362,16 @@
                     <p><b>Cliente:</b> ${p.CLIENTE}</p>
                     <p><b>RIF/CI:</b> ${p.RIF_CI || 'No registrado'}</p>
                     <p><b>Teléfono:</b> ${p.TELEFONO || 'No registrado'}</p>
-                </div>
-                <div class="info-box">
                     <p><b>Obra / Ubicación:</b> ${p.UBICACION}</p>
                 </div>
             </div>`;
 
         if(tipo === 'entrega' && datosChofer) {
             htmlPDF += `
-            <div style="border: 2px dashed #cbd5e1; padding: 15px; margin-bottom: 30px; border-radius: 8px;">
+            <div style="border: 2px dashed #cbd5e1; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
                 <h4 style="margin: 0 0 10px 0; color: #3b82f6;">📦 Datos de Transporte</h4>
-                <p style="margin: 3px 0;"><b>Destino:</b> ${datosChofer.destino}</p>
-                <p style="margin: 3px 0;"><b>Chofer:</b> ${datosChofer.nombre}</p>
+                <p style="margin: 3px 0;"><b>Destino de Carga:</b> ${datosChofer.destino}</p>
+                <p style="margin: 3px 0;"><b>Conductor Asignado:</b> ${datosChofer.nombre}</p>
                 <p style="margin: 3px 0;"><b>Vehículo:</b> ${datosChofer.modelo} (${datosChofer.anio}) | <b>Color:</b> ${datosChofer.color} | <b>Placa:</b> ${datosChofer.placa}</p>
             </div>`;
         }
@@ -396,9 +399,9 @@
         htmlPDF += `</tbody></table>`;
 
         if(tCarateo > 0 || tSellador > 0) {
-            htmlPDF += `<h4>Adicionales de Instalación:</h4><ul>`;
-            if(tCarateo > 0) htmlPDF += `<li>Carateo Sintético: ${tCarateo} Sacos</li>`;
-            if(tSellador > 0) htmlPDF += `<li>Sellador Acrílico: ${tSellador} Galones</li>`;
+            htmlPDF += `<h4 style="margin-bottom:5px;">Adicionales de Instalación:</h4><ul style="margin-top:0;">`;
+            if(tCarateo > 0) htmlPDF += `<li>Carateo Sintético: <b>${tCarateo} Sacos</b></li>`;
+            if(tSellador > 0) htmlPDF += `<li>Sellador Acrílico: <b>${tSellador} Galones</b></li>`;
             htmlPDF += `</ul>`;
         }
 
@@ -406,8 +409,20 @@
             htmlPDF += `<div class="total-box">TOTAL PRESUPUESTO: $${total.toFixed(2)}</div>`;
         }
 
-        let textoFirma1 = tipo === 'entrega' ? 'Despachado por (Planta)' : 'Firma Empresa';
-        let textoFirma2 = tipo === 'entrega' ? 'Recibido por (Chofer/Cliente)' : 'Firma Cliente';
+        htmlPDF += `
+            <div class="terminos">
+                <h4>Condiciones Comerciales y de Despacho</h4>
+                <ul>
+                    <li><b>Métodos de Pago:</b> Se requiere un 50% de anticipo para procesar la orden y el 50% restante previo al despacho. Consultar disponibilidad de pago en divisas o moneda nacional a la tasa acordada.</li>
+                    <li><b>Tiempos de Producción:</b> El tiempo de fabricación es de 25 días hábiles contados desde la confirmación del pago inicial.</li>
+                    <li><b>Compromiso de Descarga:</b> El cliente asume la responsabilidad de contar con personal adecuado en la obra para la descarga del material. Los conductores y el personal de transporte no realizan labores de estiba o descarga.</li>
+                    <li><b>Despacho y Traslado:</b> La mercancía viaja por cuenta y riesgo del comprador. La empresa no se hace responsable por daños, roturas o pérdidas ocasionadas por terceros durante el flete.</li>
+                    <li><b>Características del Producto:</b> Al tratarse de revestimientos arquitectónicos a base de concreto, pueden existir variaciones naturales en el tono y textura.</li>
+                </ul>
+            </div>`;
+
+        let textoFirma1 = tipo === 'entrega' ? 'Despachado por (Planta)' : 'Emitido por la Empresa';
+        let textoFirma2 = tipo === 'entrega' ? 'Recibido Conforme (Chofer/Cliente)' : 'Firma de Aceptación (Cliente)';
 
         htmlPDF += `
             <div class="firmas">
@@ -425,7 +440,6 @@
         printWindow.document.close();
     }
 
-    // --- ACCIONES ESTANDAR --- //
     function accion(c, f, e) {
         if(!confirm("¿Confirmar cambio a: " + e + "?")) return;
         document.getElementById('loader-overlay').style.display = 'flex';
