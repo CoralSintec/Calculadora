@@ -114,6 +114,10 @@
             return; 
         }
 
+        // Verifica si la hoja de formulas existe y tiene datos
+        let alertaGlobal = formulas.length === 0 ? "<div style='background:#fee2e2; color:#991b1b; padding:10px; border-radius:8px; margin-bottom:15px; font-size:12px; font-weight:bold; text-align:center;'>⚠️ ERROR: No se encontró la pestaña 'FORMULACION' en el Excel. Revisa el nombre.</div>" : "";
+        container.innerHTML += alertaGlobal;
+
         pedidos.reverse().forEach(p => {
             if(!p.DETALLES_JSON) return;
             let items = JSON.parse(p.DETALLES_JSON);
@@ -158,14 +162,18 @@
                 
                 tablaDetallesHtml += `<tr><td>${i.formato}</td><td>${i.color}</td><td>${i.textura}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
                 
-                // BUSCADOR INTELIGENTE EN LA INTERFAZ
-                let colorTxt = String(i.color).toUpperCase().trim();
-                let texturaTxt = String(i.textura).toUpperCase().trim();
-                let texturaCorta = texturaTxt.substring(0, 4); 
+                // BUSCADOR HIPER-AGRESIVO (Normalizando textos)
+                let colorNorm = String(i.color).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
+                let textNorm = String(i.textura).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
+                let textCorta = textNorm.substring(0, 4); 
+                
+                let palabrasColor = colorNorm.split(' ');
 
                 let formulaEncontrada = formulas.find(f => {
-                    let filaCompleta = String(Object.values(f).join(' ')).toUpperCase();
-                    return filaCompleta.includes(colorTxt) && filaCompleta.includes(texturaCorta);
+                    let filaCompleta = String(Object.values(f).join(' ')).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+                    let colorMatch = palabrasColor.every(palabra => filaCompleta.includes(palabra));
+                    let texturaMatch = filaCompleta.includes(textCorta);
+                    return colorMatch && texturaMatch;
                 });
 
                 recetaHtml += `<div class="receta-item">
@@ -191,7 +199,10 @@
                         ${c_est > 0 ? `<li><b>Estuco:</b> ${c_est} kg</li>` : ''}
                     </ul>`;
                 } else {
-                    recetaHtml += `<div style="color:#ef4444; font-size:12px; font-weight:bold;">⚠️ Fórmula no registrada en Excel.</div>`;
+                    // EL DETECTOR DE ERRORES: Te dice qué está buscando
+                    recetaHtml += `<div style="color:#ef4444; font-size:12px; font-weight:bold;">⚠️ Fórmula no registrada en Excel.<br>
+                        <span style="font-weight:normal; font-size:10px; color:#64748b;">(El sistema buscó una fila que contenga: <b>${palabrasColor.join(' + ')}</b> y <b>${textCorta}</b>)</span>
+                    </div>`;
                 }
                 recetaHtml += `</div>`;
             });
