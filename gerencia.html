@@ -87,7 +87,6 @@
 
             const cleanNum = (val) => { if(!val) return 0; let n = String(val).replace(/[^0-9.]/g, ''); return parseFloat(n) || 0; };
             
-            // EL FILTRO QUE PEDISTE: Solo suma si el estado es diferente a "NUEVO" o "RECIBIDO"
             let ventasAprobadas = rP.filter(p => p.ESTADO !== "NUEVO / POR ACEPTAR" && p.ESTADO !== "RECIBIDO")
                                     .reduce((acc, p) => acc + cleanNum(p.TOTAL_USD || p['TOTAL_USD'] || Object.values(p)[9]), 0);
             
