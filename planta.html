@@ -105,7 +105,6 @@
         btn.classList.add('active');
     }
 
-    // FUNCIÓN DE LIMPIEZA EXTREMA
     function ultraClean(str) {
         if(!str) return "";
         return String(str).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
@@ -164,8 +163,11 @@
                 
                 tablaDetallesHtml += `<tr><td>${i.formato}</td><td>${i.color}</td><td>${i.textura}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
                 
-                // LÓGICA DE BÚSQUEDA EXTREMA
-                let colorClean = ultraClean(i.color);
+                // TRADUCTOR DE NOMBRES DE VENTAS A PLANTA
+                let colorNombre = String(i.color).toUpperCase().trim();
+                if(colorNombre === "GRIS CLARO") colorNombre = "GRIS 0%";
+
+                let colorClean = ultraClean(colorNombre);
                 let textClean = ultraClean(i.textura).substring(0, 4); 
 
                 let formulaEncontrada = formulas.find(f => {
@@ -197,7 +199,7 @@
                     </ul>`;
                 } else {
                     recetaHtml += `<div style="color:#ef4444; font-size:12px; font-weight:bold;">⚠️ Fórmula no registrada en Excel.<br>
-                        <span style="font-weight:normal; font-size:10px; color:#64748b;">(El sistema buscó "<b>${colorClean}</b>" y "<b>${textClean}</b>" pero no hubo coincidencia exacta en el archivo).</span>
+                        <span style="font-weight:normal; font-size:10px; color:#64748b;">(El sistema buscó "<b>${colorClean}</b>" y "<b>${textClean}</b>" pero no hubo coincidencia exacta).</span>
                     </div>`;
                 }
                 recetaHtml += `</div>`;
