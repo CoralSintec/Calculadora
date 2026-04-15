@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cotizador Coralsintec</title>
+    <style>
+        :root {
+            --coralsintec-primary: #1e2328; 
+            --coralsintec-accent: #c49660;  
+            --coralsintec-text-main: #334155;
+            --coralsintec-border: #cbd5e1;
+        }
+
+        html, body {
+            min-height: 100vh;
+            margin: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #9baec0 0%, #7a91a6 100%);
+            background-attachment: fixed;
+            color: var(--coralsintec-text-main);
+            padding: 40px 15px 50px 15px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .app-main {
+            background: rgba(255, 255, 255, 0.90); 
+            backdrop-filter: blur(8px); 
+            -webkit-backdrop-filter: blur(8px);
+            padding: 25px 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            border-top: 6px solid var(--coralsintec-primary);
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: var(--coralsintec-primary);
+            margin: 0 0 5px 0;
+            font-weight: 800;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .form-row {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--coralsintec-border);
+            border-radius: 10px;
+            font-size: 16px; 
+            background-color: rgba(248, 250, 252, 0.9);
+            color: var(--coralsintec-primary);
+            appearance: none;
+            box-sizing: border-box;
+            font-weight: 700;
+        }
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--coralsintec-primary);
+            background-color: #fff;
+        }
+
+        .options-group {
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid var(--coralsintec-border);
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 800;
+            padding: 8px 0;
+            color: var(--coralsintec-primary);
+        }
+        .option-item input[type="checkbox"] {
+            width: 24px; height: 24px; accent-color: var(--coralsintec-accent);
+        }
+
+        /* CAJA NEGRA ARRIBA (RESULTADOS) */
+        .results-card {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: var(--coralsintec-primary);
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border-left: 4px solid var(--coralsintec-accent);
+        }
+        .breakdown-row {
+            display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: #cbd5e1; align-items: center;
+        }
+        .breakdown-val { font-weight: 800; color: white; font-size: 14px; }
+        .divider { height: 1px; background: rgba(255,255,255,0.2); margin: 12px 0; }
+        .total-price-container { text-align: center; margin-top: 15px; }
+        .total-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; font-weight: 600; }
+        .total-price { font-size: 32px; font-weight: 900; color: var(--coralsintec-accent); margin: 5px 0 0 0; }
+
+        .add-btn {
+            width: 100%; background-color: var(--coralsintec-accent); color: white; border: none; padding: 16px;
+            border-radius: 10px; font-size: 16px; font-weight: 800; text-transform: uppercase; margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(196, 150, 96, 0.4); transition: transform 0.1s; cursor: pointer;
+        }
+        .add-btn:active { transform: scale(0.97); }
+
+        .cart-section {
+            width: 100%; max-width: 400px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px);
+            padding: 20px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); margin-top: 20px; box-sizing: border-box;
+        }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 10px; }
+        .cart-header h2 { font-size: 16px; margin: 0; color: var(--coralsintec-primary); font-weight: 900;}
+        .cart-header button { background: #fee2e2; border: none; color: #ef4444; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer;}
+        
+        .cart-list { margin: 0; padding: 0; list-style: none; }
+        
+        /* CAJAS BLANCAS ABAJO (DESGLOSE) */
+        .cart-item {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--coralsintec-border);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .cart-item-title {
+            display: flex; justify-content: space-between; align-items: center; font-weight: 900; color: var(--coralsintec-primary); font-size: 15px; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;
+        }
+        .btn-del-item { background: #fee2e2; color: #b91c1c; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase;}
+        
+        .cart-row { display: flex; justify-content: space-between; font-size: 13px; color: #475569; margin-bottom: 4px; }
+        .cart-row b { color: var(--coralsintec-primary); }
+        
+        .cart-total-row {
+            display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; color: var(--coralsintec-primary);
+            border-top: 1px solid #e2e8f0; margin-top: 8px; padding-top: 8px;
+        }
+        .cart-total-row b { color: var(--coralsintec-accent); font-size: 18px; }
+
+        .grand-total { text-align: center; background: #ecfccb; padding: 15px; border-radius: 12px; border: 1px solid #bef264; margin-top: 15px;}
+        .grand-total span { font-size: 12px; color: #3f6212; font-weight: 800; display: block;}
+        .grand-total div { font-size: 28px; font-weight: 900; color: #166534; }
+        
+        .btn-volver { background: white; border: 1px solid var(--coralsintec-border); color: var(--coralsintec-primary); padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; align-self: flex-start; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+
+    <main class="app-main">
+        <button class="btn-volver" onclick="window.location.href='index.html'">⬅ MENÚ PRINCIPAL</button>
+        
+        <h1 class="section-title">Coralsintec</h1>
+        <div class="section-subtitle">Cotizador Oficial</div>
+        
+        <div class="form-row">
+            <label>Formato:</label>
+            <select id="formato" onchange="calcularPresupuesto()">
+                <option value="30x30">30x30</option><option value="40x40">40x40</option><option value="50x50">50x50</option><option value="60x60">60x60</option>
+                <option value="20x60">20x60</option><option value="30x60">30x60</option><option value="40x60">40x60</option><option value="40x70">40x70</option>
+                <option value="15x75">15x75</option><option value="10x100">10x100</option><option value="20x100">20x100</option><option value="30x100">30x100</option>
+                <option value="40x100">40x100</option><option value="60x100">60x100</option>
+            </select>
+        </div>
+
+        <div class="form-row" style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label>Uso:</label>
+                <select id="uso" onchange="calcularPresupuesto()">
+                    <option value="Pared">Pared</option><option value="Piso">Piso</option>
+                </select>
+            </div>
+            <div style="flex:1;">
+                <label>Textura:</label>
+                <select id="textura" onchange="manejarTexturaColor()">
+                    <option value="Media">Media</option><option value="Lisa">Lisa</option><option value="Gruesa">Gruesa</option><option value="Veta">Veta</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>Color:</label>
+            <select id="color" onchange="calcularPresupuesto()">
+                <option value="Gris Claro">Gris Claro</option><option value="Beige">Beige</option><option value="Gris 1%">Gris 1%</option><option value="Gris 2%">Gris 2%</option><option value="Gris 3%">Gris 3%</option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>Metros (m²):</label>
+            <input type="number" id="metros" value="10" min="0.1" step="0.1" inputmode="decimal" oninput="calcularPresupuesto()">
+        </div>
+
+        <div class="options-group">
+            <label class="option-item" style="color:#b45309;">
+                <span>+10% Desperdicio (Sugerido)</span>
+                <input type="checkbox" id="desperdicio" onchange="calcularPresupuesto()" checked>
+            </label>
+            <div style="height:1px; background:rgba(0,0,0,0.1); margin:5px 0;"></div>
+            <label class="option-item">
+                <span>Incluir Carateo (Sacos)</span>
+                <input type="checkbox" id="carateo" onchange="calcularPresupuesto()">
+            </label>
+            <label class="option-item">
+                <span>Incluir Sellador (Galones)</span>
+                <input type="checkbox" id="sellador" onchange="calcularPresupuesto()">
+            </label>
+        </div>
+
+        <div class="results-card" id="box-resultados" style="display:none;">
+            <div class="breakdown-row">
+                <span>Revestimiento (<span id="ui-espesor">1.2 cm</span>)</span>
+                <span class="breakdown-val">$<span id="ui-total-rev">0</span></span>
+            </div>
+            <div class="breakdown-row">
+                <span>Piezas a fabricar</span>
+                <span class="breakdown-val" id="res-pcs">0</span>
+            </div>
+            <div class="breakdown-row">
+                <span>Área Material Final</span>
+                <span class="breakdown-val" id="res-m2">0 m²</span>
+            </div>
+            
+            <div class="breakdown-row" id="row-carateo" style="display:none; color:#fef08a; margin-top:8px;">
+                <span>Carateo (<span id="ui-sacos">0</span> sacos)</span>
+                <span class="breakdown-val">$<span id="ui-total-carateo">0</span></span>
+            </div>
+            <div class="breakdown-row" id="row-sellador" style="display:none; color:#fef08a;">
+                <span>Sellador (<span id="ui-galones">0</span> galones)</span>
+                <span class="breakdown-val">$<span id="ui-total-sellador">0</span></span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="total-price-container">
+                <div class="total-label">PRESUPUESTO ESTIMADO USD</div>
+                <div class="total-price">$<span id="total-presupuesto">0</span></div>
+            </div>
+        </div>
+
+        <button class="add-btn" onclick="agregarAlCarrito()">AGREGAR A LA LISTA</button>
+    </main>
+
+    <section class="cart-section" id="cart-section" style="display: none;">
+        <div class="cart-header">
+            <h2>Resumen de Compra</h2>
+            <button onclick="vaciarCarrito()">Limpiar</button>
+        </div>
+        <ul class="cart-list" id="cart-list"></ul>
+        <div class="grand-total">
+            <span>TOTAL GENERAL</span>
+            <div>$<span id="grand-total">0</span></div>
+        </div>
+    </section>
+
+<script>
+    function manejarTexturaColor() {
+        const textura = document.getElementById('textura').value;
+        const colorSelect = document.getElementById('color');
+        
+        if (textura === 'Veta') {
+            colorSelect.value = 'Beige'; colorSelect.style.opacity = '0.6'; colorSelect.style.pointerEvents = 'none';
+        } else {
+            colorSelect.style.opacity = '1'; colorSelect.style.pointerEvents = 'auto';
+        }
+        calcularPresupuesto();
+    }
+
+    function calcularPresupuesto() {
+        const formato = document.getElementById('formato').value;
+        const uso = document.getElementById('uso').value;
+        const textura = document.getElementById('textura').value;
+        const color = document.getElementById('color').value;
+        const metros = parseFloat(document.getElementById('metros').value) || 0;
+        
+        const despCheck = document.getElementById('desperdicio').checked;
+        const carateoCheck = document.getElementById('carateo').checked;
+        const selladorCheck = document.getElementById('sellador').checked;
+
+        if (metros <= 0) { document.getElementById('box-resultados').style.display = 'none'; return; }
+
+        const formatosLargos = ["10x100", "20x100", "30x100", "40x100", "60x100"];
+        let espesor = (formatosLargos.includes(formato) || uso === "Piso") ? "2.2 cm" : "1.2 cm";
+        let precioM2Rev = (espesor === "1.2 cm") ? 20 : 23;
+
+        if (color === "Beige") precioM2Rev += 2;
+        if (color === "Gris 1%") precioM2Rev += 3;
+        if (color === "Gris 2%") precioM2Rev += 5;
+        if (color === "Gris 3%") precioM2Rev += 8;
+        if (textura === "Lisa" || textura === "Gruesa") { precioM2Rev += 2; } 
+        else if (textura === "Veta" && espesor === "1.2 cm") { precioM2Rev += 1; }
+
+        // Cálculo de Piezas y M2 Final (aplicando desperdicio si está marcado)
+        const dim = formato.toLowerCase().split('x');
+        const areaPieza = (parseFloat(dim[0]) * parseFloat(dim[1])) / 10000;
+        let m2Material = despCheck ? metros * 1.10 : metros;
+        let piezas = Math.ceil(m2Material / areaPieza);
+        m2Material = parseFloat((piezas * areaPieza).toFixed(2));
+
+        const totalRevestimiento = precioM2Rev * m2Material;
+
+        let totalCarateo = 0; let cantSacos = 0;
+        if (carateoCheck && metros > 0) {
+            cantSacos = Math.ceil(metros / 40); 
+            let precioSaco = (color === "Beige" || color.includes("Gris")) ? 60 : 50; 
+            totalCarateo = cantSacos * precioSaco;
+        }
+
+        let totalSellador = 0; let cantGalones = 0;
+        if (selladorCheck && metros > 0) {
+            cantGalones = Math.ceil(metros / 35); 
+            totalSellador = cantGalones * 100;
+        }
+
+        const granTotal = totalRevestimiento + totalCarateo + totalSellador;
+
+        // Actualizar la CAJA NEGRA
+        document.getElementById('ui-espesor').innerText = espesor;
+        document.getElementById('res-pcs').innerText = piezas;
+        document.getElementById('res-m2').innerText = m2Material.toFixed(2) + " m²";
+        document.getElementById('ui-total-rev').innerText = totalRevestimiento.toFixed(2);
+        
+        const rowCarateo = document.getElementById('row-carateo');
+        if(carateoCheck) {
+            rowCarateo.style.display = 'flex';
+            document.getElementById('ui-sacos').innerText = cantSacos;
+            document.getElementById('ui-total-carateo').innerText = totalCarateo.toFixed(2);
+        } else { rowCarateo.style.display = 'none'; }
+
+        const rowSellador = document.getElementById('row-sellador');
+        if(selladorCheck) {
+            rowSellador.style.display = 'flex';
+            document.getElementById('ui-galones').innerText = cantGalones;
+            document.getElementById('ui-total-sellador').innerText = totalSellador.toFixed(2);
+        } else { rowSellador.style.display = 'none'; }
+
+        document.getElementById('total-presupuesto').innerText = granTotal.toFixed(2);
+        document.getElementById('box-resultados').style.display = 'block';
+
+        // Guardar para el carrito
+        window.ultimoCalculo = {
+            titulo: `${formato} | ${textura} | ${color}`,
+            uso: uso, espesor: espesor, piezas: piezas, m2Final: m2Material,
+            totalRev: totalRevestimiento,
+            carCheck: carateoCheck, cantSacos: cantSacos, totalCar: totalCarateo,
+            selCheck: selladorCheck, cantGalones: cantGalones, totalSel: totalSellador,
+            total: granTotal,
+            metros: metros
+        };
+    }
+
+    let carrito = [];
+
+    function agregarAlCarrito() {
+        if (!window.ultimoCalculo || window.ultimoCalculo.metros <= 0) { alert("Ingresa los metros cuadrados para cotizar."); return; }
+        carrito.push({...window.ultimoCalculo});
+        document.getElementById('cart-section').style.display = 'block';
+        document.getElementById('metros').value = "";
+        document.getElementById('box-resultados').style.display = 'none';
+        actualizarUI_Carrito();
+    }
+
+    function actualizarUI_Carrito() {
+        const listaUI = document.getElementById('cart-list');
+        listaUI.innerHTML = ''; 
+        let grandTotal = 0;
+
+        carrito.forEach((item, index) => {
+            grandTotal += item.total;
+            const li = document.createElement('li');
+            li.className = 'cart-item';
+            
+            // CAJAS BLANCAS CON EL DESGLOSE COMPLETO
+            let htmlHTML = `
+                <div class="cart-item-title">
+                    <span>${item.titulo}</span>
+                    <button class="btn-del-item" onclick="eliminarDelCarrito(${index})">X Eliminar</button>
+                </div>
+                <div class="cart-row"><span>Revestimiento (${item.espesor}):</span> <b>$${item.totalRev.toFixed(2)}</b></div>
+                <div class="cart-row"><span>Piezas a fabricar:</span> <b>${item.piezas}</b></div>
+                <div class="cart-row"><span>Área Material Final:</span> <b>${item.m2Final.toFixed(2)} m²</b></div>
+            `;
+
+            if(item.carCheck) {
+                htmlHTML += `<div class="cart-row" style="color:#b45309;"><span>Carateo (${item.cantSacos} sacos):</span> <b>$${item.totalCar.toFixed(2)}</b></div>`;
+            }
+            if(item.selCheck) {
+                htmlHTML += `<div class="cart-row" style="color:#b45309;"><span>Sellador (${item.cantGalones} gal):</span> <b>$${item.totalSel.toFixed(2)}</b></div>`;
+            }
+
+            htmlHTML += `
+                <div class="cart-total-row">
+                    <span>Subtotal:</span> <b>$${item.total.toFixed(2)}</b>
+                </div>
+            `;
+            
+            li.innerHTML = htmlHTML;
+            listaUI.appendChild(li);
+        });
+
+        document.getElementById('grand-total').innerText = grandTotal.toFixed(2);
+    }
+
+    function eliminarDelCarrito(index) {
+        carrito.splice(index, 1);
+        if(carrito.length === 0) { document.getElementById('cart-section').style.display = 'none'; }
+        actualizarUI_Carrito();
+    }
+
+    function vaciarCarrito() {
+        carrito = [];
+        document.getElementById('cart-section').style.display = 'none';
+        actualizarUI_Carrito();
+    }
+    
+    manejarTexturaColor();
+</script>
+
+</body>
+</html>
