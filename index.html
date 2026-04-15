@@ -9,7 +9,8 @@
         body { font-family: -apple-system, sans-serif; background-color: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
         .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 100%; max-width: 380px; text-align: center; box-sizing: border-box; border-top: 8px solid var(--p); }
         .btn-main { background: var(--p); color: white; border: none; padding: 16px; width: 100%; border-radius: 10px; font-weight: 800; font-size: 16px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; }
-        .menu-card { background: #f8fafc; padding: 25px; border-radius: 15px; border-left: 6px solid var(--a); cursor: pointer; text-align: left; margin-bottom: 15px; }
+        .menu-card { background: #f8fafc; padding: 25px; border-radius: 15px; border-left: 6px solid var(--a); cursor: pointer; text-align: left; margin-bottom: 15px; transition: 0.2s;}
+        .menu-card:active { transform: scale(0.98); }
         input { width: 100%; padding: 14px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 16px; box-sizing: border-box; text-align: center; margin-bottom: 10px; }
         .screen { display: none; }
         .active { display: block; }
@@ -28,7 +29,7 @@
             <h2 id="welcome">HOLA</h2>
             <div onclick="location.href='ventas.html'" class="menu-card" id="v-btn"><h3>🛒 MI CALCULADORA / VENTAS</h3></div>
             
-            <div onclick="window.open('https://docs.google.com/spreadsheets/d/1X_TU_EXCEL_ID/edit#gid=TU_PESTANA_ID', '_blank')" class="menu-card" id="s-btn" style="border-left-color: #10b981;"><h3>📥 VER SOLICITUDES CLIENTES</h3></div>
+            <div onclick="location.href='solicitudes.html'" class="menu-card" id="s-btn" style="border-left-color: #10b981;"><h3>📥 SOLICITUDES RECIBIDAS</h3></div>
             
             <div onclick="location.href='planta.html'" class="menu-card" style="border-left-color: #f59e0b;"><h3>🏭 PLANTA</h3></div>
             <div onclick="location.href='gerencia.html'" class="menu-card" id="g-btn" style="border-left-color: #6366f1;"><h3>📊 GERENCIA</h3></div>
