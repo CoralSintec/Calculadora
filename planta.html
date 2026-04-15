@@ -152,7 +152,7 @@
                 </div>`;
             }
 
-            let tablaDetallesHtml = `<table><thead><tr><th>FORMATO</th><th>COLOR</th><th>TEXTURA</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`;
+            let tablaDetallesHtml = `<table><thead><tr><th>FORMATO</th><th>USO</th><th>COLOR</th><th>TEXTURA</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`;
             let recetaHtml = `<div>`;
 
             items.forEach(i => {
@@ -161,45 +161,41 @@
                 let pcs = Math.ceil(m / ((dim[0]*dim[1])/10000));
                 totalCarateo += i.carateo || 0; totalSellador += i.sellador || 0;
                 
-                tablaDetallesHtml += `<tr><td>${i.formato}</td><td>${i.color}</td><td>${i.textura}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
+                tablaDetallesHtml += `<tr><td>${i.formato}</td><td><b>${i.uso}</b></td><td>${i.color}</td><td>${i.textura}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
                 
-                // TRADUCTOR DE NOMBRES DE VENTAS A PLANTA
-                let colorNombre = String(i.color).toUpperCase().trim();
-                if(colorNombre === "GRIS CLARO") colorNombre = "GRIS 0%";
-
-                let colorClean = ultraClean(colorNombre);
+                let colorClean = ultraClean(i.color);
                 let textClean = ultraClean(i.textura).substring(0, 4); 
+                let usoClean = ultraClean(i.uso);
 
                 let formulaEncontrada = formulas.find(f => {
-                    let filaCompleta = ultraClean(Object.values(f).join(''));
-                    return filaCompleta.includes(colorClean) && filaCompleta.includes(textClean);
+                    let prodBase = ultraClean(f['PRODUCTO_BASE']);
+                    return prodBase.includes(colorClean) && prodBase.includes(textClean) && prodBase.includes(usoClean);
                 });
 
                 recetaHtml += `<div class="receta-item">
-                                <div class="receta-title">▶ Para fabricar: ${m}m² de ${i.color} (${i.textura})</div>`;
+                                <div class="receta-title">▶ Para fabricar: ${m}m² de ${i.color} (${i.textura}) - ${i.uso}</div>`;
                 
                 if(formulaEncontrada) {
-                    let val = Object.values(formulaEncontrada);
-                    let c_cem = (parseFloat(val[2] || 0) * m).toFixed(2);
-                    let c_are = (parseFloat(val[3] || 0) * m).toFixed(2);
-                    let c_arr = (parseFloat(val[4] || 0) * m).toFixed(2);
-                    let c_pig = (parseFloat(val[5] || 0) * m).toFixed(2);
-                    let c_sup = (parseFloat(val[6] || 0) * m).toFixed(2);
-                    let c_fib = (parseFloat(val[7] || 0) * m).toFixed(2);
-                    let c_est = (parseFloat(val[9] || 0) * m).toFixed(2);
+                    let keys = Object.keys(formulaEncontrada);
+                    let vals = Object.values(formulaEncontrada);
+                    let nombreEncontrado = vals[0]; 
                     
-                    recetaHtml += `<ul class="receta-lista">
-                        <li><b>Cemento ${val[1] || ''}:</b> ${c_cem} kg</li>
-                        <li><b>Arena Blanca:</b> ${c_are} kg</li>
-                        <li><b>Arrosillo Claro:</b> ${c_arr} kg</li>
-                        ${c_pig > 0 ? `<li><b>Pigmento Negro:</b> ${c_pig} kg</li>` : ''}
-                        ${c_sup > 0 ? `<li><b>Superplastificante:</b> ${c_sup} Litros</li>` : ''}
-                        ${c_fib > 0 ? `<li><b>Fibra:</b> ${c_fib} kg</li>` : ''}
-                        ${c_est > 0 ? `<li><b>Estuco:</b> ${c_est} kg</li>` : ''}
-                    </ul>`;
+                    let c_cem = (parseFloat(vals[2] || 0) * m).toFixed(2);
+                    recetaHtml += `<div style="font-size:10px; color:#10b981; margin-bottom:5px; font-weight:bold;">✅ Fórmula: ${nombreEncontrado}</div>
+                    <ul class="receta-lista">
+                        <li><b>CEMENTO ${String(vals[1]).toUpperCase()}:</b> ${c_cem} kg</li>`;
+                    
+                    // Lee automáticamente todos los químicos que agregues en el Excel
+                    for(let c = 3; c < keys.length; c++) {
+                        let qty = (parseFloat(vals[c] || 0) * m).toFixed(2);
+                        if(qty > 0) {
+                            recetaHtml += `<li><b>${keys[c]}:</b> ${qty}</li>`;
+                        }
+                    }
+                    recetaHtml += `</ul>`;
                 } else {
                     recetaHtml += `<div style="color:#ef4444; font-size:12px; font-weight:bold;">⚠️ Fórmula no registrada en Excel.<br>
-                        <span style="font-weight:normal; font-size:10px; color:#64748b;">(El sistema buscó "<b>${colorClean}</b>" y "<b>${textClean}</b>" pero no hubo coincidencia exacta).</span>
+                        <span style="font-weight:normal; font-size:10px; color:#64748b;">(Falta crear la fila para: ${colorClean} + ${textClean} + ${usoClean}).</span>
                     </div>`;
                 }
                 recetaHtml += `</div>`;
