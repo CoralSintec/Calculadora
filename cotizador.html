@@ -3,171 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>Cotizador Coralsintec</title>
     <style>
-        :root { --coralsintec-primary: #1e2328; --coralsintec-accent: #c49660; --coralsintec-text-main: #334155; --coralsintec-border: #cbd5e1; }
+        :root {
+            --p: #1e2328; 
+            --accent: #c49660;  
+            --text-main: #334155;
+            --border: #cbd5e1;
+        }
+
         html, body { min-height: 100vh; margin: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: linear-gradient(135deg, #9baec0 0%, #7a91a6 100%); background-attachment: fixed; color: var(--coralsintec-text-main); padding: 20px 15px 50px 15px; display: flex; flex-direction: column; align-items: center; }
-        .app-main { background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 25px 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 400px; box-sizing: border-box; border-top: 6px solid var(--coralsintec-primary); display: flex; flex-direction: column; }
-        .btn-volver { background: white; border: 1px solid var(--coralsintec-border); color: var(--coralsintec-primary); padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; align-self: flex-start; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .btn-volver:active { background: #e2e8f0; transform: translateX(-3px); }
-        .section-title { font-size: 20px; color: var(--coralsintec-primary); margin: 0 0 5px 0; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
-        .section-header-small { font-size: 14px; color: white; background: var(--coralsintec-primary); padding: 8px; border-radius: 6px; margin: 20px 0 15px 0; font-weight: bold; text-transform: uppercase; text-align: center;}
-        .form-row { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 5px; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; }
-        select, input, textarea { width: 100%; padding: 12px; border: 2px solid var(--coralsintec-border); border-radius: 10px; font-size: 16px; background-color: rgba(248, 250, 252, 0.9); color: var(--coralsintec-text-main); box-sizing: border-box; font-weight: 600; font-family: inherit; }
-        select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%231e2328' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1.45 1.45 0 0 1 1.104 2.404l-4.796 5.481a1 1 0 0 1-1.557 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: calc(100% - 12px) center; }
-        .options-group { background: rgba(248, 250, 252, 0.8); border-radius: 10px; padding: 12px; margin-top: 15px; border: 1px solid var(--coralsintec-border); }
-        .option-item { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 700; padding: 5px 0; color: var(--coralsintec-primary); }
-        .option-item input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--coralsintec-accent); }
-        .results-card { margin-top: 20px; padding: 15px; background-color: var(--coralsintec-primary); border-radius: 12px; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .breakdown-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; color: #cbd5e1; }
-        .breakdown-val { font-weight: 700; color: white; }
-        .total-price { font-size: 32px; font-weight: 800; color: var(--coralsintec-accent); text-align: center; margin-top: 10px; }
-        .add-btn { width: 100%; background-color: var(--coralsintec-accent); color: white; border: none; padding: 16px; border-radius: 10px; font-size: 16px; font-weight: 800; text-transform: uppercase; margin-top: 15px; cursor: pointer; transition: 0.2s; }
-        .add-btn:active { transform: scale(0.98); }
-        .btn-success { background-color: #10b981; margin-top: 10px; }
-        .cart-section { width: 100%; max-width: 400px; background: white; padding: 20px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); margin-top: 20px; box-sizing: border-box; }
-        .cart-item { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 14px; }
-        #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: var(--coralsintec-primary); }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* TU IMAGEN DE FONDO APLICADA AQUÍ */
+            background-image: url('1000556091.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-main);
+            padding: 40px 15px 50px 15px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* EFECTO CRISTAL (Glassmorphism) para las tarjetas */
+        .app-main, .cart-section, .success-msg {
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            padding: 30px 25px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
+            width: 100%;
+            max-width: 450px;
+            box-sizing: border-box;
+            border-top: 6px solid var(--p);
+            margin-bottom: 20px;
+        }
+
+        .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 15px;}
+        .header h1 { font-size: 22px; color: var(--p); margin: 0 0 5px 0; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .header p { color: #64748b; font-size: 11px; margin: 0; font-weight: bold;}
+        .header .slogan { font-style: italic; color: #475569; font-weight: normal; margin-top: 5px; font-size: 13px;}
+
+        h3 { color: var(--p); font-size: 14px; text-transform: uppercase; border-left: 4px solid var(--accent); padding-left: 10px; margin-top: 0;}
+
+        .form-row { margin-bottom: 15px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        label { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; }
+
+        select, input {
+            width: 100%; padding: 14px; border: 2px solid var(--border); border-radius: 12px;
+            font-size: 15px; background-color: rgba(248, 250, 252, 0.9); color: var(--p);
+            box-sizing: border-box; font-weight: 700; transition: 0.3s;
+        }
+        select:focus, input:focus { outline: none; border-color: var(--p); background-color: #fff; box-shadow: 0 0 0 4px rgba(30,35,40,0.1); }
+        
+        .checkbox-container {
+            background: rgba(255, 247, 237, 0.8);
+            border: 1px solid #ffedd5;
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .checkbox-container input { width: 20px; height: 20px; margin: 0; accent-color: #ea580c; cursor: pointer; }
+        .checkbox-container span { font-size: 12px; font-weight: 800; color: #9a3412; }
+
+        .results-card {
+            margin-top: 25px; padding: 20px; background-color: var(--p); border-radius: 15px;
+            color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.3); position: relative; overflow: hidden;
+        }
+        .results-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent);
+        }
+        .breakdown-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: #cbd5e1; }
+        .breakdown-val { font-weight: 800; color: white; }
+        .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0; }
+        
+        .total-price-container { text-align: center; }
+        .total-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 1px;}
+        .total-price { font-size: 32px; font-weight: 900; color: var(--accent); margin-top: 5px; }
+
+        .btn {
+            width: 100%; border: none; padding: 16px; border-radius: 12px; font-size: 14px;
+            font-weight: 900; text-transform: uppercase; margin-top: 20px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-add { background-color: white; color: var(--p); border: 2px solid var(--p); }
+        .btn-add:hover { background: var(--p); color: white; }
+        .btn-submit { background-color: #166534; color: white; box-shadow: 0 5px 15px rgba(22,101,52,0.4); }
+        .btn-submit:active { transform: scale(0.97); }
+
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 10px; }
+        .cart-header h2 { font-size: 16px; margin: 0; color: var(--p); font-weight: 900;}
+        .cart-item { padding: 15px; background: rgba(255,255,255,0.5); border-radius: 10px; border: 1px solid rgba(0,0,0,0.05); margin-bottom: 10px; position: relative; }
+        .cart-item h4 { margin: 0 0 5px 0; color: var(--p); font-size: 14px; }
+        .cart-item p { margin: 0; font-size: 12px; color: #475569; font-weight: 600;}
+        .cart-item .price { position: absolute; right: 15px; top: 15px; font-weight: 900; color: #166534; font-size: 16px; }
+        .btn-del { position: absolute; right: 15px; bottom: 15px; background: #fee2e2; color: #b91c1c; border: none; padding: 5px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer;}
+        
+        .grand-total-box { text-align: right; background: #ecfccb; padding: 20px; border-radius: 12px; border: 2px solid #bef264; margin-top: 15px; }
+        .grand-total-box span { font-size: 11px; color: #3f6212; font-weight: 900; }
+        .grand-total-box div { font-size: 28px; font-weight: 900; color: #166534; }
+
+        #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; color: var(--p); font-size: 16px; }
+        .success-msg { display: none; text-align: center; }
     </style>
 </head>
 <body>
+    <div id="loader-overlay">⏳ Sincronizando Catálogo Coralsintec...</div>
 
-    <div id="loader-overlay">
-        <span style="font-size: 35px; margin-bottom:10px;">⚙️</span>
-        Sincronizando Cerebro Coralsintec...
-    </div>
-
-    <main class="app-main">
-        <button class="btn-volver" onclick="window.location.href='index.html'">⬅ VOLVER AL MENÚ</button>
-
-        <h1 class="section-title">Coralsintec</h1>
-        
-        <div class="section-header-small">1. Datos del Cliente</div>
-        <div class="form-row"><input type="text" id="c-nombre" placeholder="Nombre completo / Proyecto"></div>
-        <div class="form-row" style="display:flex; gap:8px;">
-            <input type="text" id="c-rif" placeholder="RIF / Cédula" style="flex:1;">
-            <input type="tel" id="c-telefono" placeholder="Teléfono" style="flex:1;">
-        </div>
-        <div class="form-row"><textarea id="c-ubicacion" placeholder="Dirección u obra..." rows="2"></textarea></div>
-
-        <div class="section-header-small">2. Configurar Producto</div>
-        <div class="form-row"><label>Formato:</label><select id="formato" onchange="calcular()"></select></div>
-        <div class="form-row" style="display:flex; gap:8px;">
-            <div style="flex:1;"><label>Uso:</label><select id="uso" onchange="calcular()"></select></div>
-            <div style="flex:1;"><label>Textura:</label><select id="textura" onchange="manejarTextura()"></select></div>
-        </div>
-        <div class="form-row"><label>Color:</label><select id="color" onchange="calcular()"></select></div>
-        <div class="form-row"><label>Cantidad (m²):</label><input type="number" id="metros" value="10" step="0.1" min="0" oninput="calcular()"></div>
-
-        <div class="options-group">
-            <label class="option-item"><span>Incluir Carateo (Sacos)</span><input type="checkbox" id="carateo" onchange="calcular()"></label>
-            <label class="option-item"><span>Incluir Sellador (Galones)</span><input type="checkbox" id="sellador" onchange="calcular()"></label>
+    <main class="app-main" id="main-content">
+        <div class="header">
+            <h1>REVESTIMIENTOS CORALROCK</h1>
+            <p>RIF: J-50317540-0</p>
+            <p class="slogan">Playing with concrete since 1986</p>
         </div>
 
-        <div class="results-card">
-            <div class="breakdown-row"><span>Espesor Técnico:</span> <span class="breakdown-val" id="ui-espesor">-</span></div>
-            <div class="breakdown-row"><span>Precio m²:</span> <span class="breakdown-val" id="ui-unitario">$0.00</span></div>
-            <div class="total-price">$<span id="total-presupuesto">0.00</span></div>
+        <div style="margin-bottom: 25px;">
+            <h3>1. DATOS DEL CLIENTE</h3>
+            <div class="form-row"><input type="text" id="c-nombre" placeholder="Nombre completo / Empresa"></div>
+            <div class="grid-2 form-row">
+                <input type="text" id="c-rif" placeholder="RIF / Cédula">
+                <input type="tel" id="c-telefono" placeholder="WhatsApp">
+            </div>
+            <div class="form-row"><input type="text" id="c-ubicacion" placeholder="Dirección de la obra"></div>
         </div>
 
-        <button class="add-btn" onclick="agregar()">+ Agregar a la Lista</button>
+        <div>
+            <h3>2. CONFIGURAR MATERIAL</h3>
+            <div class="grid-2 form-row">
+                <div><label>Formato</label><select id="p-formato" onchange="filtrarYCalcular()"></select></div>
+                <div><label>Uso</label><select id="p-uso" onchange="filtrarYCalcular()"></select></div>
+            </div>
+            <div class="grid-2 form-row">
+                <div><label>Color</label><select id="p-color" onchange="filtrarYCalcular()"></select></div>
+                <div><label>Textura</label><select id="p-textura" onchange="filtrarYCalcular()"></select></div>
+            </div>
+            
+            <div class="grid-2 form-row" style="align-items: flex-end;">
+                <div>
+                    <label>Metros (m²)</label>
+                    <input type="number" id="p-m2" placeholder="0" min="1" step="0.1" oninput="filtrarYCalcular()">
+                </div>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="p-desperdicio" onchange="filtrarYCalcular()" checked>
+                    <span>+10% Desperdicio</span>
+                </label>
+            </div>
+
+            <div id="box-resultados" class="results-card" style="display:none;">
+                <div class="breakdown-row"><span>Piezas a fabricar:</span> <span class="breakdown-val" id="res-pcs">0</span></div>
+                <div class="breakdown-row"><span>Área de Material:</span> <span class="breakdown-val" id="res-m2">0 m²</span></div>
+                <div class="breakdown-row" style="color:#fde047;"><span>Carateo sugerido:</span> <span class="breakdown-val" id="res-car">0 sacos</span></div>
+                <div class="breakdown-row" style="color:#fde047;"><span>Sellador sugerido:</span> <span class="breakdown-val" id="res-sel">0 galones</span></div>
+                <div class="divider"></div>
+                <div class="total-price-container">
+                    <div class="total-label">PRECIO UNITARIO USD</div>
+                    <div class="total-price" id="res-unit">$0.00</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-add" onclick="agregarAlCarrito()">AGREGAR A LA COTIZACIÓN</button>
+        </div>
     </main>
 
-    <section class="cart-section" id="cart-section" style="display: none;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h2 style="font-size:16px; margin:0; color: var(--coralsintec-primary);">Resumen del Pedido</h2>
-            <button onclick="vaciar()" style="background:#fee2e2; border:none; color:#ef4444; padding:5px 10px; border-radius:5px; font-weight:bold; cursor:pointer;">Borrar Todo</button>
+    <section class="cart-section" id="cart-card" style="display: none;">
+        <div class="cart-header">
+            <h2>📋 RESUMEN DE COMPRA</h2>
         </div>
-        <div id="cart-list"></div>
-        <div style="text-align:right; font-size:22px; font-weight:800; margin-top:15px; color:var(--coralsintec-primary);">Total Orden: $<span id="grand-total">0.00</span></div>
-        <button class="add-btn btn-success" onclick="enviar()">📤 ENVIAR ORDEN A PLANTA</button>
+        <div id="lista-carrito"></div>
+        <div class="grand-total-box">
+            <span>TOTAL PRESUPUESTO USD</span>
+            <div id="gran-total">$0.00</div>
+        </div>
+        <button class="btn btn-submit" onclick="enviarPedido()">🚀 ENVIAR SOLICITUD A FÁBRICA</button>
     </section>
 
+    <div id="success-screen" class="success-msg">
+        <div style="font-size: 60px; margin-bottom: 10px;">✅</div>
+        <h2 style="color:var(--p); margin:0;">SOLICITUD ENVIADA</h2>
+        <p style="color:#475569; font-weight:bold;">Tu cotización ha sido recibida por planta.</p>
+        <p style="font-size: 12px; color: #64748b; margin-top: 15px;">Un asesor de Coralsintec te contactará vía WhatsApp para coordinar pago y despacho.</p>
+        <button class="btn btn-add" style="margin-top:20px;" onclick="location.reload()">NUEVA COTIZACIÓN</button>
+    </div>
+
 <script>
-    // NUEVA URL MAESTRA
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
-    
-    let db = []; let carrito = [];
+    let db = [];
+    let carrito = [];
+    let itemActual = null;
 
-    window.onload = () => {
-        // TRUCO ANTICONGELANTE APLICADO AQUÍ
-        const urlFresca = API_URL + "?action=get_productos&t=" + new Date().getTime();
+    window.onload = () => { cargarDB(); };
 
-        fetch(urlFresca)
-        .then(r => r.json())
-        .then(data => {
-            if(!Array.isArray(data)) throw new Error("Google bloqueó la lectura");
-            db = data; 
-            poblarSelects(); 
+    async function cargarDB() {
+        try {
+            const resp = await fetch(API_URL + "?action=get_productos&t=" + Date.now());
+            db = await resp.json();
+            llenarSelect('p-formato', [...new Set(db.map(i => i.FORMATO))]);
+            llenarSelect('p-uso', [...new Set(db.map(i => i.USO))]);
+            llenarSelect('p-color', [...new Set(db.map(i => i.COLOR))]);
+            llenarSelect('p-textura', [...new Set(db.map(i => i.TEXTURA))]);
             document.getElementById('loader-overlay').style.display = 'none';
-        })
-        .catch(e => {
-            alert("⚠️ Error de conexión: Revisa que tu Google Apps Script tenga acceso para 'Cualquier persona'."); 
-            document.getElementById('loader-overlay').style.display = 'none';
-        });
-    };
+        } catch(e) { alert("Error al cargar la base de datos."); document.getElementById('loader-overlay').style.display = 'none'; }
+    }
 
-    function poblarSelects() {
-        const ordenFormato = ["30x30", "40x40", "50x50", "60x60", "20x60", "30x60", "40x60", "40x70", "15x75", "10x100", "20x100", "30x100", "40x100", "60x100"];
-        const ordenUso = ["Pared", "Piso"]; const ordenTextura = ["Media", "Lisa", "Gruesa", "Veta"]; const ordenColor = ["Gris Claro", "Beige", "Gris 1%", "Gris 2%", "Gris 3%"];
-        const getUnicosYOrdenar = (campo, ordenDeseado) => {
-            let unicos = [...new Set(db.map(item => String(item[campo]).trim()))].filter(v => v && v !== "undefined");
-            unicos.sort((a, b) => { let indexA = ordenDeseado.indexOf(a); let indexB = ordenDeseado.indexOf(b); return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB); });
-            return unicos;
+    function llenarSelect(id, list) {
+        const sel = document.getElementById(id);
+        sel.innerHTML = '<option value="">Seleccione...</option>';
+        list.sort().forEach(val => { if(val && val.trim() !== '') sel.innerHTML += `<option value="${val}">${val}</option>`; });
+    }
+
+    function filtrarYCalcular() {
+        const f = document.getElementById('p-formato').value;
+        const u = document.getElementById('p-uso').value;
+        const c = document.getElementById('p-color').value;
+        const t = document.getElementById('p-textura').value;
+        const m2Base = parseFloat(document.getElementById('p-m2').value) || 0;
+        const desp = document.getElementById('p-desperdicio').checked;
+
+        if (t === 'Veta') { document.getElementById('p-color').value = 'Beige'; document.getElementById('p-color').style.pointerEvents = 'none'; } 
+        else { document.getElementById('p-color').style.pointerEvents = 'auto'; }
+
+        if(!f || !u || !c || !t || m2Base <= 0) { document.getElementById('box-resultados').style.display = 'none'; itemActual = null; return; }
+
+        const prod = db.find(i => String(i.FORMATO).trim() === f && String(i.USO).trim() === u && String(i.COLOR).trim() === c && String(i.TEXTURA).trim() === t);
+        if(!prod) { document.getElementById('box-resultados').style.display = 'none'; itemActual = null; return; }
+
+        const dim = f.toLowerCase().split('x');
+        const areaPieza = (parseFloat(dim[0]) * parseFloat(dim[1])) / 10000;
+        let m2Final = desp ? m2Base * 1.10 : m2Base;
+        let piezas = Math.ceil(m2Final / areaPieza);
+        m2Final = parseFloat((piezas * areaPieza).toFixed(2));
+
+        const sacosCarateo = Math.ceil(m2Base / 15);
+        const galonesSellador = Math.ceil(m2Base / 20);
+        const precioU = parseFloat(prod.PRECIO_USD || prod.PRECIO || 0);
+
+        itemActual = {
+            formato: f, uso: u, color: c, textura: t,
+            m2: m2Final, pieces: piezas, unit: precioU,
+            carateo: sacosCarateo, sellador: galonesSellador,
+            total: m2Final * precioU
         };
-        const llenar = (id, lista) => { document.getElementById(id).innerHTML = lista.map(v => `<option value="${v}">${v}</option>`).join(''); };
-        llenar('formato', getUnicosYOrdenar('FORMATO', ordenFormato)); llenar('uso', getUnicosYOrdenar('USO', ordenUso)); llenar('textura', getUnicosYOrdenar('TEXTURA', ordenTextura)); llenar('color', getUnicosYOrdenar('COLOR', ordenColor));
-        calcular();
+
+        document.getElementById('box-resultados').style.display = 'block';
+        document.getElementById('res-pcs').innerText = piezas;
+        document.getElementById('res-m2').innerText = m2Final + " m²";
+        document.getElementById('res-car').innerText = sacosCarateo + " sacos";
+        document.getElementById('res-sel').innerText = galonesSellador + " galones";
+        document.getElementById('res-unit').innerText = "$" + precioU.toFixed(2);
     }
 
-    function manejarTextura() {
-        const t = document.getElementById('textura').value; const c = document.getElementById('color');
-        if (t === 'Veta') { c.value = 'Beige'; c.style.opacity = '0.6'; c.style.pointerEvents = 'none'; } else { c.style.opacity = '1'; c.style.pointerEvents = 'auto'; }
-        calcular();
+    function agregarAlCarrito() {
+        if(!itemActual) return alert("Configure el material y la cantidad correctamente.");
+        carrito.push({...itemActual});
+        itemActual = null;
+        document.getElementById('p-m2').value = "";
+        document.getElementById('box-resultados').style.display = 'none';
+        renderCarrito();
     }
 
-    function calcular() {
-        if(!db.length) return;
-        const f = document.getElementById('formato').value, u = document.getElementById('uso').value, t = document.getElementById('textura').value, c = document.getElementById('color').value, m = parseFloat(document.getElementById('metros').value) || 0;
-        let match = db.find(p => String(p.FORMATO).trim() == f && String(p.USO).trim() == u && String(p.TEXTURA).trim() == t && String(p.COLOR).trim() == c);
-        let pUnit = 0, esp = "-", ok = false;
+    function renderCarrito() {
+        const box = document.getElementById('lista-carrito');
+        const card = document.getElementById('cart-card');
+        box.innerHTML = "";
+        if(carrito.length === 0) { card.style.display = 'none'; return; }
         
-        if(match) { pUnit = parseFloat(match.PRECIO_USD); esp = match.ESPESOR || "-"; ok = true; }
+        card.style.display = 'block';
+        let total = 0;
+        carrito.forEach((it, idx) => {
+            total += it.total;
+            box.innerHTML += `
+                <div class="cart-item">
+                    <h4>${it.formato} | ${it.color} (${it.textura})</h4>
+                    <p>Uso: ${it.uso} | Área: ${it.m2}m²</p>
+                    <p style="color:#d97706;">Instalación: ${it.carateo} sacos / ${it.sellador} gal.</p>
+                    <div class="price">$${it.total.toFixed(2)}</div>
+                    <button class="btn-del" onclick="carrito.splice(${idx},1); renderCarrito();">ELIMINAR</button>
+                </div>`;
+        });
+        document.getElementById('grand-total').innerText = "$" + total.toFixed(2);
+    }
 
-        let subtotal = pUnit * m; let cantCarateo = 0; let cantSellador = 0;
-        if(document.getElementById('carateo').checked && m > 0) { cantCarateo = Math.ceil(m / 40); subtotal += (cantCarateo * (String(c).includes("Beige") || String(c).includes("Gris") ? 60 : 50)); }
-        if(document.getElementById('sellador').checked && m > 0) { cantSellador = Math.ceil(m / 35); subtotal += (cantSellador * 100); }
+    async function enviarPedido() {
+        const nom = document.getElementById('c-nombre').value;
+        const rif = document.getElementById('c-rif').value;
+        const tlf = document.getElementById('c-telefono').value;
+        const obr = document.getElementById('c-ubicacion').value;
 
-        document.getElementById('ui-espesor').innerText = esp; document.getElementById('ui-unitario').innerText = "$" + pUnit.toFixed(2);
-        document.getElementById('ui-unitario').style.color = ok ? "white" : "#ef4444"; document.getElementById('total-presupuesto').innerText = subtotal.toFixed(2);
+        if(!nom || !rif || !tlf || !obr) return alert("Por favor complete sus datos personales y la dirección de la obra.");
         
-        // LA LÍNEA QUE SE HABÍA CORTADO ESTÁ AQUÍ COMPLETA:
-        window.calcActual = { ok, desc: `${f} | ${t} | ${c}`, m2: m, total: subtotal, det: `${m}m² (${u})`, formato: f, uso: u, textura: t, color: c, carateo: cantCarateo, sellador: cantSellador };
-    }
-
-    function agregar() {
-        if(!window.calcActual || !window.calcActual.ok || window.calcActual.m2 <= 0) return alert("Selección no válida o cantidad en cero.");
-        carrito.push({...window.calcActual}); document.getElementById('cart-section').style.display = 'block'; render();
-    }
-
-    function render() {
-        const l = document.getElementById('cart-list'); let g = 0;
-        l.innerHTML = carrito.map(i => { g += i.total; return `<div class="cart-item"><div style="display:flex; justify-content:space-between;"><b>${i.desc}</b><b>$${i.total.toFixed(2)}</b></div><small>${i.det} ${i.carateo > 0 ? '+ Carateo' : ''} ${i.sellador > 0 ? '+ Sellador' : ''}</small></div>`; }).join('');
-        document.getElementById('grand-total').innerText = g.toFixed(2);
-    }
-    function vaciar() { carrito = []; document.getElementById('cart-section').style.display = 'none'; render(); }
-
-    function enviar() {
-        const n = document.getElementById('c-nombre').value, r = document.getElementById('c-rif').value;
-        if(!n || !r || !carrito.length) return alert("Complete los datos del cliente y agregue productos.");
         document.getElementById('loader-overlay').style.display = 'flex';
-        const payload = { cliente: n.toUpperCase(), rif: r.toUpperCase(), telefono: document.getElementById('c-telefono').value, ubicacion: document.getElementById('c-ubicacion').value, total: document.getElementById('grand-total').innerText, detalles: carrito };
-        fetch(API_URL + "?action=nuevo_pedido", { method: "POST", body: JSON.stringify(payload) }).then(() => { alert("¡ORDEN ENVIADA A PLANTA CON ÉXITO!"); location.href = 'index.html'; }).catch(e => { alert("Error de conexión al enviar."); document.getElementById('loader-overlay').style.display = 'none'; });
+        document.getElementById('loader-overlay').innerText = "🚀 ENVIANDO SOLICITUD A PLANTA...";
+
+        const paquete = {
+            cliente: nom.toUpperCase(), rif: rif.toUpperCase(), telefono: tlf, ubicacion: obr,
+            total: carrito.reduce((s,i) => s + i.total, 0),
+            detalles: carrito
+        };
+
+        try {
+            await fetch(API_URL + "?action=nuevo_pedido", { method: "POST", mode: "no-cors", body: JSON.stringify(paquete) });
+            document.getElementById('loader-overlay').style.display = 'none';
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('cart-card').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'block';
+        } catch(e) {
+            alert("Error al enviar la solicitud.");
+            document.getElementById('loader-overlay').style.display = 'none';
+        }
     }
 </script>
 </body>
