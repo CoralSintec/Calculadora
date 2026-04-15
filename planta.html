@@ -21,14 +21,12 @@
         .st-coordinar { background: #dbeafe; color: #1e40af; border: 1px solid #60a5fa;}
         .st-listo { background: #dcfce7; color: #166534; border: 1px solid #4ade80;}
         
-        /* SISTEMA DE PESTAÑAS (TABS) DENTRO DE LA ORDEN */
         .order-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 15px; }
         .order-tab { flex: 1; background: none; border: none; padding: 10px; font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: 0.2s;}
         .order-tab.active { color: var(--p); border-bottom-color: var(--p); }
         .order-tab-content { display: none; }
         .order-tab-content.active { display: block; }
         
-        /* DISEÑO DE LA RECETA DE PRODUCCIÓN */
         .receta-item { background: #f8fafc; border-left: 4px solid var(--blue); padding: 12px; margin-bottom: 10px; border-radius: 6px; }
         .receta-title { font-weight: 900; font-size: 13px; color: var(--p); margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;}
         .receta-lista { margin: 0; padding-left: 20px; font-size: 13px; color: #334155; }
@@ -88,7 +86,6 @@
     async function loadData() {
         document.getElementById('loader-overlay').style.display = 'flex';
         try {
-            // Ahora Planta pide los pedidos y las fórmulas para poder armar la receta
             const [pedidos, formulas] = await Promise.all([
                 fetch(API_URL + "?action=get_pedidos&t=" + Date.now()).then(r => r.json()),
                 fetch(API_URL + "?action=get_formulas&t=" + Date.now()).then(r => r.json())
@@ -126,9 +123,8 @@
                           estado === "ENTREGADO" ? "st-listo" : "st-nuevo";
 
             let totalCarateo = 0, totalSellador = 0;
-            let safeId = p.FECHA_ORDEN.replace(/[^a-zA-Z0-9]/g, ''); // ID seguro para los botones
+            let safeId = p.FECHA_ORDEN.replace(/[^a-zA-Z0-9]/g, '');
             
-            // LOGICA DE DINERO
             let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0);
             let pagado = parseFloat(p.PAGADO_USD || 0);
             let falta = total - pagado;
@@ -151,27 +147,25 @@
                 </div>`;
             }
 
-            // CREAR TABLA DE DETALLES
-            let tablaDetallesHtml = `<table><thead><tr><th>FORMATO</th><th>COLOR</th><th>TEXTURA</th><th>ÁREA</th><th>FABRICAR</th></tr></thead><tbody>`;
-            
-            // CREAR LISTA DE RECETAS
+            let tablaDetallesHtml = `<table><thead><tr><th>FORMATO</th><th>COLOR</th><th>TEXTURA</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`;
             let recetaHtml = `<div>`;
 
-            items.forEach((i, index) => {
+            items.forEach(i => {
                 let m = parseFloat(i.m2 || 0);
                 let dim = i.formato.toLowerCase().split('x');
                 let pcs = Math.ceil(m / ((dim[0]*dim[1])/10000));
                 totalCarateo += i.carateo || 0; totalSellador += i.sellador || 0;
                 
-                // Agregamos fila a la tabla (sin el consumo estimado falso)
                 tablaDetallesHtml += `<tr><td>${i.formato}</td><td>${i.color}</td><td>${i.textura}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
                 
-                // Buscamos la fórmula real para la pestaña de Receta
-                let colorTxt = String(i.color).toUpperCase();
-                let texturaTxt = String(i.textura).toUpperCase();
+                // BUSCADOR INTELIGENTE EN LA INTERFAZ
+                let colorTxt = String(i.color).toUpperCase().trim();
+                let texturaTxt = String(i.textura).toUpperCase().trim();
+                let texturaCorta = texturaTxt.substring(0, 4); 
+
                 let formulaEncontrada = formulas.find(f => {
-                    let n = String(Object.values(f)[0]).toUpperCase();
-                    return n.includes(colorTxt) && n.includes(texturaTxt);
+                    let filaCompleta = String(Object.values(f).join(' ')).toUpperCase();
+                    return filaCompleta.includes(colorTxt) && filaCompleta.includes(texturaCorta);
                 });
 
                 recetaHtml += `<div class="receta-item">
@@ -188,7 +182,7 @@
                     let c_est = (parseFloat(val[9] || 0) * m).toFixed(2);
                     
                     recetaHtml += `<ul class="receta-lista">
-                        <li><b>Cemento ${val[1]}:</b> ${c_cem} kg</li>
+                        <li><b>Cemento ${val[1] || ''}:</b> ${c_cem} kg</li>
                         <li><b>Arena Blanca:</b> ${c_are} kg</li>
                         <li><b>Arrosillo Claro:</b> ${c_arr} kg</li>
                         ${c_pig > 0 ? `<li><b>Pigmento Negro:</b> ${c_pig} kg</li>` : ''}
@@ -197,7 +191,7 @@
                         ${c_est > 0 ? `<li><b>Estuco:</b> ${c_est} kg</li>` : ''}
                     </ul>`;
                 } else {
-                    recetaHtml += `<div style="color:#ef4444; font-size:12px; font-weight:bold;">⚠️ Fórmula maestra no encontrada en el Excel.</div>`;
+                    recetaHtml += `<div style="color:#ef4444; font-size:12px; font-weight:bold;">⚠️ Fórmula no registrada en Excel.</div>`;
                 }
                 recetaHtml += `</div>`;
             });
@@ -223,7 +217,7 @@
                     
                     <div class="order-tabs">
                         <button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button>
-                        <button class="order-tab" onclick="switchTab(this, 'receta-${safeId}')">🧪 RECETA DE PRODUCCIÓN</button>
+                        <button class="order-tab" onclick="switchTab(this, 'receta-${safeId}')">🧪 RECETA</button>
                     </div>
 
                     <div id="detalles-${safeId}" class="order-tab-content active" style="overflow-x: auto;">
@@ -248,7 +242,7 @@
             
             if(usuarioActual === 'EDUARDO') {
                 html += `<button class="btn-action btn-pago" onclick="registrarPago('${p.CLIENTE}', '${p.FECHA_ORDEN}', ${pagado})">💵 REGISTRAR ABONO AL PEDIDO</button>
-                         <button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR PEDIDO (ERROR / ANULADO)</button>`;
+                         <button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR PEDIDO</button>`;
             }
 
             html += `</div></div>`;
