@@ -26,14 +26,16 @@
         .item-row { background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; border: 1px solid #e2e8f0; }
         .item-row b { color: var(--blue); }
 
-        .btn-marcar { width: 100%; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        .btn-marcar:active { background: #e2e8f0; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-marcar { flex: 1; background: #166534; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(22,101,52,0.3);}
+        .btn-marcar:active { transform: scale(0.98); }
+        .btn-eliminar { background: #fee2e2; color: #b91c1c; border: 1px solid #f87171; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(243, 244, 246, 0.95); display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--p); z-index: 100; font-size: 18px; }
     </style>
 </head>
 <body>
-    <div id="loader">⏳ Buscando solicitudes nuevas...</div>
+    <div id="loader">⏳ Buscando solicitudes...</div>
     
     <main class="app-main">
         <div class="top-bar">
@@ -66,7 +68,6 @@
             document.getElementById('loader').style.display = 'none';
         })
         .catch(e => {
-            alert("Error al cargar. Intente de nuevo.");
             document.getElementById('loader').style.display = 'none';
         });
     }
@@ -86,9 +87,10 @@
 
             let htmlItems = '';
             items.forEach(i => {
+                let m2Final = i.m2Final || i.m2; // Compatibilidad
                 htmlItems += `
                 <div class="item-row">
-                    <b>${i.m2} m² de ${i.formato}</b> - ${i.color} (${i.textura} - ${i.uso})
+                    <b>${m2Final} m² de ${i.formato || 'Material'}</b> - ${i.color || ''} (${i.textura || ''})
                 </div>`;
             });
 
@@ -96,7 +98,7 @@
 
             let cardHtml = `
             <div class="solicitud-card">
-                <div style="font-size: 10px; color: #94a3b8; margin-bottom: 5px; font-weight:bold;">FECHA DE INGRESO: ${s.FECHA}</div>
+                <div style="font-size: 10px; color: #94a3b8; margin-bottom: 5px; font-weight:bold;">FECHA: ${s.FECHA}</div>
                 <div class="cliente-nombre">${s.CLIENTE}</div>
                 <p class="info-txt"><b>RIF:</b> ${s.RIF || s.RIF_CI || '-'}</p>
                 <p class="info-txt"><b>Tlf:</b> ${s.TELEFONO}</p>
@@ -108,23 +110,36 @@
                 </div>
 
                 <div class="items-box">
-                    <p style="font-size:11px; font-weight:bold; color:var(--p); margin: 0 0 10px 0; text-transform:uppercase;">Material Solicitado:</p>
+                    <p style="font-size:11px; font-weight:bold; color:var(--p); margin: 0 0 10px 0;">MATERIAL SOLICITADO:</p>
                     ${htmlItems}
                 </div>
 
-                <button class="btn-marcar" onclick="marcarRevisado('${s.CLIENTE}', '${s.FECHA}')">🗑️ Marcar como Leída / Ocultar</button>
+                <div class="btn-group">
+                    <button class="btn-marcar" onclick="aprobarAPlanta('${s.CLIENTE}', '${s.FECHA}')">✅ PAGADO / ENVIAR A PLANTA</button>
+                    <button class="btn-eliminar" onclick="eliminar('${s.CLIENTE}', '${s.FECHA}')">🗑️</button>
+                </div>
             </div>`;
             
             container.innerHTML += cardHtml;
         });
     }
 
-    function marcarRevisado(cliente, fecha) {
-        if(!confirm("¿Deseas quitar esta solicitud de tu bandeja?")) return;
+    function aprobarAPlanta(cliente, fecha) {
+        if(!confirm("¿Confirmas el pago? El pedido será enviado a la Planta de Producción para su aceptación final.")) return;
+        document.getElementById('loader').style.display = 'flex';
+        fetch(API_URL + "?action=marcar_pagado_solicitud", {
+            method: "POST", mode: "no-cors",
+            body: JSON.stringify({ cliente: cliente, fecha: fecha })
+        }).finally(() => {
+            setTimeout(() => { cargarSolicitudes(); }, 1500);
+        });
+    }
+
+    function eliminar(cliente, fecha) {
+        if(!confirm("¿Eliminar esta solicitud descartada?")) return;
         document.getElementById('loader').style.display = 'flex';
         fetch(API_URL + "?action=eliminar_solicitud", {
-            method: "POST",
-            mode: "no-cors",
+            method: "POST", mode: "no-cors",
             body: JSON.stringify({ cliente: cliente, fecha: fecha })
         }).finally(() => {
             setTimeout(() => { cargarSolicitudes(); }, 1500);
