@@ -14,43 +14,43 @@
         .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .kpi-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 4px solid var(--p);}
         .kpi-title { font-size: 11px; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
-        .kpi-val { font-size: 22px; font-weight: 900; }
+        .kpi-val { font-size: 20px; font-weight: 900; }
         .kpi-full { grid-column: span 2; background: var(--p); color: white; border: none;}
-        .kpi-full .kpi-val { color: #fde047; font-size: 28px; }
+        .kpi-full .kpi-val { color: #fde047; font-size: 26px; }
         .tabs { display: flex; background: white; border-radius: 10px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;}
-        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-size: 12px; font-weight: 800; text-transform: uppercase; cursor: pointer; color: #64748b; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; color: #64748b; }
         .tab-btn.active { background: var(--p); color: white; }
         .section { display: none; }
         .section.active { display: block; }
-        .card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; flex-direction: column; box-shadow: 0 2px 5px rgba(0,0,0,0.02); border-left: 4px solid #cbd5e1;}
-        .card-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .info b { display: block; font-size: 14px; text-transform: uppercase; }
+        .card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); border-left: 4px solid #cbd5e1;}
+        .card-row { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 8px; }
+        .info b { display: block; font-size: 14px; text-transform: uppercase; color: var(--p); }
         .info span { font-size: 11px; color: #64748b; }
-        .price { font-size: 16px; font-weight: 900; color: var(--green); margin-right: 15px; }
-        .btn-control { border: none; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 800; margin-left: 5px; }
-        .btn-plus { background: var(--p); color: white; }
-        .btn-minus { background: #fee2e2; color: var(--red); border: 1px solid #fecaca; }
-        .btn-edit { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-left: 5px; }
+        .price { font-size: 16px; font-weight: 900; color: var(--green); }
+        .btn-edit { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold; margin-left: 5px; }
+        .btn-plus { background: var(--p); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 800; }
+        .btn-minus { background: #fee2e2; color: var(--red); border: 1px solid #fecaca; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
         #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:100; display:flex; flex-direction:column; justify-content:center; align-items:center; font-weight:bold; }
     </style>
 </head>
 <body>
-    <div id="loader">📊 Sincronizando Finanzas...</div>
+    <div id="loader">📊 Sincronizando Coralsintec...</div>
     <main class="app-main">
         <div class="header-bar">
             <button class="btn-volver" onclick="location.href='index.html'">⬅ MENÚ</button>
             <div class="user-badge">👑 GERENCIA</div>
         </div>
         <div class="kpi-grid">
-            <div class="kpi-card" style="border-top-color:var(--blue);"><div class="kpi-title">Ventas Acumuladas</div><div class="kpi-val" id="k-v" style="color:var(--blue);">$0</div></div>
+            <div class="kpi-card" style="border-top-color:var(--blue);"><div class="kpi-title">Ventas Brutas</div><div class="kpi-val" id="k-v" style="color:var(--blue);">$0</div></div>
             <div class="kpi-card" style="border-top-color:var(--red);"><div class="kpi-title">Costo Operativo</div><div class="kpi-val" id="k-c" style="color:var(--red);">$0</div></div>
-            <div class="kpi-card kpi-full"><div class="kpi-title">Monto de lo que queda (Balance)</div><div class="kpi-val" id="k-b">$0</div></div>
+            <div class="kpi-card kpi-full"><div class="kpi-title">Monto Disponible</div><div class="kpi-val" id="k-b">$0</div></div>
         </div>
         <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('nomina', this)">Nómina</button>
-            <button class="tab-btn" onclick="showTab('gastos', this)">Gastos</button>
+            <button class="tab-btn active" onclick="showTab('nomina', this)">Equipo</button>
+            <button class="tab-btn" onclick="showTab('gastos', this)">Servicios</button>
             <button class="tab-btn" onclick="showTab('materiales', this)">Materiales</button>
         </div>
+        
         <div id="nomina" class="section active"><div id="l-n"></div></div>
         <div id="gastos" class="section"><div id="l-g"></div></div>
         <div id="materiales" class="section"><div id="l-m"></div></div>
@@ -58,6 +58,7 @@
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
+    
     window.onload = () => {
         if(localStorage.getItem('usuarioCoralsintec') !== 'EDUARDO') { location.href = 'index.html'; return; }
         cargarTodo();
@@ -85,17 +86,26 @@
             document.getElementById('k-c').innerText = "$" + c.toFixed(2);
             document.getElementById('k-b').innerText = "$" + (v-c).toFixed(2);
 
+            // NÓMINA CON BOTÓN DE NOMBRE Y FECHA
             document.getElementById('l-n').innerHTML = rN.filter(n => n.CATEGORIA === 'Nomina').map(n => `
-                <div class="card" style="border-left-color:var(--blue);"><div class="card-row">
-                <div class="info"><b>👷‍♂️ ${n.NOMBRE}</b><span>Sueldo</span></div>
-                <div style="display:flex;align-items:center;"><div class="price">$${n.MONTO_MENSUAL_USD}</div>
-                <button class="btn-edit" onclick="edit('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${n.MONTO_MENSUAL_USD}')">✏️</button></div></div></div>`).join('');
+                <div class="card" style="border-left-color:var(--blue);">
+                    <div class="card-row">
+                        <div class="info">
+                            <b onclick="editarDato('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 1, '${n.NOMBRE}')">${n.NOMBRE} ✏️</b>
+                            <span>Ingreso: <i onclick="editarDato('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 3, '${n.FECHA_INGRESO || '01/01/2026'}')">${n.FECHA_INGRESO || '01/01/2026'} ✏️</i></span>
+                        </div>
+                        <div style="display:flex;align-items:center;">
+                            <div class="price">$${n.MONTO_MENSUAL_USD}</div>
+                            <button class="btn-edit" onclick="editarDato('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${n.MONTO_MENSUAL_USD}')">💰</button>
+                        </div>
+                    </div>
+                </div>`).join('');
 
             document.getElementById('l-g').innerHTML = rN.filter(n => n.CATEGORIA === 'Operativo').map(n => `
                 <div class="card" style="border-left-color:var(--red);"><div class="card-row">
                 <div class="info"><b>🏢 ${n.NOMBRE}</b><span>Gasto Fijo</span></div>
                 <div style="display:flex;align-items:center;"><div class="price">$${n.MONTO_MENSUAL_USD}</div>
-                <button class="btn-edit" onclick="edit('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${n.MONTO_MENSUAL_USD}')">✏️</button></div></div></div>`).join('');
+                <button class="btn-edit" onclick="editarDato('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${n.MONTO_MENSUAL_USD}')">✏️</button></div></div></div>`).join('');
 
             document.getElementById('l-m').innerHTML = rI.map(m => {
                 let stock = parseFloat(m.STOCK_ACTUAL), alerta = parseFloat(m.PUNTO_ALERTA);
@@ -103,9 +113,9 @@
                 return `<div class="card" style="border-left-color:${color};"><div class="card-row">
                 <div class="info"><b>📦 ${m.MATERIAL}</b><span>$${m.COSTO_UNITARIO_USD}/${m.UNIDAD_MEDIDA}</span></div>
                 <div style="display:flex;align-items:center;"><div class="price" style="color:${color}">${stock}</div>
-                <button class="btn-control btn-plus" onclick="ajustarStock('${m.MATERIAL}', ${stock}, 'suma')">＋</button>
-                <button class="btn-control btn-minus" onclick="ajustarStock('${m.MATERIAL}', ${stock}, 'resta')">－</button>
-                <button class="btn-edit" onclick="edit('INVENTARIO_COSTOS','MATERIAL','${m.MATERIAL}',2,'${m.COSTO_UNITARIO_USD}')">✏️ $</button></div></div>
+                <button class="btn-edit" style="background:var(--p); color:white;" onclick="ajustarStock('${m.MATERIAL}', ${stock}, 'suma')">＋</button>
+                <button class="btn-edit" style="background:#fee2e2; color:var(--red);" onclick="ajustarStock('${m.MATERIAL}', ${stock}, 'resta')">－</button>
+                <button class="btn-edit" onclick="editarDato('INVENTARIO_COSTOS','MATERIAL','${m.MATERIAL}',2,'${m.COSTO_UNITARIO_USD}')">✏️ $</button></div></div>
                 <div style="width:100%;background:#eee;height:6px;border-radius:3px;margin-top:8px;"><div style="width:${Math.min((stock/2000)*100,100)}%;background:${color};height:100%;"></div></div></div>`;
             }).join('');
 
@@ -113,30 +123,29 @@
         } catch(e) { document.getElementById('loader').style.display = 'none'; }
     }
 
-    function edit(h, cb, id, ce, a) {
-        let n = prompt("Nuevo monto para " + id + ":", a);
-        if(!n || n == a || isNaN(n)) return;
+    async function editarDato(h, cb, id, ce, a) {
+        let n = prompt("Actualizar dato para " + id + ":", a);
+        if(!n || n == a) return;
         document.getElementById('loader').style.display = 'flex';
-        fetch(API_URL + "?action=editar_registro", { method: "POST", mode: "no-cors", body: JSON.stringify({ hoja: h, col_busqueda: (cb=='NOMBRE'?1:0), id: id, col_editar: ce, nuevo_valor: n }) })
-        .finally(() => { setTimeout(() => { cargarTodo(); }, 2000); });
+        await fetch(API_URL + "?action=editar_registro", { 
+            method: "POST", 
+            mode: "no-cors", 
+            body: JSON.stringify({ hoja: h, col_busqueda: (cb=='NOMBRE'?1:0), id: id, col_editar: ce, nuevo_valor: n }) 
+        });
+        setTimeout(() => { cargarTodo(); }, 2000);
     }
 
-    function ajustarStock(material, actual, tipo) {
-        let msg = tipo === 'suma' ? "¿Cuánta cantidad está ENTRANDO de " : "¿Cuánta cantidad se DAÑÓ o SALIÓ de ";
-        let cuanto = prompt(msg + material + "?", "0");
+    async function ajustarStock(material, actual, tipo) {
+        let cuanto = prompt("Cantidad a " + (tipo=='suma'?'sumar':'restar') + " para " + material + ":", "0");
         if(!cuanto || isNaN(cuanto) || cuanto <= 0) return;
-        
         let nuevoTotal = tipo === 'suma' ? parseFloat(actual) + parseFloat(cuanto) : parseFloat(actual) - parseFloat(cuanto);
-        
-        if(nuevoTotal < 0) { alert("Error: No puedes dejar el stock en negativo."); return; }
-
         document.getElementById('loader').style.display = 'flex';
-        fetch(API_URL + "?action=editar_registro", { 
+        await fetch(API_URL + "?action=editar_registro", { 
             method: "POST", 
             mode: "no-cors", 
             body: JSON.stringify({ hoja: 'INVENTARIO_COSTOS', col_busqueda: 0, id: material, col_editar: 3, nuevo_valor: nuevoTotal }) 
-        })
-        .finally(() => { setTimeout(() => { cargarTodo(); }, 2000); });
+        });
+        setTimeout(() => { cargarTodo(); }, 2000);
     }
 </script>
 </body>
