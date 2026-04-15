@@ -30,7 +30,6 @@
         .app-main {
             background: rgba(255, 255, 255, 0.90); 
             backdrop-filter: blur(8px); 
-            -webkit-backdrop-filter: blur(8px);
             padding: 25px 20px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
@@ -72,18 +71,26 @@
         .total-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; font-weight: 600; }
         .total-price { font-size: 32px; font-weight: 900; color: var(--coralsintec-accent); margin: 5px 0 0 0; }
 
-        .btn { width: 100%; border: none; padding: 16px; border-radius: 10px; font-size: 15px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: transform 0.1s; }
-        
-        /* DISEÑO DE BOTÓN EXACTO AL DE LA FOTO 2 */
-        .add-btn { 
-            background-color: white; 
-            color: var(--coralsintec-primary); 
+        /* BOTÓN AGREGAR A LA LISTA - ESTILO FOTO 2 */
+        .btn-add-outline {
+            width: 100%;
+            background-color: white;
+            color: var(--coralsintec-primary);
             border: 2px solid var(--coralsintec-primary);
-            margin-top: 20px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .add-btn:hover { background: var(--coralsintec-primary); color: white; }
-        .add-btn:active { transform: scale(0.97); }
+        .btn-add-outline:active { transform: scale(0.97); }
+
+        .btn-submit { width: 100%; border: none; padding: 16px; border-radius: 10px; font-size: 15px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: transform 0.1s; background-color: #166534; color: white; box-shadow: 0 5px 15px rgba(22,101,52,0.4); margin-top: 15px;}
+        .btn-submit:active { transform: scale(0.97); }
 
         .cart-section { width: 100%; max-width: 400px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); padding: 20px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); margin-top: 20px; box-sizing: border-box; border-top: 6px solid var(--coralsintec-primary); }
         .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 10px; }
@@ -101,13 +108,12 @@
         .cart-total-row { display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; color: var(--coralsintec-primary); border-top: 1px solid #e2e8f0; margin-top: 8px; padding-top: 8px; }
         .cart-total-row b { color: var(--coralsintec-accent); font-size: 18px; }
 
-        .grand-total { text-align: center; background: #ecfccb; padding: 15px; border-radius: 12px; border: 1px solid #bef264; margin-top: 15px;}
-        .grand-total span { font-size: 12px; color: #3f6212; font-weight: 800; display: block;}
-        .grand-total div { font-size: 28px; font-weight: 900; color: #166534; display:flex; justify-content:center; align-items:baseline; gap:5px; margin-top: 5px;}
+        /* TOTAL GENERAL - DISEÑO FOTO 3 (ALINEADO Y MISMO TAMAÑO) */
+        .grand-total { text-align: center; background: #ecfccb; padding: 20px; border-radius: 12px; border: 1px solid #bef264; margin-top: 15px;}
+        .grand-total span.gt-title { font-size: 12px; color: #3f6212; font-weight: 800; display: block; text-transform: uppercase; margin-bottom: 5px;}
+        .grand-total-val { font-size: 26px; font-weight: 900; color: #166534; display:flex; justify-content:center; align-items:center; gap:6px;}
         
         .btn-volver { background: white; border: 1px solid var(--coralsintec-border); color: var(--coralsintec-primary); padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; align-self: flex-start; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .btn-enviar { background: #166534; color: white; width: 100%; padding: 16px; border-radius: 10px; font-size: 15px; font-weight: 900; border: none; cursor: pointer; margin-top: 15px; text-transform: uppercase; box-shadow: 0 5px 15px rgba(22,101,52,0.4); transition: transform 0.1s;}
-        .btn-enviar:active { transform: scale(0.97); }
 
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; color: var(--coralsintec-primary); font-size:18px; display:none;}
         .success-msg { display: none; text-align: center; padding: 50px 20px; background: rgba(255, 255, 255, 0.95); border-radius: 16px; border-top: 8px solid #10b981; max-width:400px; width:100%; box-sizing:border-box;}
@@ -219,7 +225,7 @@
                 </div>
             </div>
 
-            <button class="btn add-btn" onclick="agregarAlCarrito()">AGREGAR A LA LISTA</button>
+            <button class="btn-add-outline" onclick="agregarAlCarrito()">AGREGAR A LA LISTA</button>
         </div>
     </main>
 
@@ -230,18 +236,18 @@
         </div>
         <ul class="cart-list" id="cart-list"></ul>
         <div class="grand-total">
-            <span>TOTAL GENERAL</span>
-            <div><span>$</span><span id="grand-total">0</span></div>
+            <span class="gt-title">TOTAL GENERAL</span>
+            <div class="grand-total-val">$ <span id="grand-total">0.00</span></div>
         </div>
         
-        <button class="btn-enviar" onclick="enviarPedido()">🚀 CARGAR PEDIDO A PLANTA</button>
+        <button class="btn-submit" onclick="enviarPedido()">🚀 CARGAR PEDIDO A PLANTA</button>
     </section>
 
     <div id="success-screen" class="success-msg">
         <div style="font-size: 60px; margin-bottom: 10px;">✅</div>
         <h2 style="color:var(--coralsintec-primary); margin:0;">¡PEDIDO REGISTRADO!</h2>
         <p style="color:#475569; font-weight:bold;">El pedido ha sido enviado a Producción.</p>
-        <button class="btn add-btn" style="margin-top:20px;" onclick="location.reload()">Nuevo Pedido</button>
+        <button class="btn-submit" style="margin-top:20px;" onclick="location.reload()">Nuevo Pedido</button>
     </div>
 
 <script>
@@ -374,6 +380,7 @@
             const li = document.createElement('li');
             li.className = 'cart-item';
             
+            // EL DESGLOSE COMPLETO EN LA TARJETA DEL CARRITO
             let htmlHTML = `
                 <div class="cart-item-title">
                     <span>${item.titulo}</span>
@@ -440,7 +447,6 @@
         };
 
         try {
-            // MANDA A LA PLANTA
             await fetch(API_URL + "?action=nuevo_pedido", { method: "POST", mode: "no-cors", body: JSON.stringify(paquete) });
             document.getElementById('loader-overlay').style.display = 'none';
             document.getElementById('main-content').style.display = 'none';
@@ -452,6 +458,5 @@
         }
     }
 </script>
-
 </body>
 </html>
