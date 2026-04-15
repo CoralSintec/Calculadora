@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Producción Coralsintec</title>
     <style>
-        :root { --p: #1e2328; --border: #cbd5e1; --accent: #f59e0b; }
+        :root { --p: #1e2328; --border: #cbd5e1; --accent: #f59e0b; --blue: #3b82f6; --green: #10b981; --red: #ef4444; }
         body { font-family: -apple-system, sans-serif; background: #f3f4f6; margin: 0; padding: 15px; }
         .app-main { width: 100%; max-width: 600px; margin: 0 auto; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -21,7 +21,20 @@
         .st-coordinar { background: #dbeafe; color: #1e40af; border: 1px solid #60a5fa;}
         .st-listo { background: #dcfce7; color: #166534; border: 1px solid #4ade80;}
         
-        table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0; }
+        /* SISTEMA DE PESTAÑAS (TABS) DENTRO DE LA ORDEN */
+        .order-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 15px; }
+        .order-tab { flex: 1; background: none; border: none; padding: 10px; font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: 0.2s;}
+        .order-tab.active { color: var(--p); border-bottom-color: var(--p); }
+        .order-tab-content { display: none; }
+        .order-tab-content.active { display: block; }
+        
+        /* DISEÑO DE LA RECETA DE PRODUCCIÓN */
+        .receta-item { background: #f8fafc; border-left: 4px solid var(--blue); padding: 12px; margin-bottom: 10px; border-radius: 6px; }
+        .receta-title { font-weight: 900; font-size: 13px; color: var(--p); margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;}
+        .receta-lista { margin: 0; padding-left: 20px; font-size: 13px; color: #334155; }
+        .receta-lista li { margin-bottom: 3px; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0 0 10px 0; }
         th { text-align: left; padding: 8px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; font-size: 11px; color: var(--p);}
         td { padding: 8px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #334155;}
         .qty-badge { background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-weight: 800; display: inline-block;}
@@ -64,7 +77,7 @@
         const badge = document.getElementById('badge-usuario');
         const headerSub = document.getElementById('header-user');
         if(usuarioActual === 'EDUARDO') {
-            headerSub.innerText = "⭐ VISTA GERENCIAL (Datos Completos)";
+            headerSub.innerText = "⭐ VISTA GERENCIAL";
             headerSub.style.color = "#fef08a";
             badge.innerText = "👑 MODO GERENTE";
             badge.classList.add('user-eduardo');
@@ -72,19 +85,30 @@
         loadData();
     }
 
-    function loadData() {
+    async function loadData() {
         document.getElementById('loader-overlay').style.display = 'flex';
-        fetch(API_URL + "?action=get_pedidos&t=" + Date.now())
-        .then(r => r.json())
-        .then(data => {
+        try {
+            // Ahora Planta pide los pedidos y las fórmulas para poder armar la receta
+            const [pedidos, formulas] = await Promise.all([
+                fetch(API_URL + "?action=get_pedidos&t=" + Date.now()).then(r => r.json()),
+                fetch(API_URL + "?action=get_formulas&t=" + Date.now()).then(r => r.json())
+            ]);
             document.getElementById('loader-overlay').style.display = 'none';
-            render(data);
-        }).catch(() => {
+            render(pedidos, formulas);
+        } catch(e) {
             document.getElementById('loader-overlay').style.display = 'none';
-        });
+        }
     }
 
-    function render(pedidos) {
+    function switchTab(btn, targetId) {
+        let card = btn.closest('.order-card');
+        card.querySelectorAll('.order-tab-content').forEach(c => c.classList.remove('active'));
+        card.querySelectorAll('.order-tab').forEach(b => b.classList.remove('active'));
+        card.querySelector('#' + targetId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    function render(pedidos, formulas) {
         const container = document.getElementById('lista-pedidos');
         container.innerHTML = '';
         
@@ -102,6 +126,7 @@
                           estado === "ENTREGADO" ? "st-listo" : "st-nuevo";
 
             let totalCarateo = 0, totalSellador = 0;
+            let safeId = p.FECHA_ORDEN.replace(/[^a-zA-Z0-9]/g, ''); // ID seguro para los botones
             
             // LOGICA DE DINERO
             let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0);
@@ -126,6 +151,60 @@
                 </div>`;
             }
 
+            // CREAR TABLA DE DETALLES
+            let tablaDetallesHtml = `<table><thead><tr><th>FORMATO</th><th>COLOR</th><th>TEXTURA</th><th>ÁREA</th><th>FABRICAR</th></tr></thead><tbody>`;
+            
+            // CREAR LISTA DE RECETAS
+            let recetaHtml = `<div>`;
+
+            items.forEach((i, index) => {
+                let m = parseFloat(i.m2 || 0);
+                let dim = i.formato.toLowerCase().split('x');
+                let pcs = Math.ceil(m / ((dim[0]*dim[1])/10000));
+                totalCarateo += i.carateo || 0; totalSellador += i.sellador || 0;
+                
+                // Agregamos fila a la tabla (sin el consumo estimado falso)
+                tablaDetallesHtml += `<tr><td>${i.formato}</td><td>${i.color}</td><td>${i.textura}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
+                
+                // Buscamos la fórmula real para la pestaña de Receta
+                let colorTxt = String(i.color).toUpperCase();
+                let texturaTxt = String(i.textura).toUpperCase();
+                let formulaEncontrada = formulas.find(f => {
+                    let n = String(Object.values(f)[0]).toUpperCase();
+                    return n.includes(colorTxt) && n.includes(texturaTxt);
+                });
+
+                recetaHtml += `<div class="receta-item">
+                                <div class="receta-title">▶ Para fabricar: ${m}m² de ${i.color} (${i.textura})</div>`;
+                
+                if(formulaEncontrada) {
+                    let val = Object.values(formulaEncontrada);
+                    let c_cem = (parseFloat(val[2] || 0) * m).toFixed(2);
+                    let c_are = (parseFloat(val[3] || 0) * m).toFixed(2);
+                    let c_arr = (parseFloat(val[4] || 0) * m).toFixed(2);
+                    let c_pig = (parseFloat(val[5] || 0) * m).toFixed(2);
+                    let c_sup = (parseFloat(val[6] || 0) * m).toFixed(2);
+                    let c_fib = (parseFloat(val[7] || 0) * m).toFixed(2);
+                    let c_est = (parseFloat(val[9] || 0) * m).toFixed(2);
+                    
+                    recetaHtml += `<ul class="receta-lista">
+                        <li><b>Cemento ${val[1]}:</b> ${c_cem} kg</li>
+                        <li><b>Arena Blanca:</b> ${c_are} kg</li>
+                        <li><b>Arrosillo Claro:</b> ${c_arr} kg</li>
+                        ${c_pig > 0 ? `<li><b>Pigmento Negro:</b> ${c_pig} kg</li>` : ''}
+                        ${c_sup > 0 ? `<li><b>Superplastificante:</b> ${c_sup} Litros</li>` : ''}
+                        ${c_fib > 0 ? `<li><b>Fibra:</b> ${c_fib} kg</li>` : ''}
+                        ${c_est > 0 ? `<li><b>Estuco:</b> ${c_est} kg</li>` : ''}
+                    </ul>`;
+                } else {
+                    recetaHtml += `<div style="color:#ef4444; font-size:12px; font-weight:bold;">⚠️ Fórmula maestra no encontrada en el Excel.</div>`;
+                }
+                recetaHtml += `</div>`;
+            });
+
+            tablaDetallesHtml += `</tbody></table>`;
+            recetaHtml += `</div>`;
+
             let html = `
                 <div class="order-card">
                     <div style="text-align:center;"><span class="status-tag ${stClass}">${estado}</span></div>
@@ -141,22 +220,18 @@
                             <b style="color:#ef4444; font-size: 14px;">${p.FECHA_LIMITE_HABIL}</b>
                         </div>
                     </div>
-                    <div style="overflow-x: auto;">
-                        <table>
-                            <thead><tr><th>FORMATO</th><th>COLOR</th><th>TEXTURA</th><th>ÁREA</th><th>FABRICAR</th></tr></thead>
-                            <tbody>`;
-            
-            items.forEach(i => {
-                let m = parseFloat(i.m2 || 0);
-                let dim = i.formato.toLowerCase().split('x');
-                let pcs = Math.ceil(m / ((dim[0]*dim[1])/10000));
-                totalCarateo += i.carateo || 0; totalSellador += i.sellador || 0;
-                let consumoEst = (i.textura === 'Gruesa' ? 15 : 10) * m;
-                
-                html += `<tr><td>${i.formato}</td><td>${i.color}</td><td>${i.textura}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span><br><small style="font-weight:400;color:#64748b;">~${consumoEst}kg Cem.</small></td></tr>`;
-            });
+                    
+                    <div class="order-tabs">
+                        <button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button>
+                        <button class="order-tab" onclick="switchTab(this, 'receta-${safeId}')">🧪 RECETA DE PRODUCCIÓN</button>
+                    </div>
 
-            html += `</tbody></table></div>`;
+                    <div id="detalles-${safeId}" class="order-tab-content active" style="overflow-x: auto;">
+                        ${tablaDetallesHtml}
+                    </div>
+                    <div id="receta-${safeId}" class="order-tab-content">
+                        ${recetaHtml}
+                    </div>`;
             
             if(totalCarateo > 0 || totalSellador > 0) {
                 html += `<div class="extras-box">
