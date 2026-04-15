@@ -26,10 +26,13 @@
 
         <div id="dashboard-screen" class="screen">
             <h2 id="welcome">HOLA</h2>
-            <div onclick="location.href='cotizador.html'" class="menu-card" id="v-btn"><h3>🛒 VENTAS</h3></div>
+            <div onclick="location.href='ventas.html'" class="menu-card" id="v-btn"><h3>🛒 MI CALCULADORA / VENTAS</h3></div>
+            
+            <div onclick="window.open('https://docs.google.com/spreadsheets/d/1X_TU_EXCEL_ID/edit#gid=TU_PESTANA_ID', '_blank')" class="menu-card" id="s-btn" style="border-left-color: #10b981;"><h3>📥 VER SOLICITUDES CLIENTES</h3></div>
+            
             <div onclick="location.href='planta.html'" class="menu-card" style="border-left-color: #f59e0b;"><h3>🏭 PLANTA</h3></div>
             <div onclick="location.href='gerencia.html'" class="menu-card" id="g-btn" style="border-left-color: #6366f1;"><h3>📊 GERENCIA</h3></div>
-            <button onclick="logout()" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold;">Cerrar Sesión</button>
+            <button onclick="logout()" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold; margin-top:10px;">Cerrar Sesión</button>
         </div>
     </div>
 
@@ -47,7 +50,7 @@
             if(dbu[u] && dbu[u] === p) {
                 localStorage.setItem('usuarioCoralsintec', u);
                 ui(u);
-            } else { alert("Error"); }
+            } else { alert("Error de credenciales"); }
         }
 
         function ui(u) {
@@ -56,6 +59,7 @@
             document.getElementById('welcome').innerText = "HOLA " + u;
             if(u === "PLANTA") {
                 document.getElementById('v-btn').style.display = 'none';
+                document.getElementById('s-btn').style.display = 'none';
                 document.getElementById('g-btn').style.display = 'none';
             }
         }
