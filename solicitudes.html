@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitudes Recibidas | Coralsintec</title>
+    <style>
+        :root { --p: #1e2328; --border: #cbd5e1; --green: #10b981; --blue: #3b82f6; }
+        body { font-family: -apple-system, sans-serif; background: #f1f5f9; margin: 0; padding: 15px; }
+        .app-main { width: 100%; max-width: 600px; margin: 0 auto; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-volver { background: white; border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--p); box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+        .header { background: var(--green); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .header h2 { margin: 0; letter-spacing: 1px; text-transform: uppercase; font-size: 18px;}
+        
+        .solicitud-card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid var(--green); }
+        .cliente-nombre { font-size: 18px; font-weight: 900; color: var(--p); text-transform: uppercase; margin-bottom: 5px; }
+        .info-txt { font-size: 12px; color: #64748b; margin: 3px 0; }
+        .info-txt b { color: #475569; }
+        
+        .monto-box { background: #ecfccb; padding: 10px; border-radius: 8px; border: 1px solid #bef264; display: inline-block; margin-top: 10px; }
+        .monto-box span { font-size: 10px; font-weight: bold; color: #3f6212; display: block; }
+        .monto-box b { color: #166534; font-size: 18px; }
+
+        .items-box { margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); }
+        .item-row { background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; border: 1px solid #e2e8f0; }
+        .item-row b { color: var(--blue); }
+
+        .btn-marcar { width: 100%; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        .btn-marcar:active { background: #e2e8f0; }
+
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(243, 244, 246, 0.95); display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--p); z-index: 100; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div id="loader">⏳ Buscando solicitudes nuevas...</div>
+    
+    <main class="app-main">
+        <div class="top-bar">
+            <button class="btn-volver" onclick="location.href='index.html'">⬅ MENÚ</button>
+            <div style="background: #fef08a; color: #854d0e; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;">👑 VISTA GERENCIAL</div>
+        </div>
+        
+        <div class="header">
+            <h2>📥 Bandeja de Cotizaciones</h2>
+            <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;">Enviadas por los clientes desde la web</p>
+        </div>
+
+        <div id="lista-solicitudes"></div>
+    </main>
+
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
+
+    window.onload = () => {
+        if(localStorage.getItem('usuarioCoralsintec') !== 'EDUARDO') { location.href = 'index.html'; return; }
+        cargarSolicitudes();
+    };
+
+    function cargarSolicitudes() {
+        document.getElementById('loader').style.display = 'flex';
+        fetch(API_URL + "?action=get_solicitudes&t=" + Date.now())
+        .then(r => r.json())
+        .then(data => {
+            render(data);
+            document.getElementById('loader').style.display = 'none';
+        })
+        .catch(e => {
+            alert("Error al cargar. Intente de nuevo.");
+            document.getElementById('loader').style.display = 'none';
+        });
+    }
+
+    function render(solicitudes) {
+        const container = document.getElementById('lista-solicitudes');
+        container.innerHTML = '';
+        
+        if(!solicitudes || solicitudes.length === 0) { 
+            container.innerHTML = "<p style='text-align:center; color:#64748b; font-weight:bold; margin-top:40px;'>No hay cotizaciones nuevas por revisar.</p>"; 
+            return; 
+        }
+
+        solicitudes.reverse().forEach(s => {
+            let items = [];
+            try { items = JSON.parse(s.DETALLES_JSON); } catch(e){}
+
+            let htmlItems = '';
+            items.forEach(i => {
+                htmlItems += `
+                <div class="item-row">
+                    <b>${i.m2} m² de ${i.formato}</b> - ${i.color} (${i.textura} - ${i.uso})
+                </div>`;
+            });
+
+            let totalVal = parseFloat(s.TOTAL_USD || s.TOTAL || 0).toFixed(2);
+
+            let cardHtml = `
+            <div class="solicitud-card">
+                <div style="font-size: 10px; color: #94a3b8; margin-bottom: 5px; font-weight:bold;">FECHA DE INGRESO: ${s.FECHA}</div>
+                <div class="cliente-nombre">${s.CLIENTE}</div>
+                <p class="info-txt"><b>RIF:</b> ${s.RIF || s.RIF_CI || '-'}</p>
+                <p class="info-txt"><b>Tlf:</b> ${s.TELEFONO}</p>
+                <p class="info-txt"><b>Obra:</b> ${s.UBICACION}</p>
+                
+                <div class="monto-box">
+                    <span>VALOR COTIZADO:</span>
+                    <b>$${totalVal}</b>
+                </div>
+
+                <div class="items-box">
+                    <p style="font-size:11px; font-weight:bold; color:var(--p); margin: 0 0 10px 0; text-transform:uppercase;">Material Solicitado:</p>
+                    ${htmlItems}
+                </div>
+
+                <button class="btn-marcar" onclick="marcarRevisado('${s.CLIENTE}', '${s.FECHA}')">🗑️ Marcar como Leída / Ocultar</button>
+            </div>`;
+            
+            container.innerHTML += cardHtml;
+        });
+    }
+
+    function marcarRevisado(cliente, fecha) {
+        if(!confirm("¿Deseas quitar esta solicitud de tu bandeja?")) return;
+        document.getElementById('loader').style.display = 'flex';
+        fetch(API_URL + "?action=eliminar_solicitud", {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify({ cliente: cliente, fecha: fecha })
+        }).finally(() => {
+            setTimeout(() => { cargarSolicitudes(); }, 1500);
+        });
+    }
+</script>
+</body>
+</html>
