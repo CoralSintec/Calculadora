@@ -13,9 +13,15 @@
         .user-badge { background: #e2e8f0; color: #475569; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
         .user-eduardo { background: #fef08a; color: #854d0e; border: 1px solid #fde047; }
         .header { background: var(--p); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .order-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--accent); }
         
-        .status-tag { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .order-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--accent); position: relative;}
+        
+        /* BOTONES DE DOCUMENTOS PDF */
+        .doc-buttons { position: absolute; top: 12px; right: 12px; display: flex; gap: 5px; }
+        .btn-doc { background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 5px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-doc:hover { background: #e2e8f0; color: var(--p); border-color: #94a3b8; }
+        
+        .status-tag { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 20px; }
         .st-nuevo { background: #fee2e2; color: #991b1b; border: 1px solid #f87171;}
         .st-proceso { background: #fef3c7; color: #92400e; border: 1px solid #fbbf24;}
         .st-coordinar { background: #dbeafe; color: #1e40af; border: 1px solid #60a5fa;}
@@ -51,10 +57,36 @@
         .btn-eliminar { background: #ef4444; }
         
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(243, 244, 246, 0.95); z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: var(--p); font-size: 18px;}
+        
+        /* MODAL DE DESPACHO */
+        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; justify-content: center; align-items: center; }
+        .modal-card { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-card h3 { margin: 0 0 15px 0; color: var(--p); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;}
+        .modal-input { width: 100%; box-sizing: border-box; padding: 10px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+        .modal-row { display: flex; gap: 10px; }
     </style>
 </head>
 <body>
     <div id="loader-overlay">⏳ Sincronizando Planta...</div>
+    
+    <div id="modal-chofer" class="modal-bg">
+        <div class="modal-card">
+            <h3>📝 Datos de Transporte</h3>
+            <input type="hidden" id="ch-id-pedido">
+            <input type="text" id="ch-destino" class="modal-input" placeholder="Dirección de Destino">
+            <input type="text" id="ch-nombre" class="modal-input" placeholder="Nombre y Apellido del Chofer">
+            <input type="text" id="ch-modelo" class="modal-input" placeholder="Modelo del Camión">
+            <div class="modal-row">
+                <input type="text" id="ch-anio" class="modal-input" placeholder="Año">
+                <input type="text" id="ch-color" class="modal-input" placeholder="Color">
+            </div>
+            <input type="text" id="ch-placa" class="modal-input" placeholder="Placas del vehículo">
+            
+            <button onclick="ejecutarNotaEntrega()" style="background:var(--blue); color:white; padding:12px; width:100%; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:8px;">✅ GENERAR NOTA EN PDF</button>
+            <button onclick="document.getElementById('modal-chofer').style.display='none'" style="background:#e2e8f0; color:#475569; padding:10px; width:100%; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Cancelar</button>
+        </div>
+    </div>
+
     <main class="app-main">
         <div class="top-bar">
             <button class="btn-volver" onclick="location.href='index.html'">⬅ MENÚ</button>
@@ -70,6 +102,7 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
     const usuarioActual = localStorage.getItem('usuarioCoralsintec') || 'PLANTA';
+    let pedidosGlobal = []; // Para los PDF
 
     window.onload = () => {
         const badge = document.getElementById('badge-usuario');
@@ -90,6 +123,7 @@
                 fetch(API_URL + "?action=get_pedidos&t=" + Date.now()).then(r => r.json()),
                 fetch(API_URL + "?action=get_formulas&t=" + Date.now()).then(r => r.json())
             ]);
+            pedidosGlobal = pedidos;
             document.getElementById('loader-overlay').style.display = 'none';
             render(pedidos, formulas);
         } catch(e) {
@@ -119,7 +153,9 @@
             return; 
         }
 
-        pedidos.reverse().forEach(p => {
+        let pedidosOrdenados = [...pedidos].reverse();
+
+        pedidosOrdenados.forEach(p => {
             if(!p.DETALLES_JSON) return;
             let items = JSON.parse(p.DETALLES_JSON);
             let estado = p.ESTADO || "NUEVO / POR ACEPTAR";
@@ -133,8 +169,6 @@
             let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0);
             let pagado = parseFloat(p.PAGADO_USD || 0);
             let falta = total - pagado;
-            let porcPagado = total > 0 ? ((pagado / total) * 100).toFixed(0) : 0;
-            let porcFalta = total > 0 ? ((falta / total) * 100).toFixed(0) : 0;
 
             let etiquetaPrecio = "";
             if(usuarioActual === 'EDUARDO') {
@@ -142,13 +176,6 @@
                 <div style="background: #ecfccb; padding: 6px 10px; border-radius: 6px; border: 1px solid #bef264; margin-top: 10px; display: inline-block;">
                     <span style="font-size:10px; font-weight:bold; color:#3f6212;">MONTO DEL PEDIDO:</span>
                     <b style="color:#166534; font-size: 15px; margin-left: 5px;">$${total}</b>
-                </div>
-                <div style="background: #dbeafe; padding: 6px 10px; border-radius: 6px; border: 1px solid #93c5fd; margin-top: 5px; display: inline-block;">
-                    <span style="font-size:10px; font-weight:bold; color:#1e40af;">PAGADO (${porcPagado}%):</span>
-                    <b style="color:#1d4ed8; font-size: 15px; margin-left: 5px;">$${pagado}</b>
-                </div>
-                <div style="margin-top: 5px; font-size: 12px; font-weight: 800; color: #ef4444;">
-                    ⚠️ FALTA POR COBRAR: $${falta.toFixed(2)} (${porcFalta}%)
                 </div>`;
             }
 
@@ -168,7 +195,7 @@
                 let usoClean = ultraClean(i.uso);
 
                 let formulaEncontrada = formulas.find(f => {
-                    let prodBase = ultraClean(f['PRODUCTO_BASE']);
+                    let prodBase = ultraClean(f['PRODUCTO_BASE'] || f[0]);
                     return prodBase.includes(colorClean) && prodBase.includes(textClean) && prodBase.includes(usoClean);
                 });
 
@@ -182,21 +209,15 @@
                     
                     let c_cem = (parseFloat(vals[2] || 0) * m).toFixed(2);
                     recetaHtml += `<div style="font-size:10px; color:#10b981; margin-bottom:5px; font-weight:bold;">✅ Fórmula: ${nombreEncontrado}</div>
-                    <ul class="receta-lista">
-                        <li><b>CEMENTO ${String(vals[1]).toUpperCase()}:</b> ${c_cem} kg</li>`;
+                    <ul class="receta-lista"><li><b>CEMENTO ${String(vals[1]).toUpperCase()}:</b> ${c_cem} kg</li>`;
                     
-                    // Lee automáticamente todos los químicos que agregues en el Excel
                     for(let c = 3; c < keys.length; c++) {
                         let qty = (parseFloat(vals[c] || 0) * m).toFixed(2);
-                        if(qty > 0) {
-                            recetaHtml += `<li><b>${keys[c]}:</b> ${qty}</li>`;
-                        }
+                        if(qty > 0) recetaHtml += `<li><b>${keys[c]}:</b> ${qty}</li>`;
                     }
                     recetaHtml += `</ul>`;
                 } else {
-                    recetaHtml += `<div style="color:#ef4444; font-size:12px; font-weight:bold;">⚠️ Fórmula no registrada en Excel.<br>
-                        <span style="font-weight:normal; font-size:10px; color:#64748b;">(Falta crear la fila para: ${colorClean} + ${textClean} + ${usoClean}).</span>
-                    </div>`;
+                    recetaHtml += `<div style="color:#ef4444; font-size:12px; font-weight:bold;">⚠️ Fórmula no registrada.</div>`;
                 }
                 recetaHtml += `</div>`;
             });
@@ -206,6 +227,12 @@
 
             let html = `
                 <div class="order-card">
+                    <div class="doc-buttons">
+                        <button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'cotizacion')">📄 COTIZ.</button>
+                        <button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'produccion')">🏭 PROD.</button>
+                        <button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'entrega')">🚚 ENVÍO</button>
+                    </div>
+
                     <div style="text-align:center;"><span class="status-tag ${stClass}">${estado}</span></div>
                     <div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:15px;">
                         <div>
@@ -233,8 +260,7 @@
                     </div>`;
             
             if(totalCarateo > 0 || totalSellador > 0) {
-                html += `<div class="extras-box">
-                            <h4 class="extras-title">📦 Materiales de Instalación</h4>`;
+                html += `<div class="extras-box"><h4 class="extras-title">📦 Materiales de Instalación</h4>`;
                 if(totalCarateo > 0) html += `<div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span style="font-size:12px; font-weight:bold; color:#92400e;">CARATEO:</span> <b style="font-size:15px; color:#b45309;">${totalCarateo} SACOS</b></div>`;
                 if(totalSellador > 0) html += `<div style="display: flex; justify-content: space-between;"><span style="font-size:12px; font-weight:bold; color:#92400e;">SELLADOR:</span> <b style="font-size:15px; color:#b45309;">${totalSellador} GALONES</b></div>`;
                 html += `</div>`;
@@ -242,12 +268,11 @@
 
             html += `<div class="btn-group">
                 <button class="btn-action btn-aceptar" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN PROCESO')">✅ ACEPTAR E INICIAR</button>
-                <button class="btn-action btn-aviso" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'PROCESANDO / COORDINAR ENTREGA')">🚚 AVISAR: FALTA 1 SEMANA</button>
-                <button class="btn-action btn-entregado" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 MARCAR COMO ENTREGADO</button>`;
+                <button class="btn-action btn-entregado" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 MARCAR ENTREGADO</button>`;
             
             if(usuarioActual === 'EDUARDO') {
-                html += `<button class="btn-action btn-pago" onclick="registrarPago('${p.CLIENTE}', '${p.FECHA_ORDEN}', ${pagado})">💵 REGISTRAR ABONO AL PEDIDO</button>
-                         <button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR PEDIDO</button>`;
+                html += `<button class="btn-action btn-pago" onclick="registrarPago('${p.CLIENTE}', '${p.FECHA_ORDEN}', ${pagado})">💵 REGISTRAR ABONO</button>
+                         <button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR</button>`;
             }
 
             html += `</div></div>`;
@@ -255,6 +280,152 @@
         });
     }
 
+    // --- MOTOR GENERADOR DE PDF --- //
+    function prepararPDF(fechaOrden, tipo) {
+        if(tipo === 'entrega') {
+            document.getElementById('ch-id-pedido').value = fechaOrden;
+            document.getElementById('modal-chofer').style.display = 'flex';
+        } else {
+            generarPDF(fechaOrden, tipo, null);
+        }
+    }
+
+    function ejecutarNotaEntrega() {
+        let fechaOrden = document.getElementById('ch-id-pedido').value;
+        let datosChofer = {
+            destino: document.getElementById('ch-destino').value || 'No especificado',
+            nombre: document.getElementById('ch-nombre').value || 'No especificado',
+            modelo: document.getElementById('ch-modelo').value || 'N/A',
+            anio: document.getElementById('ch-anio').value || 'N/A',
+            color: document.getElementById('ch-color').value || 'N/A',
+            placa: document.getElementById('ch-placa').value || 'N/A'
+        };
+        document.getElementById('modal-chofer').style.display = 'none';
+        generarPDF(fechaOrden, 'entrega', datosChofer);
+    }
+
+    function generarPDF(fechaOrden, tipo, datosChofer) {
+        let p = pedidosGlobal.find(x => x.FECHA_ORDEN === fechaOrden);
+        if(!p) return;
+
+        let items = JSON.parse(p.DETALLES_JSON);
+        let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0);
+
+        let tituloDoc = "DOCUMENTO";
+        if(tipo === 'cotizacion') tituloDoc = "COTIZACIÓN FORMAL";
+        if(tipo === 'produccion') tituloDoc = "ORDEN DE PRODUCCIÓN";
+        if(tipo === 'entrega') tituloDoc = "NOTA DE ENTREGA / GUÍA DE DESPACHO";
+
+        let htmlPDF = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>${tituloDoc} - ${p.CLIENTE}</title>
+            <style>
+                body { font-family: Arial, sans-serif; color: #333; margin: 40px; font-size: 14px; }
+                .header { border-bottom: 3px solid #1e2328; padding-bottom: 15px; margin-bottom: 30px; display:flex; justify-content:space-between; align-items:flex-end;}
+                .empresa h1 { margin: 0 0 5px 0; color: #1e2328; font-size:22px; text-transform:uppercase;}
+                .empresa p { margin: 0; color: #666; font-size:12px;}
+                .titulo-doc { text-align: right;}
+                .titulo-doc h2 { margin: 0; color: #f59e0b; font-size:20px;}
+                .info-grid { display: flex; justify-content: space-between; margin-bottom: 30px; background: #f8fafc; padding: 15px; border-radius: 8px;}
+                .info-box p { margin: 5px 0; }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                th { background: #1e2328; color: white; padding: 10px; text-align: left; font-size:12px;}
+                td { border-bottom: 1px solid #ddd; padding: 10px; font-size:13px;}
+                .total-box { text-align: right; font-size: 18px; font-weight: bold; margin-top: 20px; }
+                .firmas { margin-top: 80px; display: flex; justify-content: space-around; text-align: center; }
+                .firma-linea { border-top: 1px solid #000; width: 200px; padding-top: 5px; font-weight: bold; }
+                @media print { body { margin: 0; } .no-print { display: none; } }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="empresa">
+                    <h1>REVESTIMIENTOS CORALROCK C.A.</h1>
+                    <p>Coralsintec | Caracas, Distrito Capital</p>
+                </div>
+                <div class="titulo-doc">
+                    <h2>${tituloDoc}</h2>
+                    <p><b>Fecha:</b> ${p.FECHA_ORDEN}</p>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <p><b>Cliente:</b> ${p.CLIENTE}</p>
+                    <p><b>RIF/CI:</b> ${p.RIF_CI || 'No registrado'}</p>
+                    <p><b>Teléfono:</b> ${p.TELEFONO || 'No registrado'}</p>
+                </div>
+                <div class="info-box">
+                    <p><b>Obra / Ubicación:</b> ${p.UBICACION}</p>
+                </div>
+            </div>`;
+
+        if(tipo === 'entrega' && datosChofer) {
+            htmlPDF += `
+            <div style="border: 2px dashed #cbd5e1; padding: 15px; margin-bottom: 30px; border-radius: 8px;">
+                <h4 style="margin: 0 0 10px 0; color: #3b82f6;">📦 Datos de Transporte</h4>
+                <p style="margin: 3px 0;"><b>Destino:</b> ${datosChofer.destino}</p>
+                <p style="margin: 3px 0;"><b>Chofer:</b> ${datosChofer.nombre}</p>
+                <p style="margin: 3px 0;"><b>Vehículo:</b> ${datosChofer.modelo} (${datosChofer.anio}) | <b>Color:</b> ${datosChofer.color} | <b>Placa:</b> ${datosChofer.placa}</p>
+            </div>`;
+        }
+
+        htmlPDF += `<table><thead><tr><th>FORMATO</th><th>USO</th><th>TEXTURA</th><th>COLOR</th><th>ÁREA</th><th>PIEZAS</th>`;
+        if(tipo === 'cotizacion') htmlPDF += `<th>PRECIO USD</th>`;
+        htmlPDF += `</tr></thead><tbody>`;
+
+        let tCarateo = 0, tSellador = 0;
+        items.forEach(i => {
+            let dim = i.formato.toLowerCase().split('x');
+            let pcs = Math.ceil(parseFloat(i.m2) / ((dim[0]*dim[1])/10000));
+            tCarateo += i.carateo || 0; tSellador += i.sellador || 0;
+
+            htmlPDF += `<tr>
+                <td>${i.formato}</td>
+                <td>${i.uso}</td>
+                <td>${i.textura}</td>
+                <td>${i.color}</td>
+                <td><b>${i.m2} m²</b></td>
+                <td>${pcs}</td>`;
+            if(tipo === 'cotizacion') htmlPDF += `<td>$${i.total}</td>`;
+            htmlPDF += `</tr>`;
+        });
+        htmlPDF += `</tbody></table>`;
+
+        if(tCarateo > 0 || tSellador > 0) {
+            htmlPDF += `<h4>Adicionales de Instalación:</h4><ul>`;
+            if(tCarateo > 0) htmlPDF += `<li>Carateo Sintético: ${tCarateo} Sacos</li>`;
+            if(tSellador > 0) htmlPDF += `<li>Sellador Acrílico: ${tSellador} Galones</li>`;
+            htmlPDF += `</ul>`;
+        }
+
+        if(tipo === 'cotizacion') {
+            htmlPDF += `<div class="total-box">TOTAL PRESUPUESTO: $${total.toFixed(2)}</div>`;
+        }
+
+        let textoFirma1 = tipo === 'entrega' ? 'Despachado por (Planta)' : 'Firma Empresa';
+        let textoFirma2 = tipo === 'entrega' ? 'Recibido por (Chofer/Cliente)' : 'Firma Cliente';
+
+        htmlPDF += `
+            <div class="firmas">
+                <div class="firma-linea">${textoFirma1}</div>
+                <div class="firma-linea">${textoFirma2}</div>
+            </div>
+            <script>
+                window.onload = function() { setTimeout(() => { window.print(); }, 500); }
+            <\/script>
+        </body>
+        </html>`;
+
+        let printWindow = window.open('', '_blank');
+        printWindow.document.write(htmlPDF);
+        printWindow.document.close();
+    }
+
+    // --- ACCIONES ESTANDAR --- //
     function accion(c, f, e) {
         if(!confirm("¿Confirmar cambio a: " + e + "?")) return;
         document.getElementById('loader-overlay').style.display = 'flex';
@@ -263,7 +434,7 @@
     }
 
     function registrarPago(c, f, actual) {
-        let monto = prompt("¿Cuánto dinero en total ha pagado el cliente por este pedido?", actual);
+        let monto = prompt("¿Cuánto dinero ha pagado?", actual);
         if(monto === null || isNaN(monto)) return;
         document.getElementById('loader-overlay').style.display = 'flex';
         fetch(API_URL + "?action=registrar_pago", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: c, fecha_orden: f, monto_pagado: monto }) })
