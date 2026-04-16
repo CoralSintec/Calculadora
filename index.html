@@ -31,7 +31,7 @@
         .sub-perm-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #475569; cursor: pointer;}
         .sub-perm-label input { width: 16px; height: 16px; margin: 0; accent-color: var(--a); cursor: pointer;}
         
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; color: var(--p); font-size:18px; text-align:center; padding:20px;}
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; color: var(--p); font-size:18px; text-align:center; padding:20px; display:none;}
     </style>
 </head>
 <body>
@@ -114,6 +114,7 @@
         let dbUsuarios = [];
 
         window.onload = () => {
+            document.getElementById('loader').style.display = 'flex';
             fetch(API_URL + "?action=get_usuarios").then(r => r.json()).then(data => {
                 dbUsuarios = data;
                 document.getElementById('loader').style.display = 'none';
@@ -188,7 +189,7 @@
                 m_planta: document.getElementById('m_planta').checked,
                 p_precios: document.getElementById('p_pla_precio').checked,
                 p_receta: document.getElementById('p_pla_receta').checked,
-                p_acciones: document.getElementById('p-pla-accion').checked,
+                p_acciones: document.getElementById('p_pla_accion').checked,
                 p_pdf: document.getElementById('p_pla_pdf').checked
             };
 
