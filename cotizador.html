@@ -71,7 +71,6 @@
         .total-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; font-weight: 600; }
         .total-price { font-size: 32px; font-weight: 900; color: var(--coralsintec-accent); margin: 5px 0 0 0; }
 
-        /* BOTÓN AGREGAR A LA LISTA - ESTILO FOTO 2 */
         .btn-add-outline {
             width: 100%;
             background-color: white;
@@ -108,7 +107,6 @@
         .cart-total-row { display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; color: var(--coralsintec-primary); border-top: 1px solid #e2e8f0; margin-top: 8px; padding-top: 8px; }
         .cart-total-row b { color: var(--coralsintec-accent); font-size: 18px; }
 
-        /* TOTAL GENERAL - DISEÑO FOTO 3 (ALINEADO Y MISMO TAMAÑO) */
         .grand-total { text-align: center; background: #ecfccb; padding: 20px; border-radius: 12px; border: 1px solid #bef264; margin-top: 15px;}
         .grand-total span.gt-title { font-size: 12px; color: #3f6212; font-weight: 800; display: block; text-transform: uppercase; margin-bottom: 5px;}
         .grand-total-val { font-size: 26px; font-weight: 900; color: #166534; display:flex; justify-content:center; align-items:center; gap:6px;}
@@ -225,7 +223,7 @@
                 </div>
             </div>
 
-            <button class="btn-add-outline" onclick="agregarAlCarrito()">AGREGAR A LA LISTA</button>
+            <button id="btn-add-lista" class="btn-add-outline" onclick="agregarAlCarrito()">AGREGAR A LA LISTA</button>
         </div>
     </main>
 
@@ -254,7 +252,19 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
     let db = [];
 
+    // --- LÓGICA DE PERMISOS ---
+    const usuarioActual = localStorage.getItem('usuarioCoralsintec') || 'DESCONOCIDO';
+    let p_master = (usuarioActual === 'EDUARDO');
+    let perms = {};
+    try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
+    const canCreate = p_master || perms.v_crear === true;
+
     window.onload = () => {
+        if(!canCreate) {
+            document.getElementById('btn-add-lista').style.display = 'none';
+            document.getElementById('cart-section').style.display = 'none';
+        }
+
         document.getElementById('loader-overlay').style.display = 'flex';
         document.getElementById('loader-overlay').innerHTML = "⏳ Cargando Catálogo...";
         fetch(API_URL + "?action=get_productos&t=" + Date.now())
@@ -380,7 +390,6 @@
             const li = document.createElement('li');
             li.className = 'cart-item';
             
-            // EL DESGLOSE COMPLETO EN LA TARJETA DEL CARRITO
             let htmlHTML = `
                 <div class="cart-item-title">
                     <span>${item.titulo}</span>
@@ -458,5 +467,6 @@
         }
     }
 </script>
+
 </body>
 </html>
