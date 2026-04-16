@@ -50,7 +50,6 @@
         .btn-action { border: none; padding: 14px; border-radius: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; font-size: 12px; transition: transform 0.1s;}
         .btn-action:active { transform: scale(0.98); }
         .btn-aceptar { background: #1e2328; }
-        .btn-aviso { background: #3b82f6; }
         .btn-entregado { background: #10b981; }
         .btn-pago { background: #059669; }
         .btn-eliminar { background: #ef4444; }
@@ -62,6 +61,16 @@
         .modal-card h3 { margin: 0 0 15px 0; color: var(--p); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;}
         .modal-input { width: 100%; box-sizing: border-box; padding: 10px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
         .modal-row { display: flex; gap: 10px; }
+
+        /* ESTILO PARA EL PANEL DE PAGOS GERENCIAL */
+        .payment-panel { background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 12px; display: inline-block; width: 100%; box-sizing: border-box;}
+        .payment-grid { display: flex; justify-content: space-between; align-items: center; }
+        .payment-box { display: flex; flex-direction: column; }
+        .payment-label { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 2px; }
+        .payment-val { font-size: 16px; font-weight: 900; color: #1e2328; }
+        .val-green { color: #059669; }
+        .val-red { color: #e11d48; }
+        .payment-divider { width: 2px; background: #e2e8f0; height: 30px; }
     </style>
 </head>
 <body>
@@ -165,15 +174,32 @@
             let safeId = p.FECHA_ORDEN.replace(/[^a-zA-Z0-9]/g, '');
             
             let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0);
-            let pagado = parseFloat(p.PAGADO_USD || 0);
+            
+            // LECTURA EXACTA DEL MONTO PAGADO DESDE LA COLUMNA 12 (Índice 11 de object.values)
+            let pagado = parseFloat(p.PAGADO_USD || p.PAGADO || Object.values(p)[11] || 0);
             let falta = total - pagado;
+            let porcentaje = total > 0 ? ((pagado / total) * 100).toFixed(0) : 0;
 
             let etiquetaPrecio = "";
             if(usuarioActual === 'EDUARDO') {
                 etiquetaPrecio = `
-                <div style="background: #ecfccb; padding: 6px 10px; border-radius: 6px; border: 1px solid #bef264; margin-top: 10px; display: inline-block;">
-                    <span style="font-size:10px; font-weight:bold; color:#3f6212;">MONTO DEL PEDIDO:</span>
-                    <b style="color:#166534; font-size: 15px; margin-left: 5px;">$${total}</b>
+                <div class="payment-panel">
+                    <div class="payment-grid">
+                        <div class="payment-box">
+                            <span class="payment-label">Total Orden</span>
+                            <span class="payment-val">$${total.toFixed(2)}</span>
+                        </div>
+                        <div class="payment-divider"></div>
+                        <div class="payment-box">
+                            <span class="payment-label">Abonado (${porcentaje}%)</span>
+                            <span class="payment-val val-green">$${pagado.toFixed(2)}</span>
+                        </div>
+                        <div class="payment-divider"></div>
+                        <div class="payment-box">
+                            <span class="payment-label">Resta</span>
+                            <span class="payment-val val-red">$${falta.toFixed(2)}</span>
+                        </div>
+                    </div>
                 </div>`;
             }
 
@@ -181,16 +207,21 @@
             let recetaHtml = `<div>`;
 
             items.forEach(i => {
-                let m = parseFloat(i.m2 || 0);
-                let dim = i.formato.toLowerCase().split('x');
-                let pcs = Math.ceil(parseFloat(i.m2) / ((dim[0]*dim[1])/10000));
-                totalCarateo += i.carateo || 0; totalSellador += i.sellador || 0;
+                let m = parseFloat(i.m2Final || i.m2 || 0);
+                let formatoReal = i.formato || 'N/A';
+                let colorReal = i.color || 'N/A';
+                let usoReal = i.uso || 'N/A';
+                let texturaReal = i.textura || 'N/A';
+                let pcs = i.piezas || i.pieces || Math.ceil(m / (((formatoReal.split('x')[0] || 1)*(formatoReal.split('x')[1] || 1))/10000));
                 
-                tablaDetallesHtml += `<tr><td>${i.formato}</td><td><b>${i.uso}</b></td><td>${i.color}</td><td>${i.textura}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
+                totalCarateo += i.carateo || i.cantSacos || 0; 
+                totalSellador += i.sellador || i.cantGalones || 0;
                 
-                let colorClean = ultraClean(i.color);
-                let textClean = ultraClean(i.textura).substring(0, 4); 
-                let usoClean = ultraClean(i.uso);
+                tablaDetallesHtml += `<tr><td>${formatoReal}</td><td><b>${usoReal}</b></td><td>${colorReal}</td><td>${texturaReal}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
+                
+                let colorClean = ultraClean(colorReal);
+                let textClean = ultraClean(texturaReal).substring(0, 4); 
+                let usoClean = ultraClean(usoReal);
 
                 let formulaEncontrada = formulas.find(f => {
                     let prodBase = ultraClean(f['PRODUCTO_BASE'] || f[0]);
@@ -198,7 +229,7 @@
                 });
 
                 recetaHtml += `<div class="receta-item">
-                                <div class="receta-title">▶ Para fabricar: ${m}m² de ${i.color} (${i.textura}) - ${i.uso}</div>`;
+                                <div class="receta-title">▶ Para fabricar: ${m}m² de ${colorReal} (${texturaReal}) - ${usoReal}</div>`;
                 
                 if(formulaEncontrada) {
                     let keys = Object.keys(formulaEncontrada);
@@ -233,15 +264,19 @@
 
                     <div style="text-align:center;"><span class="status-tag ${stClass}">${estado}</span></div>
                     <div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:15px;">
-                        <div>
-                            <div style="font-size:18px; font-weight:900; color:var(--p); text-transform:uppercase;">${p.CLIENTE}</div>
-                            <div style="font-size:12px; color:#64748b; margin-top:3px;"><b>RIF:</b> ${p.RIF_CI || '-'}</div>
-                            <div style="font-size:12px; color:#64748b; margin-top:2px;"><b>OBRA:</b> ${p.UBICACION || '-'}</div>
+                        <div style="width: 100%;">
+                            <div style="display:flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size:18px; font-weight:900; color:var(--p); text-transform:uppercase;">${p.CLIENTE}</div>
+                                    <div style="font-size:12px; color:#64748b; margin-top:3px;"><b>RIF:</b> ${p.RIF_CI || '-'}</div>
+                                    <div style="font-size:12px; color:#64748b; margin-top:2px;"><b>OBRA:</b> ${p.UBICACION || '-'}</div>
+                                </div>
+                                <div style="text-align:right; background: #f1f5f9; padding: 8px; border-radius: 8px;">
+                                    <span style="font-size:10px; font-weight:bold; color:#64748b;">ENTREGA:</span><br>
+                                    <b style="color:#ef4444; font-size: 14px;">${p.FECHA_LIMITE_HABIL}</b>
+                                </div>
+                            </div>
                             ${etiquetaPrecio}
-                        </div>
-                        <div style="text-align:right; background: #f1f5f9; padding: 8px; border-radius: 8px;">
-                            <span style="font-size:10px; font-weight:bold; color:#64748b;">ENTREGA:</span><br>
-                            <b style="color:#ef4444; font-size: 14px;">${p.FECHA_LIMITE_HABIL}</b>
                         </div>
                     </div>
                     
@@ -270,7 +305,7 @@
             
             if(usuarioActual === 'EDUARDO') {
                 html += `<button class="btn-action btn-pago" onclick="registrarPago('${p.CLIENTE}', '${p.FECHA_ORDEN}', ${pagado})">💵 REGISTRAR ABONO</button>
-                         <button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR</button>`;
+                         <button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN</button>`;
             }
 
             html += `</div></div>`;
@@ -382,18 +417,24 @@
 
         let tCarateo = 0, tSellador = 0;
         items.forEach(i => {
-            let dim = i.formato.toLowerCase().split('x');
-            let pcs = Math.ceil(parseFloat(i.m2) / ((dim[0]*dim[1])/10000));
-            tCarateo += i.carateo || 0; tSellador += i.sellador || 0;
+            let m = parseFloat(i.m2Final || i.m2 || 0);
+            let formatoReal = i.formato || 'N/A';
+            let colorReal = i.color || 'N/A';
+            let usoReal = i.uso || 'N/A';
+            let texturaReal = i.textura || 'N/A';
+            let pcs = i.piezas || i.pieces || Math.ceil(m / (((formatoReal.split('x')[0] || 1)*(formatoReal.split('x')[1] || 1))/10000));
+            
+            tCarateo += i.carateo || i.cantSacos || 0; 
+            tSellador += i.sellador || i.cantGalones || 0;
 
             htmlPDF += `<tr>
-                <td>${i.formato}</td>
-                <td>${i.uso}</td>
-                <td>${i.textura}</td>
-                <td>${i.color}</td>
-                <td><b>${i.m2} m²</b></td>
+                <td>${formatoReal}</td>
+                <td>${usoReal}</td>
+                <td>${texturaReal}</td>
+                <td>${colorReal}</td>
+                <td><b>${m} m²</b></td>
                 <td>${pcs}</td>`;
-            if(tipo === 'cotizacion') htmlPDF += `<td>$${i.total}</td>`;
+            if(tipo === 'cotizacion') htmlPDF += `<td>$${i.total || 0}</td>`;
             htmlPDF += `</tr>`;
         });
         htmlPDF += `</tbody></table>`;
@@ -407,9 +448,6 @@
 
         if(tipo === 'cotizacion') {
             htmlPDF += `<div class="total-box">TOTAL PRESUPUESTO: $${total.toFixed(2)}</div>`;
-        }
-
-        if(tipo === 'cotizacion') {
             htmlPDF += `
                 <div class="terminos">
                     <h4>Condiciones Comerciales y de Despacho</h4>
@@ -461,15 +499,15 @@
     }
 
     function registrarPago(c, f, actual) {
-        let monto = prompt("¿Cuánto dinero ha pagado?", actual);
-        if(monto === null || isNaN(monto)) return;
+        let monto = prompt("Ingresa el monto total abonado hasta la fecha (USD):", actual);
+        if(monto === null || isNaN(monto) || monto === "") return;
         document.getElementById('loader-overlay').style.display = 'flex';
         fetch(API_URL + "?action=registrar_pago", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: c, fecha_orden: f, monto_pagado: monto }) })
         .finally(() => { setTimeout(() => { loadData(); }, 2000); });
     }
 
     function eliminar(c, f) {
-        if(!confirm("⚠️ ¿BORRAR pedido permanentemente?")) return;
+        if(!confirm("⚠️ ¿Eliminar orden permanentemente?")) return;
         document.getElementById('loader-overlay').style.display = 'flex';
         fetch(API_URL + "?action=eliminar_pedido", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: c, fecha_orden: f }) })
         .finally(() => { setTimeout(() => { loadData(); }, 2000); });
