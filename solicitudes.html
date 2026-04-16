@@ -55,7 +55,6 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
 
     window.onload = () => {
-        if(localStorage.getItem('usuarioCoralsintec') !== 'EDUARDO') { location.href = 'index.html'; return; }
         cargarSolicitudes();
     };
 
@@ -81,13 +80,20 @@
             return; 
         }
 
+        // LÓGICA DE PERMISOS
+        const usuarioActual = localStorage.getItem('usuarioCoralsintec') || 'DESCONOCIDO';
+        let p_master = (usuarioActual === 'EDUARDO');
+        let perms = {};
+        try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
+        const canApprove = p_master || perms.s_aprobar === true;
+
         solicitudes.reverse().forEach(s => {
             let items = [];
             try { items = JSON.parse(s.DETALLES_JSON); } catch(e){}
 
             let htmlItems = '';
             items.forEach(i => {
-                let m2Final = i.m2Final || i.m2; // Compatibilidad
+                let m2Final = i.m2Final || i.m2;
                 htmlItems += `
                 <div class="item-row">
                     <b>${m2Final} m² de ${i.formato || 'Material'}</b> - ${i.color || ''} (${i.textura || ''})
@@ -112,14 +118,18 @@
                 <div class="items-box">
                     <p style="font-size:11px; font-weight:bold; color:var(--p); margin: 0 0 10px 0;">MATERIAL SOLICITADO:</p>
                     ${htmlItems}
-                </div>
+                </div>`;
 
+            // SOLO IMPRIME LOS BOTONES SI TIENE PERMISO
+            if(canApprove) {
+                cardHtml += `
                 <div class="btn-group">
                     <button class="btn-marcar" onclick="aprobarAPlanta('${s.CLIENTE}', '${s.FECHA}')">✅ PAGADO / ENVIAR A PLANTA</button>
                     <button class="btn-eliminar" onclick="eliminar('${s.CLIENTE}', '${s.FECHA}')">🗑️</button>
-                </div>
-            </div>`;
-            
+                </div>`;
+            }
+
+            cardHtml += `</div>`;
             container.innerHTML += cardHtml;
         });
     }
