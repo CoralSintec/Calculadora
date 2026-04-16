@@ -122,7 +122,7 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
     let db = [];
 
-    // --- LOGICA DE PERMISOS ---
+    // --- LÓGICA DE PERMISOS ---
     const usuarioActual = localStorage.getItem('usuarioCoralsintec') || 'DESCONOCIDO';
     let p_master = (usuarioActual === 'EDUARDO');
     let perms = {}; try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
