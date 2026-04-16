@@ -27,29 +27,20 @@
         .info span { font-size: 11px; color: #64748b; }
         .price { font-size: 16px; font-weight: 900; color: var(--green); }
         .btn-edit { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-left: 5px; }
-        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:100; display:flex; flex-direction:column; justify-content:center; align-items:center; font-weight:bold; }
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:100; display:flex; flex-direction:column; justify-content:center; align-items:center; font-weight:bold; }
     </style>
 </head>
 <body>
-    <div id="loader">📊 Sincronizando Finanzas Coralsintec...</div>
+    <div id="loader">📊 Sincronizando Finanzas...</div>
     <main class="app-main">
         <div class="header-bar">
             <button class="btn-volver" onclick="location.href='index.html'">⬅ MENÚ</button>
-            <div style="background: #fef08a; color: #854d0e; padding: 6px; border-radius: 8px; font-size: 10px; font-weight: 800;">👑 GERENCIA</div>
+            <div style="background: #fef08a; color: #854d0e; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;" id="badge-usuario">👑 GERENCIA</div>
         </div>
         <div class="kpi-grid">
-            <div class="kpi-card" style="border-top-color:var(--blue);">
-                <div class="kpi-title">Ventas (Aprobadas)</div>
-                <div class="kpi-val" id="k-v" style="color:var(--blue);">$0.00</div>
-            </div>
-            <div class="kpi-card" style="border-top-color:var(--red);">
-                <div class="kpi-title">Costo Operativo</div>
-                <div class="kpi-val" id="k-c" style="color:var(--red);">$0.00</div>
-            </div>
-            <div class="kpi-card kpi-full">
-                <div class="kpi-title">Monto Disponible (Balance)</div>
-                <div class="kpi-val" id="k-b">$0.00</div>
-            </div>
+            <div class="kpi-card" style="border-top-color:var(--blue);"><div class="kpi-title">Ventas (Aprobadas)</div><div class="kpi-val" id="k-v" style="color:var(--blue);">$0.00</div></div>
+            <div class="kpi-card" style="border-top-color:var(--red);"><div class="kpi-title">Costo Operativo</div><div class="kpi-val" id="k-c" style="color:var(--red);">$0.00</div></div>
+            <div class="kpi-card kpi-full"><div class="kpi-title">Monto Disponible (Balance)</div><div class="kpi-val" id="k-b">$0.00</div></div>
         </div>
         <div class="tabs">
             <button class="tab-btn active" onclick="showTab('nomina', this)">Equipo</button>
@@ -65,103 +56,46 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
     
     window.onload = () => {
+        const u = localStorage.getItem('usuarioCoralsintec') || 'DESCONOCIDO';
+        document.getElementById('badge-usuario').innerText = "👤 " + u;
         cargarTodo();
     };
 
-    function showTab(id, btn) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        btn.classList.add('active');
-    }
+    function showTab(id, btn) { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
 
     async function cargarTodo() {
         document.getElementById('loader').style.display = 'flex';
         
-        // --- LÓGICA DE PERMISOS ---
         const usuarioActual = localStorage.getItem('usuarioCoralsintec');
         let p_master = (usuarioActual === 'EDUARDO');
         let perms = {}; try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
         const canEdit = p_master || perms.g_editar === true;
-        // --------------------------
 
         try {
-            const [rP, rN, rI] = await Promise.all([
-                fetch(API_URL + "?action=get_pedidos&t=" + Date.now()).then(r => r.json()),
-                fetch(API_URL + "?action=get_nomina&t=" + Date.now()).then(r => r.json()),
-                fetch(API_URL + "?action=get_inventario&t=" + Date.now()).then(r => r.json())
-            ]);
-
+            const [rP, rN, rI] = await Promise.all([fetch(API_URL + "?action=get_pedidos&t=" + Date.now()).then(r => r.json()), fetch(API_URL + "?action=get_nomina&t=" + Date.now()).then(r => r.json()), fetch(API_URL + "?action=get_inventario&t=" + Date.now()).then(r => r.json())]);
             const cleanNum = (val) => { if(!val) return 0; let n = String(val).replace(/[^0-9.]/g, ''); return parseFloat(n) || 0; };
             
             let ventasAprobadas = rP.filter(p => p.ESTADO !== "NUEVO / POR ACEPTAR" && p.ESTADO !== "RECIBIDO").reduce((acc, p) => acc + cleanNum(p.TOTAL_USD || p['TOTAL_USD'] || Object.values(p)[9]), 0);
             let c = rN.reduce((acc, n) => acc + cleanNum(n.MONTO_MENSUAL_USD || n['MONTO_MENSUAL_USD'] || Object.values(n)[2]), 0);
             
-            document.getElementById('k-v').innerText = "$" + ventasAprobadas.toFixed(2);
-            document.getElementById('k-c').innerText = "$" + c.toFixed(2);
-            document.getElementById('k-b').innerText = "$" + (ventasAprobadas - c).toFixed(2);
+            document.getElementById('k-v').innerText = "$" + ventasAprobadas.toFixed(2); document.getElementById('k-c').innerText = "$" + c.toFixed(2); document.getElementById('k-b').innerText = "$" + (ventasAprobadas - c).toFixed(2);
 
-            document.getElementById('l-n').innerHTML = rN.filter(n => n.CATEGORIA === 'Nomina').map(n => `
-                <div class="card" style="border-left-color:var(--blue);">
-                    <div class="card-row">
-                        <div class="info">
-                            <b ${canEdit ? `onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 1, '${n.NOMBRE}')" style="cursor:pointer;"` : ''}>${n.NOMBRE} ${canEdit ? '✏️' : ''}</b>
-                            <span>Ingreso: <i ${canEdit ? `onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 3, '${n.FECHA_INGRESO || '-'}')"` : ''}>${n.FECHA_INGRESO || '-'} ${canEdit ? '✏️' : ''}</i></span>
-                        </div>
-                        <div style="display:flex;align-items:center;">
-                            <div class="price">$${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}</div>
-                            ${canEdit ? `<button class="btn-edit" onclick="editar('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}')">💰</button>` : ''}
-                        </div>
-                    </div>
-                </div>`).join('');
+            document.getElementById('l-n').innerHTML = rN.filter(n => n.CATEGORIA === 'Nomina').map(n => `<div class="card" style="border-left-color:var(--blue);"><div class="card-row"><div class="info"><b ${canEdit ? `onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 1, '${n.NOMBRE}')" style="cursor:pointer;"` : ''}>${n.NOMBRE} ${canEdit ? '✏️' : ''}</b><span>Ingreso: <i ${canEdit ? `onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 3, '${n.FECHA_INGRESO || '-'}')"` : ''}>${n.FECHA_INGRESO || '-'} ${canEdit ? '✏️' : ''}</i></span></div><div style="display:flex;align-items:center;"><div class="price">$${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}</div>${canEdit ? `<button class="btn-edit" onclick="editar('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}')">💰</button>` : ''}</div></div></div>`).join('');
 
-            document.getElementById('l-g').innerHTML = rN.filter(n => n.CATEGORIA === 'Operativo').map(n => `
-                <div class="card" style="border-left-color:var(--red);"><div class="card-row">
-                <div class="info"><b>🏢 ${n.NOMBRE}</b><span>Servicio Fijo</span></div>
-                <div style="display:flex;align-items:center;"><div class="price">$${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}</div>
-                ${canEdit ? `<button class="btn-edit" onclick="editar('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}')">✏️</button>` : ''}
-                </div></div></div>`).join('');
+            document.getElementById('l-g').innerHTML = rN.filter(n => n.CATEGORIA === 'Operativo').map(n => `<div class="card" style="border-left-color:var(--red);"><div class="card-row"><div class="info"><b>🏢 ${n.NOMBRE}</b><span>Servicio Fijo</span></div><div style="display:flex;align-items:center;"><div class="price">$${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}</div>${canEdit ? `<button class="btn-edit" onclick="editar('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}')">✏️</button>` : ''}</div></div></div>`).join('');
 
             document.getElementById('l-m').innerHTML = rI.map(m => {
-                let stock = cleanNum(m.STOCK_ACTUAL || Object.values(m)[3]);
-                let alerta = cleanNum(m.PUNTO_ALERTA || Object.values(m)[4]);
-                let color = stock <= alerta ? 'var(--red)' : 'var(--green)';
-                
-                let btnsHTML = "";
-                if(canEdit) {
-                    btnsHTML = `
-                    <button class="btn-edit" style="background:var(--p); color:white;" onclick="ajustarStock('${m.MATERIAL}', ${stock}, 'suma')">＋</button>
-                    <button class="btn-edit" style="background:#fee2e2; color:var(--red);" onclick="ajustarStock('${m.MATERIAL}', ${stock}, 'resta')">－</button>
-                    <button class="btn-edit" onclick="editar('INVENTARIO_COSTOS','MATERIAL','${m.MATERIAL}',2,'${cleanNum(m.COSTO_UNITARIO_USD || Object.values(m)[2])}')">✏️ $</button>`;
-                }
-
-                return `<div class="card" style="border-left-color:${color};"><div class="card-row">
-                <div class="info"><b>📦 ${m.MATERIAL}</b><span>$${cleanNum(m.COSTO_UNITARIO_USD || Object.values(m)[2])}/${m.UNIDAD_MEDIDA}</span></div>
-                <div style="display:flex;align-items:center;"><div class="price" style="color:${color}; margin-right:8px;">${stock}</div>
-                ${btnsHTML}
-                </div></div></div>`;
+                let stock = cleanNum(m.STOCK_ACTUAL || Object.values(m)[3]); let alerta = cleanNum(m.PUNTO_ALERTA || Object.values(m)[4]); let color = stock <= alerta ? 'var(--red)' : 'var(--green)';
+                let btnsHTML = ""; if(canEdit) { btnsHTML = `<button class="btn-edit" style="background:var(--p); color:white;" onclick="ajustarStock('${m.MATERIAL}', ${stock}, 'suma')">＋</button><button class="btn-edit" style="background:#fee2e2; color:var(--red);" onclick="ajustarStock('${m.MATERIAL}', ${stock}, 'resta')">－</button><button class="btn-edit" onclick="editar('INVENTARIO_COSTOS','MATERIAL','${m.MATERIAL}',2,'${cleanNum(m.COSTO_UNITARIO_USD || Object.values(m)[2])}')">✏️ $</button>`; }
+                return `<div class="card" style="border-left-color:${color};"><div class="card-row"><div class="info"><b>📦 ${m.MATERIAL}</b><span>$${cleanNum(m.COSTO_UNITARIO_USD || Object.values(m)[2])}/${m.UNIDAD_MEDIDA}</span></div><div style="display:flex;align-items:center;"><div class="price" style="color:${color}; margin-right:8px;">${stock}</div>${btnsHTML}</div></div></div>`;
             }).join('');
 
             document.getElementById('loader').style.display = 'none';
         } catch(e) { document.getElementById('loader').style.display = 'none'; }
     }
 
-    async function editar(h, cb, id, ce, a) {
-        let n = prompt("Modificar valor para " + id + ":", a);
-        if(!n || n == a) return;
-        document.getElementById('loader').style.display = 'flex';
-        await fetch(API_URL + "?action=editar_registro", { method: "POST", mode: "no-cors", body: JSON.stringify({ hoja: h, id: id, col_editar: ce, nuevo_valor: n }) });
-        setTimeout(() => { cargarTodo(); }, 2000);
-    }
-
-    async function ajustarStock(material, actual, tipo) {
-        let cuanto = prompt("Cantidad a " + (tipo=='suma'?'sumar':'restar') + ":", "0");
-        if(!cuanto || isNaN(cuanto)) return;
-        let nuevoTotal = tipo === 'suma' ? parseFloat(actual) + parseFloat(cuanto) : parseFloat(actual) - parseFloat(cuanto);
-        document.getElementById('loader').style.display = 'flex';
-        await fetch(API_URL + "?action=editar_registro", { method: "POST", mode: "no-cors", body: JSON.stringify({ hoja: 'INVENTARIO_COSTOS', id: material, col_editar: 3, nuevo_valor: nuevoTotal }) });
-        setTimeout(() => { cargarTodo(); }, 2000);
-    }
+    async function editar(h, cb, id, ce, a) { let n = prompt("Modificar valor para " + id + ":", a); if(!n || n == a) return; document.getElementById('loader').style.display = 'flex'; await fetch(API_URL + "?action=editar_registro", { method: "POST", mode: "no-cors", body: JSON.stringify({ hoja: h, id: id, col_editar: ce, nuevo_valor: n }) }); setTimeout(() => { cargarTodo(); }, 2000); }
+    async function ajustarStock(material, actual, tipo) { let cuanto = prompt("Cantidad a " + (tipo=='suma'?'sumar':'restar') + ":", "0"); if(!cuanto || isNaN(cuanto)) return; let nuevoTotal = tipo === 'suma' ? parseFloat(actual) + parseFloat(cuanto) : parseFloat(actual) - parseFloat(cuanto); document.getElementById('loader').style.display = 'flex'; await fetch(API_URL + "?action=editar_registro", { method: "POST", mode: "no-cors", body: JSON.stringify({ hoja: 'INVENTARIO_COSTOS', id: material, col_editar: 3, nuevo_valor: nuevoTotal }) }); setTimeout(() => { cargarTodo(); }, 2000); }
 </script>
 </body>
 </html>
