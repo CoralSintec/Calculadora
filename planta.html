@@ -56,10 +56,11 @@
         
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(243, 244, 246, 0.95); z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: var(--p); font-size: 18px;}
         
+        /* ESTILOS DE LOS MODALES */
         .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; justify-content: center; align-items: center; }
-        .modal-card { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-card { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 420px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
         .modal-card h3 { margin: 0 0 15px 0; color: var(--p); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;}
-        .modal-input { width: 100%; box-sizing: border-box; padding: 10px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+        .modal-input { width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; font-weight:600;}
         .modal-row { display: flex; gap: 10px; }
 
         .payment-panel { background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 12px; display: inline-block; width: 100%; box-sizing: border-box;}
@@ -70,11 +71,51 @@
         .val-green { color: #059669; }
         .val-red { color: #e11d48; }
         .payment-divider { width: 2px; background: #e2e8f0; height: 30px; }
+
+        /* BOTÓN DE CALENDARIO ANIMADO */
+        .calendar-btn {
+            background: #f8fafc; padding: 10px 12px; border-radius: 10px; border: 1px solid #cbd5e1; 
+            display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s;
+        }
+        .calendar-btn:hover { border-color: var(--blue); background: #eff6ff; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(59,130,246,0.1);}
+        .calendar-btn:active { transform: translateY(0); }
     </style>
 </head>
 <body>
     <div id="loader-overlay">⏳ Sincronizando Planta...</div>
     
+    <div id="modal-timeline" class="modal-bg">
+        <div class="modal-card">
+            <h3 style="color:var(--p); margin: 0 0 5px 0;">📅 Monitoreo de Producción</h3>
+            <p id="tl-cliente" style="margin: 0 0 20px 0; font-weight: 900; color: var(--blue); font-size: 16px; text-transform: uppercase;"></p>
+            
+            <div style="position: relative; margin: 30px 10px 40px 10px;">
+                <div style="height: 12px; background: #e2e8f0; border-radius: 6px; width: 100%; position: absolute;"></div>
+                
+                <div style="height: 12px; width: 100%; position: absolute; border-radius: 6px; overflow: hidden;">
+                    <div id="tl-gradient" style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(to right, #3b82f6 0%, #facc15 50%, #10b981 100%); clip-path: inset(0 100% 0 0); transition: clip-path 0.8s ease-out;"></div>
+                </div>
+                
+                <div id="tl-circle" style="width: 20px; height: 20px; background: white; border: 4px solid var(--p); border-radius: 50%; position: absolute; top: -8px; left: 0%; transform: translateX(-50%); box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: left 0.8s ease-out;"></div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 25px;">
+                <div>
+                    <span style="display:block; text-transform:uppercase;">Inicio Producción</span>
+                    <span id="tl-inicio" style="color:var(--p); font-size:13px;"></span>
+                </div>
+                <div style="text-align: right;">
+                    <span style="display:block; text-transform:uppercase;">Fecha de Entrega</span>
+                    <span id="tl-fin" style="color:var(--p); font-size:13px;"></span>
+                </div>
+            </div>
+            
+            <div id="tl-texto-dias" style="text-align: center; padding: 12px; border-radius: 8px; font-weight: 900; font-size: 15px; margin-bottom: 20px;"></div>
+            
+            <button onclick="document.getElementById('modal-timeline').style.display='none'" style="background:var(--p); color:white; padding:14px; width:100%; border:none; border-radius:10px; font-weight:900; cursor:pointer; text-transform:uppercase;">Cerrar Visualizador</button>
+        </div>
+    </div>
+
     <div id="modal-chofer" class="modal-bg">
         <div class="modal-card">
             <h3>📝 Datos de Transporte</h3>
@@ -88,8 +129,8 @@
             </div>
             <input type="text" id="ch-placa" class="modal-input" placeholder="Placas del vehículo">
             
-            <button onclick="ejecutarNotaEntrega()" style="background:var(--blue); color:white; padding:12px; width:100%; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:8px;">✅ GENERAR NOTA EN PDF</button>
-            <button onclick="document.getElementById('modal-chofer').style.display='none'" style="background:#e2e8f0; color:#475569; padding:10px; width:100%; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Cancelar</button>
+            <button onclick="ejecutarNotaEntrega()" style="background:var(--blue); color:white; padding:14px; width:100%; border:none; border-radius:10px; font-weight:900; cursor:pointer; margin-bottom:10px; text-transform:uppercase;">✅ Generar Nota en PDF</button>
+            <button onclick="document.getElementById('modal-chofer').style.display='none'" style="background:#e2e8f0; color:#475569; padding:12px; width:100%; border:none; border-radius:10px; font-weight:900; cursor:pointer; text-transform:uppercase;">Cancelar</button>
         </div>
     </div>
 
@@ -137,7 +178,7 @@
         }
     }
 
-    // --- NUEVAS FUNCIONES DE CALENDARIO ---
+    // --- FUNCIONES DE TIEMPO Y CALENDARIO ---
     function parseFechaLocal(fechaStr) {
         if(!fechaStr || fechaStr.includes("-")) return new Date();
         let partes = fechaStr.split('/');
@@ -145,18 +186,64 @@
         return new Date();
     }
 
-    function obtenerProgresoFechas(fInicio, fFin) {
+    function obtenerProgreso(fInicio, fFin) {
         let start = parseFechaLocal(fInicio).getTime();
         let end = parseFechaLocal(fFin).getTime();
         let now = new Date().getTime();
 
-        if (now <= start) return 5; // Mínimo visible
-        if (now >= end) return 100; // Completado
+        if (now <= start) return 0;
+        if (now >= end) return 100;
         if (end === start) return 100;
         
-        return Math.max(5, ((now - start) / (end - start)) * 100);
+        return ((now - start) / (end - start)) * 100;
     }
-    // --------------------------------------
+
+    function abrirTimeline(fInicio, fFin, cliente) {
+        let pct = obtenerProgreso(fInicio, fFin);
+        
+        document.getElementById('tl-cliente').innerText = cliente;
+        document.getElementById('tl-inicio').innerText = fInicio;
+        document.getElementById('tl-fin').innerText = fFin;
+        
+        let dFin = parseFechaLocal(fFin);
+        let hoy = new Date();
+        
+        // Quitar las horas para calcular días exactos
+        dFin.setHours(0,0,0,0);
+        hoy.setHours(0,0,0,0);
+        
+        let restanMs = dFin.getTime() - hoy.getTime();
+        let diasRestantes = Math.ceil(restanMs / (1000*60*60*24));
+        
+        let cajaTexto = document.getElementById('tl-texto-dias');
+        if (diasRestantes > 0) {
+            cajaTexto.innerText = `Faltan ${diasRestantes} días para la entrega`;
+            cajaTexto.style.background = "#f1f5f9";
+            cajaTexto.style.color = "#475569";
+        } else if (diasRestantes === 0) {
+            cajaTexto.innerText = `¡HOY ES EL DÍA DE ENTREGA!`;
+            cajaTexto.style.background = "#fef08a";
+            cajaTexto.style.color = "#854d0e";
+        } else {
+            cajaTexto.innerText = `¡Orden atrasada por ${Math.abs(diasRestantes)} días!`;
+            cajaTexto.style.background = "#fee2e2";
+            cajaTexto.style.color = "#b91c1c";
+        }
+        
+        // Reset animation
+        document.getElementById('tl-gradient').style.clipPath = `inset(0 100% 0 0)`;
+        document.getElementById('tl-circle').style.left = `0%`;
+        
+        document.getElementById('modal-timeline').style.display = 'flex';
+
+        // Trigger animation after slightly delay for visual effect
+        setTimeout(() => {
+            let invertedPct = 100 - pct; // Lo que falta por llenar de derecha a izq
+            document.getElementById('tl-gradient').style.clipPath = `inset(0 ${invertedPct}% 0 0)`;
+            document.getElementById('tl-circle').style.left = `${pct}%`;
+        }, 100);
+    }
+    // ------------------------------------------
 
     function switchTab(btn, targetId) {
         let card = btn.closest('.order-card');
@@ -193,9 +280,10 @@
             let totalCarateo = 0, totalSellador = 0;
             let safeId = p.FECHA_ORDEN.replace(/[^a-zA-Z0-9]/g, '');
             
-            // LÓGICA DE BARRA DE PROGRESO DE FECHA
-            let porcentajeTiempo = obtenerProgresoFechas(p.FECHA_ORDEN, p.FECHA_LIMITE_HABIL);
-            
+            // CALCULO DEL PORCENTAJE PARA LA MINI-BARRA
+            let pctMini = obtenerProgreso(p.FECHA_ORDEN, p.FECHA_LIMITE_HABIL);
+            let clipMini = 100 - pctMini;
+
             let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0);
             let pagado = parseFloat(p.PAGADO_USD || p.PAGADO || Object.values(p)[11] || 0);
             let falta = total - pagado;
@@ -295,16 +383,14 @@
                                     <div style="font-size:12px; color:#64748b; margin-top:2px;"><b>OBRA:</b> ${p.UBICACION || '-'}</div>
                                 </div>
                                 
-                                <div style="background: #f8fafc; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 10px;">
-                                    <span style="font-size: 24px;">📅</span>
-                                    <div style="width: 110px;">
+                                <div class="calendar-btn" onclick="abrirTimeline('${p.FECHA_ORDEN}', '${p.FECHA_LIMITE_HABIL}', '${p.CLIENTE}')">
+                                    <span style="font-size: 26px;">📅</span>
+                                    <div style="width: 100px;">
                                         <div style="font-size:9px; font-weight:900; color:#64748b; text-transform:uppercase; text-align:left;">FECHA LÍMITE</div>
                                         <div style="color:#1e2328; font-size:14px; font-weight:900; margin-top:1px; text-align:left;">${p.FECHA_LIMITE_HABIL}</div>
                                         
-                                        <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; margin-top: 5px; position: relative; overflow: hidden;">
-                                            <div style="width: ${porcentajeTiempo}%; height: 100%; position: absolute; left: 0; top: 0; overflow: hidden; border-radius: 3px; transition: width 0.5s ease;">
-                                                <div style="width: 110px; height: 100%; background: linear-gradient(to right, #3b82f6, #facc15, #10b981);"></div>
-                                            </div>
+                                        <div style="width: 100%; height: 5px; background: #e2e8f0; border-radius: 3px; margin-top: 4px; position: relative;">
+                                            <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(to right, #3b82f6, #facc15, #10b981); border-radius: 3px; clip-path: inset(0 ${clipMini}% 0 0);"></div>
                                         </div>
                                     </div>
                                 </div>
