@@ -31,7 +31,7 @@
         .sub-perm-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #475569; cursor: pointer;}
         .sub-perm-label input { width: 16px; height: 16px; margin: 0; accent-color: var(--a); cursor: pointer;}
         
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; color: var(--p); }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; color: var(--p); font-size:18px; text-align:center; padding:20px;}
     </style>
 </head>
 <body>
@@ -71,34 +71,31 @@
                 <div class="module-group">
                     <label class="module-header"><input type="checkbox" id="m_ventas"> Módulo Cotizador</label>
                     <div class="sub-perms">
-                        <label class="sub-perm-label" style="color:#059669;"><input type="checkbox" id="v_crear"> Botón "Agregar/Enviar Presupuesto"</label>
-                        <div style="font-size:10px; color:#64748b; margin-top:-4px; margin-left:24px;">(Si se apaga, el usuario solo podrá ver los precios)</div>
+                        <label class="sub-perm-label" style="color:#059669;"><input type="checkbox" id="v_crear"> Botón "Agregar a la Lista"</label>
                     </div>
                 </div>
 
                 <div class="module-group">
                     <label class="module-header"><input type="checkbox" id="m_soli"> Módulo Solicitudes</label>
                     <div class="sub-perms">
-                        <label class="sub-perm-label" style="color:#059669;"><input type="checkbox" id="s_aprobar"> Botón "Aprobar y Enviar a Planta"</label>
-                        <div style="font-size:10px; color:#64748b; margin-top:-4px; margin-left:24px;">(Si se apaga, solo verá la bandeja como lectura)</div>
+                        <label class="sub-perm-label" style="color:#059669;"><input type="checkbox" id="s_aprobar"> Botón "Aprobar y Enviar"</label>
                     </div>
                 </div>
 
                 <div class="module-group">
-                    <label class="module-header"><input type="checkbox" id="m_gerencia"> Módulo Gerencia (Finanzas)</label>
+                    <label class="module-header"><input type="checkbox" id="m_gerencia"> Módulo Gerencia</label>
                     <div class="sub-perms">
-                        <label class="sub-perm-label" style="color:#059669;"><input type="checkbox" id="g_editar"> Botones de Editar Gastos/Stock</label>
-                        <div style="font-size:10px; color:#64748b; margin-top:-4px; margin-left:24px;">(Si se apaga, solo verá los reportes y el balance)</div>
+                        <label class="sub-perm-label" style="color:#059669;"><input type="checkbox" id="g_editar"> Botones de Editar Datos</label>
                     </div>
                 </div>
 
                 <div class="module-group">
-                    <label class="module-header"><input type="checkbox" id="m_planta"> Módulo Producción (Planta)</label>
+                    <label class="module-header"><input type="checkbox" id="m_planta"> Módulo Producción</label>
                     <div class="sub-perms">
-                        <label class="sub-perm-label"><input type="checkbox" id="p_pla_precio"> Ver Panel de Dinero (Total/Abonos)</label>
-                        <label class="sub-perm-label"><input type="checkbox" id="p_pla_receta"> Ver Receta / Fórmulas Químicas</label>
-                        <label class="sub-perm-label"><input type="checkbox" id="p_pla_accion"> Botones de (Iniciar/Entregar)</label>
-                        <label class="sub-perm-label"><input type="checkbox" id="p_pla_pdf"> Botones Generar Documentos PDF</label>
+                        <label class="sub-perm-label"><input type="checkbox" id="p_pla_precio"> Ver Panel de Dinero ($)</label>
+                        <label class="sub-perm-label"><input type="checkbox" id="p_pla_receta"> Ver Receta Química</label>
+                        <label class="sub-perm-label"><input type="checkbox" id="p_pla_accion"> Botones Iniciar/Entregar</label>
+                        <label class="sub-perm-label"><input type="checkbox" id="p_pla_pdf"> Botones de PDF</label>
                     </div>
                 </div>
 
@@ -110,6 +107,7 @@
     </div>
 
     <script>
+        // PEGA AQUÍ TU URL EXACTA DEL APPS SCRIPT
         const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
         let dbUsuarios = [];
 
@@ -169,10 +167,16 @@
         function cerrarAdmin() { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('dashboard-screen').classList.add('active'); }
 
         function guardarUsuario() {
-            const u = document.getElementById('new-user').value.trim();
+            // 1. VERIFICAR QUE HAY DATOS
+            const u = document.getElementById('new-user').value.trim().toUpperCase();
             const p = document.getElementById('new-pin').value.trim();
-            if(!u || !p) return alert("Falta usuario o PIN");
+            
+            if(u === "" || p === "") {
+                alert("⚠️ POR FAVOR: Escribe un Nombre de Usuario y un PIN antes de guardar.");
+                return; // Detiene la función aquí si está vacío
+            }
 
+            // 2. RECOLECTAR PERMISOS
             const permisos = {
                 m_ventas: document.getElementById('m_ventas').checked,
                 v_crear: document.getElementById('v_crear').checked,
@@ -184,19 +188,36 @@
                 p_precios: document.getElementById('p_pla_precio').checked,
                 p_receta: document.getElementById('p_pla_receta').checked,
                 p_acciones: document.getElementById('p-pla-accion').checked,
-                p_pdf: document.getElementById('p-pla-pdf').checked
+                p_pdf: document.getElementById('p_pla_pdf').checked
             };
 
+            // 3. MOSTRAR PANTALLA DE CARGA
+            document.getElementById('loader').innerText = `⏳ Guardando los accesos para ${u}...`;
             document.getElementById('loader').style.display = 'flex';
-            fetch(API_URL + "?action=guardar_usuario", { method: "POST", mode: "no-cors", body: JSON.stringify({ usuario: u, pin: p, permisos: permisos }) })
-            .finally(() => { setTimeout(() => { location.reload(); }, 1500); });
+
+            // 4. ENVIAR A GOOGLE
+            fetch(API_URL + "?action=guardar_usuario", { 
+                method: "POST", 
+                mode: "no-cors", 
+                body: JSON.stringify({ usuario: u, pin: p, permisos: permisos }) 
+            })
+            .then(() => {
+                // 5. AVISAR QUE FUE UN ÉXITO
+                alert(`✅ ¡Listo! El usuario ${u} ha sido creado/actualizado correctamente.`);
+                location.reload(); 
+            })
+            .catch(error => {
+                alert("❌ Falló la conexión. No se pudo guardar el usuario.");
+                document.getElementById('loader').style.display = 'none';
+            });
         }
 
         function eliminarUser(u) {
             if(!confirm("¿Borrar acceso de " + u + "?")) return;
+            document.getElementById('loader').innerText = "🗑️ Borrando usuario...";
             document.getElementById('loader').style.display = 'flex';
             fetch(API_URL + "?action=eliminar_usuario", { method: "POST", mode: "no-cors", body: JSON.stringify({ usuario: u }) })
-            .finally(() => { setTimeout(() => { location.reload(); }, 1500); });
+            .then(() => { location.reload(); });
         }
         function logout() { localStorage.clear(); location.reload(); }
     </script>
