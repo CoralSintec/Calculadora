@@ -174,11 +174,12 @@
             let safeId = p.FECHA_ORDEN.replace(/[^a-zA-Z0-9]/g, '');
             
             let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0);
-            
-            // LECTURA EXACTA DEL MONTO PAGADO DESDE LA COLUMNA 12 (Índice 11 de object.values)
             let pagado = parseFloat(p.PAGADO_USD || p.PAGADO || Object.values(p)[11] || 0);
             let falta = total - pagado;
+            
+            // CÁLCULO DE PORCENTAJES (Abonado y Resta)
             let porcentaje = total > 0 ? ((pagado / total) * 100).toFixed(0) : 0;
+            let porcentajeResta = total > 0 ? ((falta / total) * 100).toFixed(0) : 0;
 
             let etiquetaPrecio = "";
             if(usuarioActual === 'EDUARDO') {
@@ -196,7 +197,7 @@
                         </div>
                         <div class="payment-divider"></div>
                         <div class="payment-box">
-                            <span class="payment-label">Resta</span>
+                            <span class="payment-label">Resta (${porcentajeResta}%)</span>
                             <span class="payment-val val-red">$${falta.toFixed(2)}</span>
                         </div>
                     </div>
@@ -411,9 +412,7 @@
             </div>`;
         }
 
-        htmlPDF += `<table><thead><tr><th>FORMATO</th><th>USO</th><th>TEXTURA</th><th>COLOR</th><th>ÁREA</th><th>PIEZAS</th>`;
-        if(tipo === 'cotizacion') htmlPDF += `<th>PRECIO USD</th>`;
-        htmlPDF += `</tr></thead><tbody>`;
+        htmlPDF += `<table><thead><tr><th>FORMATO</th><th>USO</th><th>TEXTURA</th><th>COLOR</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`;
 
         let tCarateo = 0, tSellador = 0;
         items.forEach(i => {
@@ -433,9 +432,8 @@
                 <td>${texturaReal}</td>
                 <td>${colorReal}</td>
                 <td><b>${m} m²</b></td>
-                <td>${pcs}</td>`;
-            if(tipo === 'cotizacion') htmlPDF += `<td>$${i.total || 0}</td>`;
-            htmlPDF += `</tr>`;
+                <td>${pcs}</td>
+            </tr>`;
         });
         htmlPDF += `</tbody></table>`;
 
