@@ -6,70 +6,209 @@
     <title>Coralsintec | Centro de Mando</title>
     <style>
         :root { --p: #1e2328; --a: #c49660; --bg: #d1d5db; }
-        body { font-family: -apple-system, sans-serif; background-color: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 100%; max-width: 380px; text-align: center; box-sizing: border-box; border-top: 8px solid var(--p); }
-        .btn-main { background: var(--p); color: white; border: none; padding: 16px; width: 100%; border-radius: 10px; font-weight: 800; font-size: 16px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; }
+        body { font-family: -apple-system, sans-serif; background-color: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px 0;}
+        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 100%; max-width: 400px; box-sizing: border-box; border-top: 8px solid var(--p); }
+        h1, h2, h3 { color: var(--p); margin-top: 0; }
+        .btn-main { background: var(--p); color: white; border: none; padding: 16px; width: 100%; border-radius: 10px; font-weight: 900; font-size: 14px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; }
+        .btn-main:active { transform: scale(0.98); }
         .menu-card { background: #f8fafc; padding: 25px; border-radius: 15px; border-left: 6px solid var(--a); cursor: pointer; text-align: left; margin-bottom: 15px; transition: 0.2s;}
         .menu-card:active { transform: scale(0.98); }
-        input { width: 100%; padding: 14px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 16px; box-sizing: border-box; text-align: center; margin-bottom: 10px; }
+        .menu-card h3 { margin: 0; font-size: 15px; text-transform: uppercase; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 14px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 16px; box-sizing: border-box; text-align: center; margin-bottom: 10px; font-weight: bold; }
         .screen { display: none; }
         .active { display: block; }
+        
+        /* ESTILOS DE GESTIÓN DE USUARIOS */
+        .user-list { background: #f8fafc; border-radius: 10px; padding: 10px; max-height: 150px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #e2e8f0;}
+        .user-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #cbd5e1; font-size: 13px; font-weight: bold; }
+        .user-item:last-child { border: none; }
+        .btn-sm { background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
+        
+        .perm-group { background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; margin-bottom: 10px; text-align: left; }
+        .perm-title { font-size: 11px; font-weight: 900; color: var(--a); text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; }
+        .perm-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: bold; color: #475569; margin-bottom: 6px; cursor: pointer;}
+        .perm-label input { width: 18px; height: 18px; margin: 0; accent-color: var(--p); cursor: pointer;}
+        
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; color: var(--p); }
     </style>
 </head>
 <body>
+    <div id="loader">⏳ Conectando con Base de Datos...</div>
+
     <div class="container">
-        <div id="login-screen" class="screen active">
-            <h1 style="color:var(--p);">CORALSINTEC</h1>
+        <div id="login-screen" class="screen">
+            <h1>CORALSINTEC</h1>
+            <p style="font-size:12px; color:#64748b; font-weight:bold; margin-top:-5px; margin-bottom:20px;">SISTEMA DE GESTIÓN</p>
             <input type="text" id="username" placeholder="USUARIO" style="text-transform: uppercase;">
-            <input type="password" id="pin" placeholder="PIN" maxlength="4">
-            <button class="btn-main" onclick="validar()">ENTRAR</button>
+            <input type="password" id="pin" placeholder="PIN">
+            <button class="btn-main" onclick="validar()">ENTRAR AL SISTEMA</button>
         </div>
 
         <div id="dashboard-screen" class="screen">
             <h2 id="welcome">HOLA</h2>
             
-            <div onclick="location.href='cotizador.html'" class="menu-card" id="v-btn"><h3>🛒 COTIZADOR</h3></div>
+            <div id="btn-ventas" onclick="location.href='cotizador.html'" class="menu-card"><h3>🛒 MI COTIZADOR</h3></div>
+            <div id="btn-solicitudes" onclick="location.href='solicitudes.html'" class="menu-card" style="border-left-color: #10b981;"><h3>📥 SOLICITUDES CLIENTES</h3></div>
+            <div id="btn-planta" onclick="location.href='planta.html'" class="menu-card" style="border-left-color: #f59e0b;"><h3>🏭 PRODUCCIÓN (PLANTA)</h3></div>
+            <div id="btn-gerencia" onclick="location.href='gerencia.html'" class="menu-card" style="border-left-color: #6366f1;"><h3>📊 FINANZAS (GERENCIA)</h3></div>
             
-            <div onclick="location.href='solicitudes.html'" class="menu-card" id="s-btn" style="border-left-color: #10b981;"><h3>📥 SOLICITUDES RECIBIDAS</h3></div>
-            
-            <div onclick="location.href='planta.html'" class="menu-card" style="border-left-color: #f59e0b;"><h3>🏭 PLANTA</h3></div>
-            <div onclick="location.href='gerencia.html'" class="menu-card" id="g-btn" style="border-left-color: #6366f1;"><h3>📊 GERENCIA</h3></div>
+            <div id="btn-admin" onclick="abrirAdmin()" class="menu-card" style="border-left-color: #a855f7; display:none; background:#faf5ff;">
+                <h3 style="color:#7e22ce;">🔑 GESTIÓN DE USUARIOS</h3>
+            </div>
+
             <button onclick="logout()" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold; margin-top:10px;">Cerrar Sesión</button>
         </div>
+
+        <div id="admin-screen" class="screen">
+            <h2 style="color:#7e22ce;">Gestión de Roles</h2>
+            
+            <div class="user-list" id="lista-usuarios-ui">
+                </div>
+
+            <div style="background:#f1f5f9; padding:15px; border-radius:10px; border:1px solid #cbd5e1;">
+                <h3 style="font-size:14px; text-align:left; margin-bottom:10px;">Nuevo / Editar Usuario</h3>
+                <input type="text" id="new-user" placeholder="NOMBRE DE USUARIO" style="text-transform:uppercase;">
+                <input type="text" id="new-pin" placeholder="PIN DE ACCESO">
+                
+                <div class="perm-group">
+                    <div class="perm-title">Accesos Generales al Menú</div>
+                    <label class="perm-label"><input type="checkbox" id="p-ventas"> Cotizador Privado</label>
+                    <label class="perm-label"><input type="checkbox" id="p-soli"> Solicitudes de Clientes</label>
+                    <label class="perm-label"><input type="checkbox" id="p-gerencia"> Finanzas (Gerencia)</label>
+                    <label class="perm-label"><input type="checkbox" id="p-planta"> Módulo de Planta</label>
+                </div>
+
+                <div class="perm-group" style="background:#fffbeb; border-color:#fde68a;">
+                    <div class="perm-title" style="color:#d97706;">Permisos Específicos (Planta)</div>
+                    <label class="perm-label"><input type="checkbox" id="p-pla-precio"> Ver Precios y Pagos ($)</label>
+                    <label class="perm-label"><input type="checkbox" id="p-pla-receta"> Ver Recetas / Fórmulas</label>
+                    <label class="perm-label"><input type="checkbox" id="p-pla-accion"> Botones (Aceptar/Entregar)</label>
+                    <label class="perm-label"><input type="checkbox" id="p-pla-pdf"> Generar Documentos PDF</label>
+                </div>
+
+                <button class="btn-main" style="background:#7e22ce;" onclick="guardarUsuario()">💾 GUARDAR USUARIO</button>
+            </div>
+            <button onclick="cerrarAdmin()" style="background:none; border:none; font-weight:bold; color:#64748b; margin-top:15px; cursor:pointer;">Volver al Menú</button>
+        </div>
+
     </div>
 
     <script>
-        const dbu = {"EDUARDO": "1234", "VENTAS": "1111", "PLANTA": "0000"};
-        
+        const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
+        let dbUsuarios = [];
+
         window.onload = () => {
-            const s = localStorage.getItem('usuarioCoralsintec');
-            if(s) ui(s);
+            fetch(API_URL + "?action=get_usuarios")
+            .then(r => r.json())
+            .then(data => {
+                dbUsuarios = data;
+                document.getElementById('loader').style.display = 'none';
+                
+                const userRegistrado = localStorage.getItem('usuarioCoralsintec');
+                if(userRegistrado) aplicarInterfaz(userRegistrado);
+                else document.getElementById('login-screen').classList.add('active');
+            })
+            .catch(e => { alert("Error de conexión"); document.getElementById('loader').style.display = 'none'; });
         };
 
         function validar() {
             const u = document.getElementById('username').value.toUpperCase().trim();
-            const p = document.getElementById('pin').value;
-            if(dbu[u] && dbu[u] === p) {
+            const p = document.getElementById('pin').value.trim();
+            
+            // Bypass maestro para Eduardo por seguridad extrema
+            if(u === "EDUARDO" && p === "1234") {
+                let masterPerms = { menu_ventas:true, menu_solicitudes:true, menu_gerencia:true, menu_planta:true, p_precios:true, p_receta:true, p_acciones:true, p_pdf:true };
                 localStorage.setItem('usuarioCoralsintec', u);
-                ui(u);
-            } else { alert("Error de credenciales"); }
-        }
+                localStorage.setItem('permisosCoralsintec', JSON.stringify(masterPerms));
+                aplicarInterfaz(u);
+                return;
+            }
 
-        function ui(u) {
-            document.getElementById('login-screen').classList.remove('active');
-            document.getElementById('dashboard-screen').classList.add('active');
-            document.getElementById('welcome').innerText = "HOLA " + u;
-            if(u === "PLANTA") {
-                document.getElementById('v-btn').style.display = 'none';
-                document.getElementById('s-btn').style.display = 'none';
-                document.getElementById('g-btn').style.display = 'none';
+            const userRow = dbUsuarios.find(x => String(x.USUARIO).trim().toUpperCase() === u && String(x.PIN).trim() === p);
+            
+            if(userRow) {
+                localStorage.setItem('usuarioCoralsintec', u);
+                localStorage.setItem('permisosCoralsintec', userRow.PERMISOS_JSON || "{}");
+                aplicarInterfaz(u);
+            } else { 
+                alert("Usuario o PIN incorrecto."); 
             }
         }
 
-        function logout() {
-            localStorage.clear();
-            location.reload();
+        function aplicarInterfaz(u) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('dashboard-screen').classList.add('active');
+            document.getElementById('welcome').innerText = "HOLA " + u;
+
+            let perms = {};
+            try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
+
+            // Si es Eduardo, ve todo. Si no, lee el JSON de permisos de la base de datos.
+            const isMaster = (u === "EDUARDO");
+
+            document.getElementById('btn-ventas').style.display = (isMaster || perms.menu_ventas) ? 'block' : 'none';
+            document.getElementById('btn-solicitudes').style.display = (isMaster || perms.menu_solicitudes) ? 'block' : 'none';
+            document.getElementById('btn-gerencia').style.display = (isMaster || perms.menu_gerencia) ? 'block' : 'none';
+            document.getElementById('btn-planta').style.display = (isMaster || perms.menu_planta) ? 'block' : 'none';
+            document.getElementById('btn-admin').style.display = isMaster ? 'block' : 'none';
         }
+
+        // --- FUNCIONES DE ADMINISTRADOR ---
+        function abrirAdmin() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('admin-screen').classList.add('active');
+            
+            const listaUI = document.getElementById('lista-usuarios-ui');
+            listaUI.innerHTML = "";
+            dbUsuarios.forEach(user => {
+                if(user.USUARIO.toUpperCase() !== "EDUARDO") {
+                    listaUI.innerHTML += `
+                    <div class="user-item">
+                        <span>👤 ${user.USUARIO}</span>
+                        <button class="btn-sm" onclick="eliminarUser('${user.USUARIO}')">Borrar</button>
+                    </div>`;
+                }
+            });
+        }
+
+        function cerrarAdmin() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('dashboard-screen').classList.add('active');
+        }
+
+        function guardarUsuario() {
+            const u = document.getElementById('new-user').value.trim();
+            const p = document.getElementById('new-pin').value.trim();
+            if(!u || !p) return alert("Falta usuario o PIN");
+
+            const permisos = {
+                menu_ventas: document.getElementById('p-ventas').checked,
+                menu_solicitudes: document.getElementById('p-soli').checked,
+                menu_gerencia: document.getElementById('p-gerencia').checked,
+                menu_planta: document.getElementById('p-planta').checked,
+                p_precios: document.getElementById('p-pla-precio').checked,
+                p_receta: document.getElementById('p-pla-receta').checked,
+                p_acciones: document.getElementById('p-pla-accion').checked,
+                p_pdf: document.getElementById('p-pla-pdf').checked
+            };
+
+            document.getElementById('loader').style.display = 'flex';
+            fetch(API_URL + "?action=guardar_usuario", {
+                method: "POST", mode: "no-cors",
+                body: JSON.stringify({ usuario: u, pin: p, permisos: permisos })
+            }).finally(() => { setTimeout(() => { location.reload(); }, 1500); });
+        }
+
+        function eliminarUser(u) {
+            if(!confirm("¿Borrar acceso de " + u + "?")) return;
+            document.getElementById('loader').style.display = 'flex';
+            fetch(API_URL + "?action=eliminar_usuario", {
+                method: "POST", mode: "no-cors",
+                body: JSON.stringify({ usuario: u })
+            }).finally(() => { setTimeout(() => { location.reload(); }, 1500); });
+        }
+
+        function logout() { localStorage.clear(); location.reload(); }
     </script>
 </body>
 </html>
