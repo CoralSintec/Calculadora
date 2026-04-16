@@ -65,7 +65,6 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
     
     window.onload = () => {
-        if(localStorage.getItem('usuarioCoralsintec') !== 'EDUARDO') { location.href = 'index.html'; return; }
         cargarTodo();
     };
 
@@ -78,6 +77,14 @@
 
     async function cargarTodo() {
         document.getElementById('loader').style.display = 'flex';
+        
+        // --- LÓGICA DE PERMISOS ---
+        const usuarioActual = localStorage.getItem('usuarioCoralsintec');
+        let p_master = (usuarioActual === 'EDUARDO');
+        let perms = {}; try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
+        const canEdit = p_master || perms.g_editar === true;
+        // --------------------------
+
         try {
             const [rP, rN, rI] = await Promise.all([
                 fetch(API_URL + "?action=get_pedidos&t=" + Date.now()).then(r => r.json()),
@@ -87,9 +94,7 @@
 
             const cleanNum = (val) => { if(!val) return 0; let n = String(val).replace(/[^0-9.]/g, ''); return parseFloat(n) || 0; };
             
-            let ventasAprobadas = rP.filter(p => p.ESTADO !== "NUEVO / POR ACEPTAR" && p.ESTADO !== "RECIBIDO")
-                                    .reduce((acc, p) => acc + cleanNum(p.TOTAL_USD || p['TOTAL_USD'] || Object.values(p)[9]), 0);
-            
+            let ventasAprobadas = rP.filter(p => p.ESTADO !== "NUEVO / POR ACEPTAR" && p.ESTADO !== "RECIBIDO").reduce((acc, p) => acc + cleanNum(p.TOTAL_USD || p['TOTAL_USD'] || Object.values(p)[9]), 0);
             let c = rN.reduce((acc, n) => acc + cleanNum(n.MONTO_MENSUAL_USD || n['MONTO_MENSUAL_USD'] || Object.values(n)[2]), 0);
             
             document.getElementById('k-v').innerText = "$" + ventasAprobadas.toFixed(2);
@@ -100,12 +105,12 @@
                 <div class="card" style="border-left-color:var(--blue);">
                     <div class="card-row">
                         <div class="info">
-                            <b onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 1, '${n.NOMBRE}')">${n.NOMBRE} ✏️</b>
-                            <span>Ingreso: <i onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 3, '${n.FECHA_INGRESO || '-'}')">${n.FECHA_INGRESO || '-'} ✏️</i></span>
+                            <b ${canEdit ? `onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 1, '${n.NOMBRE}')" style="cursor:pointer;"` : ''}>${n.NOMBRE} ${canEdit ? '✏️' : ''}</b>
+                            <span>Ingreso: <i ${canEdit ? `onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 3, '${n.FECHA_INGRESO || '-'}')"` : ''}>${n.FECHA_INGRESO || '-'} ${canEdit ? '✏️' : ''}</i></span>
                         </div>
                         <div style="display:flex;align-items:center;">
                             <div class="price">$${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}</div>
-                            <button class="btn-edit" onclick="editar('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}')">💰</button>
+                            ${canEdit ? `<button class="btn-edit" onclick="editar('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}')">💰</button>` : ''}
                         </div>
                     </div>
                 </div>`).join('');
@@ -114,18 +119,27 @@
                 <div class="card" style="border-left-color:var(--red);"><div class="card-row">
                 <div class="info"><b>🏢 ${n.NOMBRE}</b><span>Servicio Fijo</span></div>
                 <div style="display:flex;align-items:center;"><div class="price">$${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}</div>
-                <button class="btn-edit" onclick="editar('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}')">✏️</button></div></div></div>`).join('');
+                ${canEdit ? `<button class="btn-edit" onclick="editar('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}')">✏️</button>` : ''}
+                </div></div></div>`).join('');
 
             document.getElementById('l-m').innerHTML = rI.map(m => {
                 let stock = cleanNum(m.STOCK_ACTUAL || Object.values(m)[3]);
                 let alerta = cleanNum(m.PUNTO_ALERTA || Object.values(m)[4]);
                 let color = stock <= alerta ? 'var(--red)' : 'var(--green)';
+                
+                let btnsHTML = "";
+                if(canEdit) {
+                    btnsHTML = `
+                    <button class="btn-edit" style="background:var(--p); color:white;" onclick="ajustarStock('${m.MATERIAL}', ${stock}, 'suma')">＋</button>
+                    <button class="btn-edit" style="background:#fee2e2; color:var(--red);" onclick="ajustarStock('${m.MATERIAL}', ${stock}, 'resta')">－</button>
+                    <button class="btn-edit" onclick="editar('INVENTARIO_COSTOS','MATERIAL','${m.MATERIAL}',2,'${cleanNum(m.COSTO_UNITARIO_USD || Object.values(m)[2])}')">✏️ $</button>`;
+                }
+
                 return `<div class="card" style="border-left-color:${color};"><div class="card-row">
                 <div class="info"><b>📦 ${m.MATERIAL}</b><span>$${cleanNum(m.COSTO_UNITARIO_USD || Object.values(m)[2])}/${m.UNIDAD_MEDIDA}</span></div>
-                <div style="display:flex;align-items:center;"><div class="price" style="color:${color}">${stock}</div>
-                <button class="btn-edit" style="background:var(--p); color:white;" onclick="ajustarStock('${m.MATERIAL}', ${stock}, 'suma')">＋</button>
-                <button class="btn-edit" style="background:#fee2e2; color:var(--red);" onclick="ajustarStock('${m.MATERIAL}', ${stock}, 'resta')">－</button>
-                <button class="btn-edit" onclick="editar('INVENTARIO_COSTOS','MATERIAL','${m.MATERIAL}',2,'${cleanNum(m.COSTO_UNITARIO_USD || Object.values(m)[2])}')">✏️ $</button></div></div></div>`;
+                <div style="display:flex;align-items:center;"><div class="price" style="color:${color}; margin-right:8px;">${stock}</div>
+                ${btnsHTML}
+                </div></div></div>`;
             }).join('');
 
             document.getElementById('loader').style.display = 'none';
