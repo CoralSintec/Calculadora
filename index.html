@@ -107,8 +107,10 @@
     </div>
 
     <script>
-        // PEGA AQUÍ TU URL EXACTA DEL APPS SCRIPT
+        window.onerror = function(msg, url, line) { alert("🚨 ERROR DETECTADO:\n" + msg + "\nLínea: " + line); };
+
         const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
+        
         let dbUsuarios = [];
 
         window.onload = () => {
@@ -159,24 +161,23 @@
             document.getElementById('admin-screen').classList.add('active');
             const listaUI = document.getElementById('lista-usuarios-ui'); listaUI.innerHTML = "";
             dbUsuarios.forEach(user => {
-                if(user.USUARIO.toUpperCase() !== "EDUARDO") {
+                if(user.USUARIO && user.USUARIO.toUpperCase() !== "EDUARDO") {
                     listaUI.innerHTML += `<div class="user-item"><span>👤 ${user.USUARIO}</span><button class="btn-sm" onclick="eliminarUser('${user.USUARIO}')">Borrar</button></div>`;
                 }
             });
         }
+        
         function cerrarAdmin() { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('dashboard-screen').classList.add('active'); }
 
         function guardarUsuario() {
-            // 1. VERIFICAR QUE HAY DATOS
             const u = document.getElementById('new-user').value.trim().toUpperCase();
             const p = document.getElementById('new-pin').value.trim();
             
             if(u === "" || p === "") {
                 alert("⚠️ POR FAVOR: Escribe un Nombre de Usuario y un PIN antes de guardar.");
-                return; // Detiene la función aquí si está vacío
+                return; 
             }
 
-            // 2. RECOLECTAR PERMISOS
             const permisos = {
                 m_ventas: document.getElementById('m_ventas').checked,
                 v_crear: document.getElementById('v_crear').checked,
@@ -191,23 +192,20 @@
                 p_pdf: document.getElementById('p_pla_pdf').checked
             };
 
-            // 3. MOSTRAR PANTALLA DE CARGA
             document.getElementById('loader').innerText = `⏳ Guardando los accesos para ${u}...`;
             document.getElementById('loader').style.display = 'flex';
 
-            // 4. ENVIAR A GOOGLE
             fetch(API_URL + "?action=guardar_usuario", { 
                 method: "POST", 
                 mode: "no-cors", 
                 body: JSON.stringify({ usuario: u, pin: p, permisos: permisos }) 
             })
             .then(() => {
-                // 5. AVISAR QUE FUE UN ÉXITO
-                alert(`✅ ¡Listo! El usuario ${u} ha sido creado/actualizado correctamente.`);
+                alert(`✅ ¡Listo! El usuario ${u} ha sido guardado correctamente.`);
                 location.reload(); 
             })
             .catch(error => {
-                alert("❌ Falló la conexión. No se pudo guardar el usuario.");
+                alert("❌ Falló la conexión: " + error.message);
                 document.getElementById('loader').style.display = 'none';
             });
         }
