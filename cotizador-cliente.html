@@ -3,52 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cotizador Coralsintec</title>
+    <title>Cotizador Oficial | Coralsintec</title>
     <style>
-        :root { --coralsintec-primary: #1e2328; --coralsintec-accent: #c49660; --coralsintec-text-main: #334155; --coralsintec-border: #cbd5e1; }
+        :root { 
+            --c-bg: #1c1c1c; 
+            --c-card: #2d2d2d; 
+            --c-input: #3a3a3a; 
+            --c-accent: #b0b0b0; /* Gris Cemento Mate */
+            --c-text: #e0e0e0; 
+            --c-border: #555555; 
+            --c-muted: #9ca3af; 
+        }
         html, body { min-height: 100vh; margin: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-image: url('1000556091.jpg'); background-size: cover; background-position: center; background-attachment: fixed; color: var(--coralsintec-text-main); padding: 40px 15px 50px 15px; display: flex; flex-direction: column; align-items: center; }
-        .app-main { background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(8px); padding: 25px 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 400px; box-sizing: border-box; border-top: 6px solid var(--coralsintec-primary); }
-        .section-title { font-size: 20px; color: var(--coralsintec-primary); margin: 0 0 5px 0; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
-        .section-subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 20px; font-weight: 500; }
-        h3 { color: var(--coralsintec-primary); font-size: 14px; text-transform: uppercase; border-left: 4px solid var(--coralsintec-accent); padding-left: 10px; margin-top: 0; margin-bottom: 15px;}
+        body { 
+            font-family: -apple-system, sans-serif; 
+            background-image: linear-gradient(rgba(28,28,28,0.9), rgba(28,28,28,0.9)), url('cabecera.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed; 
+            color: var(--c-text); 
+            padding: 40px 15px 50px 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        .app-main { background: rgba(45, 45, 45, 0.95); backdrop-filter: blur(8px); padding: 25px 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); width: 100%; max-width: 400px; box-sizing: border-box; border-top: 6px solid var(--c-accent); }
+        .section-title { font-size: 20px; color: #fff; margin: 0 0 5px 0; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+        .section-subtitle { text-align: center; color: var(--c-muted); font-size: 13px; margin-bottom: 20px; font-weight: 500; }
+        h3 { color: #fff; font-size: 14px; text-transform: uppercase; border-left: 4px solid var(--c-accent); padding-left: 10px; margin-top: 0; margin-bottom: 15px;}
         .form-row { margin-bottom: 15px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        label { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; }
-        select, input[type="number"], input[type="text"], input[type="tel"] { width: 100%; padding: 14px; border: 2px solid var(--coralsintec-border); border-radius: 10px; font-size: 15px; background-color: rgba(248, 250, 252, 0.9); color: var(--coralsintec-primary); appearance: none; box-sizing: border-box; font-weight: 700; }
-        select:focus, input:focus { outline: none; border-color: var(--coralsintec-primary); background-color: #fff; }
-        .options-group { background: rgba(248, 250, 252, 0.8); border-radius: 10px; padding: 15px; margin-top: 20px; border: 1px solid var(--coralsintec-border); }
-        .option-item { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 800; padding: 8px 0; color: var(--coralsintec-primary); }
-        .option-item input[type="checkbox"] { width: 24px; height: 24px; accent-color: var(--coralsintec-accent); }
-        .results-card { margin-top: 25px; padding: 20px; background-color: var(--coralsintec-primary); border-radius: 12px; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border-left: 4px solid var(--coralsintec-accent); }
-        .breakdown-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: #cbd5e1; align-items: center; }
-        .breakdown-val { font-weight: 800; color: white; font-size: 14px; }
-        .divider { height: 1px; background: rgba(255,255,255,0.2); margin: 12px 0; }
+        label { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 800; color: var(--c-muted); text-transform: uppercase; }
+        select, input[type="number"], input[type="text"], input[type="tel"] { width: 100%; padding: 14px; border: 1px solid var(--c-border); border-radius: 10px; font-size: 15px; background-color: var(--c-input); color: #fff; appearance: none; box-sizing: border-box; font-weight: 700; }
+        select:focus, input:focus { outline: none; border-color: var(--c-accent); }
+        
+        .options-group { background: var(--c-bg); border-radius: 10px; padding: 15px; margin-top: 20px; border: 1px solid var(--c-border); }
+        .option-item { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 800; padding: 8px 0; color: #fff; }
+        .option-item input[type="checkbox"] { width: 24px; height: 24px; accent-color: var(--c-accent); }
+        
+        .results-card { margin-top: 25px; padding: 20px; background-color: var(--c-bg); border-radius: 12px; color: white; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); border-left: 4px solid var(--c-accent); border: 1px solid var(--c-border);}
+        .breakdown-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: var(--c-muted); align-items: center; }
+        .breakdown-val { font-weight: 800; color: #fff; font-size: 14px; }
+        .divider { height: 1px; background: var(--c-border); margin: 12px 0; }
         .total-price-container { text-align: center; margin-top: 15px; }
-        .total-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; font-weight: 600; }
-        .total-price { font-size: 32px; font-weight: 900; color: var(--coralsintec-accent); margin: 5px 0 0 0; }
-        .btn-add-outline { width: 100%; background-color: white; color: var(--coralsintec-primary); border: 2px solid var(--coralsintec-primary); padding: 16px; border-radius: 10px; font-size: 14px; font-weight: 900; text-transform: uppercase; margin-top: 20px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .btn-add-outline:hover { background: var(--coralsintec-primary); color: white; }
+        .total-label { font-size: 11px; text-transform: uppercase; color: var(--c-muted); letter-spacing: 1px; font-weight: 600; }
+        .total-price { font-size: 32px; font-weight: 900; color: var(--c-accent); margin: 5px 0 0 0; }
+        
+        .btn-add-outline { width: 100%; background-color: transparent; color: var(--c-accent); border: 2px solid var(--c-accent); padding: 16px; border-radius: 10px; font-size: 14px; font-weight: 900; text-transform: uppercase; margin-top: 20px; cursor: pointer; transition: 0.2s; }
+        .btn-add-outline:hover { background: var(--c-accent); color: #1c1c1c; }
         .btn-add-outline:active { transform: scale(0.97); }
-        .btn-submit { width: 100%; border: none; padding: 16px; border-radius: 10px; font-size: 15px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: transform 0.1s; background-color: #166534; color: white; box-shadow: 0 5px 15px rgba(22,101,52,0.4); margin-top: 15px;}
+        
+        .btn-submit { width: 100%; border: none; padding: 16px; border-radius: 10px; font-size: 15px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.1s; background-color: #166534; color: white; margin-top: 15px;}
         .btn-submit:active { transform: scale(0.97); }
-        .cart-section { width: 100%; max-width: 400px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); padding: 20px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); margin-top: 20px; box-sizing: border-box; border-top: 6px solid var(--coralsintec-primary); }
-        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 10px; }
-        .cart-header h2 { font-size: 16px; margin: 0; color: var(--coralsintec-primary); font-weight: 900;}
-        .cart-header button { background: #fee2e2; border: none; color: #ef4444; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer;}
+        
+        .cart-section { width: 100%; max-width: 400px; background: rgba(45, 45, 45, 0.95); backdrop-filter: blur(8px); padding: 20px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); margin-top: 20px; box-sizing: border-box; border-top: 6px solid var(--c-accent); }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--c-border); padding-bottom: 10px; }
+        .cart-header h2 { font-size: 16px; margin: 0; color: #fff; font-weight: 900;}
+        .cart-header button { background: #7f1d1d; border: 1px solid #991b1b; color: #fca5a5; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer;}
+        
         .cart-list { margin: 0; padding: 0; list-style: none; }
-        .cart-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--coralsintec-border); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .cart-item-title { display: flex; justify-content: space-between; align-items: center; font-weight: 900; color: var(--coralsintec-primary); font-size: 15px; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; }
-        .btn-del-item { background: #fee2e2; color: #b91c1c; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase;}
-        .cart-row { display: flex; justify-content: space-between; font-size: 13px; color: #475569; margin-bottom: 4px; }
-        .cart-row b { color: var(--coralsintec-primary); }
-        .cart-total-row { display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; color: var(--coralsintec-primary); border-top: 1px solid #e2e8f0; margin-top: 8px; padding-top: 8px; }
-        .cart-total-row b { color: var(--coralsintec-accent); font-size: 18px; }
-        .grand-total { text-align: center; background: #ecfccb; padding: 20px; border-radius: 12px; border: 1px solid #bef264; margin-top: 15px;}
-        .grand-total span.gt-title { font-size: 12px; color: #3f6212; font-weight: 800; display: block; text-transform: uppercase; margin-bottom: 5px;}
-        .grand-total-val { font-size: 26px; font-weight: 900; color: #166534; display:flex; justify-content:center; align-items:center; gap:6px;}
-        #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; color: var(--coralsintec-primary); font-size:18px; display:none;}
-        .success-msg { display: none; text-align: center; padding: 50px 20px; background: rgba(255, 255, 255, 0.95); border-radius: 16px; border-top: 8px solid #10b981; max-width:400px; width:100%; box-sizing:border-box;}
+        .cart-item { background: var(--c-bg); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--c-border); }
+        .cart-item-title { display: flex; justify-content: space-between; align-items: center; font-weight: 900; color: #fff; font-size: 15px; margin-bottom: 8px; border-bottom: 1px solid var(--c-border); padding-bottom: 8px; }
+        .btn-del-item { background: transparent; color: #fca5a5; border: none; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase;}
+        
+        .cart-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--c-muted); margin-bottom: 4px; }
+        .cart-row b { color: #fff; }
+        .cart-total-row { display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; color: #fff; border-top: 1px solid var(--c-border); margin-top: 8px; padding-top: 8px; }
+        .cart-total-row b { color: var(--c-accent); font-size: 18px; }
+        
+        .grand-total { text-align: center; background: #374151; padding: 20px; border-radius: 12px; border: 1px solid #4b5563; margin-top: 15px;}
+        .grand-total span.gt-title { font-size: 12px; color: #d1d5db; font-weight: 800; display: block; text-transform: uppercase; margin-bottom: 5px;}
+        .grand-total-val { font-size: 26px; font-weight: 900; color: #fff; display:flex; justify-content:center; align-items:center; gap:6px;}
+        
+        .btn-volver { background: var(--c-input); border: 1px solid var(--c-border); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; align-self: flex-start; }
+        
+        #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28,28,28,0.95); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; color: var(--c-accent); font-size:18px; display:none;}
+        
+        .success-msg { display: none; text-align: center; padding: 50px 20px; background: rgba(45, 45, 45, 0.95); border-radius: 16px; border-top: 8px solid #b0b0b0; max-width:400px; width:100%; box-sizing:border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.6);}
+        .success-msg h2 { color: #fff; margin:0;}
+        .success-msg p { color: var(--c-muted); font-weight:bold;}
     </style>
 </head>
 <body>
@@ -56,6 +89,12 @@
     <div id="loader-overlay">⏳ PROCESANDO...</div>
 
     <main class="app-main" id="main-content">
+        <button class="btn-volver" onclick="window.location.href='index.html'">⬅ VOLVER</button>
+        
+        <div style="text-align:center; margin-bottom:10px;">
+            <img src="icono.jpg" alt="Icono" style="width:60px; border-radius:50%; border:2px solid var(--c-border);" onerror="this.style.display='none'">
+        </div>
+
         <h1 class="section-title">Coralsintec</h1>
         <div class="section-subtitle">Cotizador Oficial</div>
 
@@ -82,8 +121,8 @@
             <div class="form-row"><label>Metros (m²):</label><input type="number" id="metros" placeholder="10" min="0.1" step="0.1" oninput="calcularPresupuesto()"></div>
 
             <div class="options-group">
-                <label class="option-item" style="color:#b45309;"><span>+10% Desperdicio (Sugerido)</span><input type="checkbox" id="desperdicio" onchange="calcularPresupuesto()" checked></label>
-                <div class="divider" style="background:rgba(0,0,0,0.1);"></div>
+                <label class="option-item" style="color:#d1d5db;"><span>+10% Desperdicio (Sugerido)</span><input type="checkbox" id="desperdicio" onchange="calcularPresupuesto()" checked></label>
+                <div class="divider"></div>
                 <label class="option-item"><span>Incluir Carateo (Sacos)</span><input type="checkbox" id="carateo" onchange="calcularPresupuesto()"></label>
                 <label class="option-item"><span>Incluir Sellador (Galones)</span><input type="checkbox" id="sellador" onchange="calcularPresupuesto()"></label>
             </div>
@@ -91,9 +130,9 @@
             <div class="results-card" id="box-resultados" style="display:none;">
                 <div class="breakdown-row"><span>Revestimiento (<span id="ui-espesor">1.2 cm</span>)</span><span class="breakdown-val">$<span id="ui-total-rev">0</span></span></div>
                 <div class="breakdown-row"><span>Piezas a fabricar</span><span class="breakdown-val" id="res-pcs">0</span></div>
-                <div class="breakdown-row"><span>Área Material Final</span><span class="breakdown-val" id="res-m2">0 m²</span></div>
-                <div class="breakdown-row" id="row-carateo" style="display:none; color:#fef08a; margin-top:8px;"><span>Carateo (<span id="ui-sacos">0</span> sacos)</span><span class="breakdown-val">$<span id="ui-total-carateo">0</span></span></div>
-                <div class="breakdown-row" id="row-sellador" style="display:none; color:#fef08a;"><span>Sellador (<span id="ui-galones">0</span> galones)</span><span class="breakdown-val">$<span id="ui-total-sellador">0</span></span></div>
+                <div class="breakdown-row"><span>Área Final</span><span class="breakdown-val" id="res-m2">0 m²</span></div>
+                <div class="breakdown-row" id="row-carateo" style="display:none; margin-top:8px;"><span>Carateo (<span id="ui-sacos">0</span> sacos)</span><span class="breakdown-val">$<span id="ui-total-carateo">0</span></span></div>
+                <div class="breakdown-row" id="row-sellador" style="display:none;"><span>Sellador (<span id="ui-galones">0</span> galones)</span><span class="breakdown-val">$<span id="ui-total-sellador">0</span></span></div>
                 <div class="divider"></div>
                 <div class="total-price-container"><div class="total-label">PRESUPUESTO ESTIMADO USD</div><div class="total-price">$<span id="total-presupuesto">0</span></div></div>
             </div>
@@ -111,27 +150,24 @@
 
     <div id="success-screen" class="success-msg">
         <div style="font-size: 60px; margin-bottom: 10px;">✅</div>
-        <h2 style="color:var(--coralsintec-primary); margin:0;">¡SOLICITUD ENVIADA!</h2>
-        <p style="color:#475569; font-weight:bold;">Tu solicitud ha sido enviada a nuestras oficinas.</p>
+        <h2>¡SOLICITUD ENVIADA!</h2>
+        <p>Tu solicitud ha sido enviada a nuestras oficinas.</p>
         <button class="btn-submit" style="margin-top:20px;" onclick="location.reload()">Nueva Cotización</button>
     </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
+    
     let db = [];
 
     window.onload = () => {
         document.getElementById('loader-overlay').style.display = 'flex';
-        document.getElementById('loader-overlay').innerHTML = "⏳ Cargando Catálogo...";
-        fetch(API_URL + "?action=get_productos&t=" + Date.now()).then(r => r.json()).then(data => {
-            db = data; document.getElementById('loader-overlay').style.display = 'none';
-        }).catch(e => { document.getElementById('loader-overlay').style.display = 'none'; });
+        fetch(API_URL + "?action=get_productos").then(r => r.json()).then(data => { db = data; document.getElementById('loader-overlay').style.display = 'none'; }).catch(e => { document.getElementById('loader-overlay').style.display = 'none'; });
     };
 
     function manejarTexturaColor() {
         const textura = document.getElementById('textura').value; const colorSelect = document.getElementById('color');
-        if (textura === 'Veta') { colorSelect.value = 'Beige'; colorSelect.style.opacity = '0.6'; colorSelect.style.pointerEvents = 'none';
-        } else { colorSelect.style.opacity = '1'; colorSelect.style.pointerEvents = 'auto'; }
+        if (textura === 'Veta') { colorSelect.value = 'Beige'; colorSelect.style.opacity = '0.6'; colorSelect.style.pointerEvents = 'none'; } else { colorSelect.style.opacity = '1'; colorSelect.style.pointerEvents = 'auto'; }
         calcularPresupuesto();
     }
 
@@ -160,21 +196,15 @@
         const granTotal = totalRevestimiento + totalCarateo + totalSellador;
 
         document.getElementById('ui-espesor').innerText = espesor; document.getElementById('res-pcs').innerText = piezas; document.getElementById('res-m2').innerText = m2Material.toFixed(2) + " m²"; document.getElementById('ui-total-rev').innerText = totalRevestimiento.toFixed(2);
-        
         const rowCarateo = document.getElementById('row-carateo'); if(carateoCheck) { rowCarateo.style.display = 'flex'; document.getElementById('ui-sacos').innerText = cantSacos; document.getElementById('ui-total-carateo').innerText = totalCarateo.toFixed(2); } else { rowCarateo.style.display = 'none'; }
         const rowSellador = document.getElementById('row-sellador'); if(selladorCheck) { rowSellador.style.display = 'flex'; document.getElementById('ui-galones').innerText = cantGalones; document.getElementById('ui-total-sellador').innerText = totalSellador.toFixed(2); } else { rowSellador.style.display = 'none'; }
 
         document.getElementById('total-presupuesto').innerText = granTotal.toFixed(2); document.getElementById('box-resultados').style.display = 'block';
-
         window.ultimoCalculo = { titulo: `${formato} | ${textura} | ${color}`, formato: formato, uso: uso, textura: textura, color: color, espesor: espesor, piezas: piezas, m2Final: m2Material, precioM2: precioM2Rev, totalRev: totalRevestimiento, carCheck: carateoCheck, cantSacos: cantSacos, totalCar: totalCarateo, selCheck: selladorCheck, cantGalones: cantGalones, totalSel: totalSellador, total: granTotal };
     }
 
     let carrito = [];
-
-    function agregarAlCarrito() {
-        if (!window.ultimoCalculo || window.ultimoCalculo.m2Final <= 0) { alert("Ingresa los metros cuadrados para cotizar."); return; }
-        carrito.push({...window.ultimoCalculo}); document.getElementById('cart-section').style.display = 'block'; document.getElementById('metros').value = ""; document.getElementById('box-resultados').style.display = 'none'; actualizarUI_Carrito();
-    }
+    function agregarAlCarrito() { if (!window.ultimoCalculo || window.ultimoCalculo.m2Final <= 0) { alert("Ingresa los metros cuadrados para cotizar."); return; } carrito.push({...window.ultimoCalculo}); document.getElementById('cart-section').style.display = 'block'; document.getElementById('metros').value = ""; document.getElementById('box-resultados').style.display = 'none'; actualizarUI_Carrito(); }
 
     function actualizarUI_Carrito() {
         const listaUI = document.getElementById('cart-list'); listaUI.innerHTML = ''; let grandTotal = 0;
@@ -183,11 +213,10 @@
             let htmlHTML = `<div class="cart-item-title"><span>${item.titulo}</span><button class="btn-del-item" onclick="eliminarDelCarrito(${index})">X Eliminar</button></div>
             <div class="cart-row"><span>Precio Unitario:</span> <b>$${item.precioM2.toFixed(2)} /m²</b></div>
             <div class="cart-row"><span>Revestimiento (${item.espesor}):</span> <b>$${item.totalRev.toFixed(2)}</b></div>
-            <div class="cart-row"><span>Piezas a fabricar:</span> <b>${item.piezas}</b></div><div class="cart-row"><span>Área Material Final:</span> <b>${item.m2Final.toFixed(2)} m²</b></div>`;
-            if(item.carCheck) htmlHTML += `<div class="cart-row" style="color:#b45309;"><span>Carateo (${item.cantSacos} sacos):</span> <b>$${item.totalCar.toFixed(2)}</b></div>`;
-            if(item.selCheck) htmlHTML += `<div class="cart-row" style="color:#b45309;"><span>Sellador (${item.cantGalones} gal):</span> <b>$${item.totalSel.toFixed(2)}</b></div>`;
-            htmlHTML += `<div class="cart-total-row"><span>Subtotal:</span> <b>$${item.total.toFixed(2)}</b></div>`;
-            li.innerHTML = htmlHTML; listaUI.appendChild(li);
+            <div class="cart-row"><span>Piezas a fabricar:</span> <b>${item.piezas}</b></div><div class="cart-row"><span>Área Final:</span> <b>${item.m2Final.toFixed(2)} m²</b></div>`;
+            if(item.carCheck) htmlHTML += `<div class="cart-row" style="color:#d1d5db;"><span>Carateo (${item.cantSacos} sacos):</span> <b>$${item.totalCar.toFixed(2)}</b></div>`;
+            if(item.selCheck) htmlHTML += `<div class="cart-row" style="color:#d1d5db;"><span>Sellador (${item.cantGalones} gal):</span> <b>$${item.totalSel.toFixed(2)}</b></div>`;
+            htmlHTML += `<div class="cart-total-row"><span>Subtotal:</span> <b>$${item.total.toFixed(2)}</b></div>`; li.innerHTML = htmlHTML; listaUI.appendChild(li);
         });
         document.getElementById('grand-total').innerText = grandTotal.toFixed(2);
     }
@@ -197,15 +226,20 @@
 
     async function enviarPedido() {
         const nom = document.getElementById('c-nombre').value; const rif = document.getElementById('c-rif').value; const tlf = document.getElementById('c-telefono').value; const obr = document.getElementById('c-ubicacion').value;
-        if(!nom || !rif || !tlf || !obr) { alert("Por favor complete los datos del cliente."); return; }
-        if(carrito.length === 0) return;
+        if(!nom || !rif || !tlf || !obr) { alert("Por favor complete los datos del cliente."); return; } if(carrito.length === 0) return;
+        
         document.getElementById('loader-overlay').style.display = 'flex'; document.getElementById('loader-overlay').innerHTML = "⏳ ENVIANDO SOLICITUD...";
+        
         let carritoLimpio = carrito.map(item => ({ formato: item.formato, uso: item.uso, color: item.color, textura: item.textura, m2: item.m2Final, carateo: item.cantSacos, sellador: item.cantGalones, total: item.total }));
         const paquete = { cliente: nom.toUpperCase(), rif: rif.toUpperCase(), telefono: tlf, ubicacion: obr, total: document.getElementById('grand-total').innerText, detalles: carritoLimpio };
-        try {
-            await fetch(API_URL + "?action=nueva_solicitud", { method: "POST", mode: "no-cors", body: JSON.stringify(paquete) });
-            document.getElementById('loader-overlay').style.display = 'none'; document.getElementById('main-content').style.display = 'none'; document.getElementById('cart-section').style.display = 'none'; document.getElementById('success-screen').style.display = 'block';
-        } catch(e) { alert("Error de conexión. Intente de nuevo."); document.getElementById('loader-overlay').style.display = 'none'; }
+        
+        // ESTA ES LA FUNCIÓN CLAVE PARA SOLICITUDES EXTERNAS
+        try { 
+            await fetch(API_URL + "?action=nueva_solicitud", { method: "POST", mode: "no-cors", body: JSON.stringify(paquete) }); 
+            document.getElementById('loader-overlay').style.display = 'none'; document.getElementById('main-content').style.display = 'none'; document.getElementById('cart-section').style.display = 'none'; document.getElementById('success-screen').style.display = 'block'; 
+        } catch(e) { 
+            alert("Error de conexión."); document.getElementById('loader-overlay').style.display = 'none'; 
+        }
     }
 </script>
 </body>
