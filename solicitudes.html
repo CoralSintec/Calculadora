@@ -2,84 +2,248 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitudes Recibidas | Coralsintec</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cotizador Privado | Coralsintec</title>
     <style>
-        :root { --p: #1e2328; --border: #cbd5e1; --green: #10b981; --blue: #3b82f6; }
-        body { font-family: -apple-system, sans-serif; background: #f1f5f9; margin: 0; padding: 15px; }
-        .app-main { width: 100%; max-width: 600px; margin: 0 auto; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn-volver { background: white; border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--p); box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
-        .header { background: var(--green); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .header h2 { margin: 0; letter-spacing: 1px; text-transform: uppercase; font-size: 18px;}
-        .solicitud-card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid var(--green); }
-        .cliente-nombre { font-size: 18px; font-weight: 900; color: var(--p); text-transform: uppercase; margin-bottom: 5px; }
-        .info-txt { font-size: 12px; color: #64748b; margin: 3px 0; }
-        .info-txt b { color: #475569; }
-        .monto-box { background: #ecfccb; padding: 10px; border-radius: 8px; border: 1px solid #bef264; display: inline-block; margin-top: 10px; }
-        .monto-box span { font-size: 10px; font-weight: bold; color: #3f6212; display: block; }
-        .monto-box b { color: #166534; font-size: 18px; }
-        .items-box { margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); }
-        .item-row { background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; border: 1px solid #e2e8f0; }
-        .item-row b { color: var(--blue); }
-        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-marcar { flex: 1; background: #166534; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(22,101,52,0.3);}
-        .btn-marcar:active { transform: scale(0.98); }
-        .btn-eliminar { background: #fee2e2; color: #b91c1c; border: 1px solid #f87171; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(243, 244, 246, 0.95); display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--p); z-index: 100; font-size: 18px; }
+        :root { 
+            --c-bg: #1c1c1c; 
+            --c-card: #2d2d2d; 
+            --c-input: #3a3a3a; 
+            /* Gris Cemento Mate */
+            --c-accent: #b0b0b0; 
+            --c-text: #e0e0e0; 
+            --c-border: #555555; 
+            --c-muted: #9ca3af; 
+        }
+        html, body { min-height: 100vh; margin: 0; }
+        body { 
+            font-family: -apple-system, sans-serif; 
+            background-image: linear-gradient(rgba(28,28,28,0.9), rgba(28,28,28,0.9)), url('cabecera.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed; 
+            color: var(--c-text); 
+            padding: 40px 15px 50px 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        .app-main { background: rgba(45, 45, 45, 0.95); backdrop-filter: blur(8px); padding: 25px 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); width: 100%; max-width: 400px; box-sizing: border-box; border-top: 6px solid var(--c-accent); }
+        .section-title { font-size: 20px; color: #fff; margin: 0 0 5px 0; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+        .section-subtitle { text-align: center; color: var(--c-muted); font-size: 13px; margin-bottom: 20px; font-weight: 500; }
+        h3 { color: #fff; font-size: 14px; text-transform: uppercase; border-left: 4px solid var(--c-accent); padding-left: 10px; margin-top: 0; margin-bottom: 15px;}
+        .form-row { margin-bottom: 15px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        label { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 800; color: var(--c-muted); text-transform: uppercase; }
+        select, input[type="number"], input[type="text"], input[type="tel"] { width: 100%; padding: 14px; border: 1px solid var(--c-border); border-radius: 10px; font-size: 15px; background-color: var(--c-input); color: #fff; appearance: none; box-sizing: border-box; font-weight: 700; }
+        select:focus, input:focus { outline: none; border-color: var(--c-accent); }
+        
+        .options-group { background: var(--c-bg); border-radius: 10px; padding: 15px; margin-top: 20px; border: 1px solid var(--c-border); }
+        .option-item { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 800; padding: 8px 0; color: #fff; }
+        .option-item input[type="checkbox"] { width: 24px; height: 24px; accent-color: var(--c-accent); }
+        
+        .results-card { margin-top: 25px; padding: 20px; background-color: var(--c-bg); border-radius: 12px; color: white; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); border-left: 4px solid var(--c-accent); border: 1px solid var(--c-border);}
+        .breakdown-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: var(--c-muted); align-items: center; }
+        .breakdown-val { font-weight: 800; color: #fff; font-size: 14px; }
+        .divider { height: 1px; background: var(--c-border); margin: 12px 0; }
+        .total-price-container { text-align: center; margin-top: 15px; }
+        .total-label { font-size: 11px; text-transform: uppercase; color: var(--c-muted); letter-spacing: 1px; font-weight: 600; }
+        .total-price { font-size: 32px; font-weight: 900; color: var(--c-accent); margin: 5px 0 0 0; }
+        
+        .btn-add-outline { width: 100%; background-color: transparent; color: var(--c-accent); border: 2px solid var(--c-accent); padding: 16px; border-radius: 10px; font-size: 14px; font-weight: 900; text-transform: uppercase; margin-top: 20px; cursor: pointer; transition: 0.2s; }
+        .btn-add-outline:hover { background: var(--c-accent); color: #1c1c1c; }
+        .btn-add-outline:active { transform: scale(0.97); }
+        
+        .btn-submit { width: 100%; border: none; padding: 16px; border-radius: 10px; font-size: 15px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.1s; background-color: #166534; color: white; margin-top: 15px;}
+        .btn-submit:active { transform: scale(0.97); }
+        
+        .cart-section { width: 100%; max-width: 400px; background: rgba(45, 45, 45, 0.95); backdrop-filter: blur(8px); padding: 20px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); margin-top: 20px; box-sizing: border-box; border-top: 6px solid var(--c-accent); }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--c-border); padding-bottom: 10px; }
+        .cart-header h2 { font-size: 16px; margin: 0; color: #fff; font-weight: 900;}
+        .cart-header button { background: #7f1d1d; border: 1px solid #991b1b; color: #fca5a5; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer;}
+        
+        .cart-list { margin: 0; padding: 0; list-style: none; }
+        .cart-item { background: var(--c-bg); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--c-border); }
+        .cart-item-title { display: flex; justify-content: space-between; align-items: center; font-weight: 900; color: #fff; font-size: 15px; margin-bottom: 8px; border-bottom: 1px solid var(--c-border); padding-bottom: 8px; }
+        .btn-del-item { background: transparent; color: #fca5a5; border: none; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase;}
+        
+        .cart-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--c-muted); margin-bottom: 4px; }
+        .cart-row b { color: #fff; }
+        .cart-total-row { display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; color: #fff; border-top: 1px solid var(--c-border); margin-top: 8px; padding-top: 8px; }
+        .cart-total-row b { color: var(--c-accent); font-size: 18px; }
+        
+        .grand-total { text-align: center; background: rgba(22,101,52,0.2); padding: 20px; border-radius: 12px; border: 1px solid #166534; margin-top: 15px;}
+        .grand-total span.gt-title { font-size: 12px; color: #4ade80; font-weight: 800; display: block; text-transform: uppercase; margin-bottom: 5px;}
+        .grand-total-val { font-size: 26px; font-weight: 900; color: #86efac; display:flex; justify-content:center; align-items:center; gap:6px;}
+        
+        .btn-volver { background: var(--c-input); border: 1px solid var(--c-border); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; align-self: flex-start; }
+        
+        #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28,28,28,0.95); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; color: var(--c-accent); font-size:18px; display:none;}
+        
+        .success-msg { display: none; text-align: center; padding: 50px 20px; background: rgba(45, 45, 45, 0.95); border-radius: 16px; border-top: 8px solid #10b981; max-width:400px; width:100%; box-sizing:border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.6);}
+        .success-msg h2 { color: #fff; margin:0;}
+        .success-msg p { color: var(--c-muted); font-weight:bold;}
     </style>
 </head>
 <body>
-    <div id="loader">⏳ Buscando solicitudes...</div>
-    <main class="app-main">
-        <div class="top-bar">
-            <button class="btn-volver" onclick="location.href='index.html'">⬅ MENÚ</button>
-            <div id="badge-usuario" style="background: #fef08a; color: #854d0e; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;"></div>
+
+    <div id="loader-overlay">⏳ PROCESANDO...</div>
+
+    <main class="app-main" id="main-content">
+        <button class="btn-volver" onclick="window.location.href='index.html'">⬅ MENÚ PRINCIPAL</button>
+        
+        <div style="text-align:center; margin-bottom:10px;">
+            <img src="icono.jpg" alt="Icono" style="width:60px; border-radius:50%; border:2px solid var(--c-border);" onerror="this.style.display='none'">
         </div>
-        <div class="header"><h2>📥 Bandeja de Cotizaciones</h2><p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;">Enviadas por los clientes desde la web</p></div>
-        <div id="lista-solicitudes"></div>
+
+        <h1 class="section-title">Coralsintec</h1>
+        <div class="section-subtitle">Cotizador Privado (Interno)</div>
+
+        <div style="margin-bottom: 25px;">
+            <h3>1. Datos del Cliente</h3>
+            <div class="form-row"><input type="text" id="c-nombre" placeholder="Nombre completo / Empresa"></div>
+            <div class="grid-2 form-row"><input type="text" id="c-rif" placeholder="RIF / Cédula"><input type="tel" id="c-telefono" placeholder="WhatsApp / Teléfono"></div>
+            <div class="form-row"><input type="text" id="c-ubicacion" placeholder="Dirección de la obra"></div>
+        </div>
+
+        <div>
+            <h3>2. Configurar Material</h3>
+            <div class="form-row">
+                <label>Formato:</label>
+                <select id="formato" onchange="calcularPresupuesto()">
+                    <option value="30x30">30x30</option><option value="40x40">40x40</option><option value="50x50">50x50</option><option value="60x60">60x60</option><option value="20x60">20x60</option><option value="30x60">30x60</option><option value="40x60">40x60</option><option value="40x70">40x70</option><option value="15x75">15x75</option><option value="10x100">10x100</option><option value="20x100">20x100</option><option value="30x100">30x100</option><option value="40x100">40x100</option><option value="60x100">60x100</option>
+                </select>
+            </div>
+            <div class="form-row" style="display:flex; gap:10px;">
+                <div style="flex:1;"><label>Uso:</label><select id="uso" onchange="calcularPresupuesto()"><option value="Pared">Pared</option><option value="Piso">Piso</option></select></div>
+                <div style="flex:1;"><label>Textura:</label><select id="textura" onchange="manejarTexturaColor()"><option value="Media">Media</option><option value="Lisa">Lisa</option><option value="Gruesa">Gruesa</option><option value="Veta">Veta</option></select></div>
+            </div>
+            <div class="form-row"><label>Color:</label><select id="color" onchange="calcularPresupuesto()"><option value="Gris Claro">Gris Claro</option><option value="Beige">Beige</option><option value="Gris 1%">Gris 1%</option><option value="Gris 2%">Gris 2%</option><option value="Gris 3%">Gris 3%</option></select></div>
+            <div class="form-row"><label>Metros (m²):</label><input type="number" id="metros" placeholder="10" min="0.1" step="0.1" oninput="calcularPresupuesto()"></div>
+
+            <div class="options-group">
+                <label class="option-item" style="color:#fde047;"><span>+10% Desperdicio (Sugerido)</span><input type="checkbox" id="desperdicio" onchange="calcularPresupuesto()" checked></label>
+                <div class="divider"></div>
+                <label class="option-item"><span>Incluir Carateo (Sacos)</span><input type="checkbox" id="carateo" onchange="calcularPresupuesto()"></label>
+                <label class="option-item"><span>Incluir Sellador (Galones)</span><input type="checkbox" id="sellador" onchange="calcularPresupuesto()"></label>
+            </div>
+
+            <div class="results-card" id="box-resultados" style="display:none;">
+                <div class="breakdown-row"><span>Revestimiento (<span id="ui-espesor">1.2 cm</span>)</span><span class="breakdown-val">$<span id="ui-total-rev">0</span></span></div>
+                <div class="breakdown-row"><span>Piezas a fabricar</span><span class="breakdown-val" id="res-pcs">0</span></div>
+                <div class="breakdown-row"><span>Área Material Final</span><span class="breakdown-val" id="res-m2">0 m²</span></div>
+                <div class="breakdown-row" id="row-carateo" style="display:none; color:#fde047; margin-top:8px;"><span>Carateo (<span id="ui-sacos">0</span> sacos)</span><span class="breakdown-val">$<span id="ui-total-carateo">0</span></span></div>
+                <div class="breakdown-row" id="row-sellador" style="display:none; color:#fde047;"><span>Sellador (<span id="ui-galones">0</span> galones)</span><span class="breakdown-val">$<span id="ui-total-sellador">0</span></span></div>
+                <div class="divider"></div>
+                <div class="total-price-container"><div class="total-label">PRESUPUESTO ESTIMADO USD</div><div class="total-price">$<span id="total-presupuesto">0</span></div></div>
+            </div>
+
+            <button id="btn-add-lista" class="btn-add-outline" onclick="agregarAlCarrito()">AGREGAR A LA LISTA</button>
+        </div>
     </main>
+
+    <section class="cart-section" id="cart-section" style="display: none;">
+        <div class="cart-header"><h2>Resumen de Compra</h2><button onclick="vaciarCarrito()">Limpiar</button></div>
+        <ul class="cart-list" id="cart-list"></ul>
+        <div class="grand-total"><span class="gt-title">TOTAL GENERAL</span><div class="grand-total-val">$ <span id="grand-total">0.00</span></div></div>
+        <button class="btn-submit" onclick="enviarPedido()">🚀 CARGAR PEDIDO A PLANTA</button>
+    </section>
+
+    <div id="success-screen" class="success-msg">
+        <div style="font-size: 60px; margin-bottom: 10px;">✅</div>
+        <h2>¡PEDIDO REGISTRADO!</h2>
+        <p>El pedido ha sido enviado a Producción.</p>
+        <button class="btn-submit" style="margin-top:20px;" onclick="location.reload()">Nuevo Pedido</button>
+    </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
+    
+    let db = [];
+
+    const usuarioActual = localStorage.getItem('usuarioCoralsintec') || 'DESCONOCIDO';
+    let p_master = (usuarioActual === 'EDUARDO');
+    let perms = {}; try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
+    const canCreate = p_master || perms.v_crear === true;
 
     window.onload = () => {
-        const u = localStorage.getItem('usuarioCoralsintec') || 'DESCONOCIDO';
-        document.getElementById('badge-usuario').innerText = "👤 " + u;
-        cargarSolicitudes();
+        if(!canCreate) { document.getElementById('btn-add-lista').style.display = 'none'; document.getElementById('cart-section').style.display = 'none'; }
+        document.getElementById('loader-overlay').style.display = 'flex';
+        fetch(API_URL + "?action=get_productos&t=" + Date.now()).then(r => r.json()).then(data => { db = data; document.getElementById('loader-overlay').style.display = 'none'; }).catch(e => { document.getElementById('loader-overlay').style.display = 'none'; });
     };
 
-    function cargarSolicitudes() {
-        document.getElementById('loader').style.display = 'flex';
-        fetch(API_URL + "?action=get_solicitudes&t=" + Date.now()).then(r => r.json()).then(data => { render(data); document.getElementById('loader').style.display = 'none'; }).catch(e => { document.getElementById('loader').style.display = 'none'; });
+    function manejarTexturaColor() {
+        const textura = document.getElementById('textura').value; const colorSelect = document.getElementById('color');
+        if (textura === 'Veta') { colorSelect.value = 'Beige'; colorSelect.style.opacity = '0.6'; colorSelect.style.pointerEvents = 'none'; } else { colorSelect.style.opacity = '1'; colorSelect.style.pointerEvents = 'auto'; }
+        calcularPresupuesto();
     }
 
-    function render(solicitudes) {
-        const container = document.getElementById('lista-solicitudes'); container.innerHTML = '';
-        if(!solicitudes || solicitudes.length === 0) { container.innerHTML = "<p style='text-align:center; color:#64748b; font-weight:bold; margin-top:40px;'>No hay cotizaciones nuevas por revisar.</p>"; return; }
+    function calcularPresupuesto() {
+        const formato = document.getElementById('formato').value; const uso = document.getElementById('uso').value; const textura = document.getElementById('textura').value; const color = document.getElementById('color').value; const metros = parseFloat(document.getElementById('metros').value) || 0;
+        const despCheck = document.getElementById('desperdicio').checked; const carateoCheck = document.getElementById('carateo').checked; const selladorCheck = document.getElementById('sellador').checked;
 
-        const usuarioActual = localStorage.getItem('usuarioCoralsintec') || 'DESCONOCIDO';
-        let p_master = (usuarioActual === 'EDUARDO');
-        let perms = {}; try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
-        const canApprove = p_master || perms.s_aprobar === true;
+        if (metros <= 0) { document.getElementById('box-resultados').style.display = 'none'; return; }
 
-        solicitudes.reverse().forEach(s => {
-            let items = []; try { items = JSON.parse(s.DETALLES_JSON); } catch(e){}
-            let htmlItems = '';
-            items.forEach(i => { let m2Final = i.m2Final || i.m2; htmlItems += `<div class="item-row"><b>${m2Final} m² de ${i.formato || 'Material'}</b> - ${i.color || ''} (${i.textura || ''})</div>`; });
+        const formatosLargos = ["10x100", "20x100", "30x100", "40x100", "60x100"];
+        let espesor = (formatosLargos.includes(formato) || uso === "Piso") ? "2.2 cm" : "1.2 cm";
+        let precioM2Rev = (espesor === "1.2 cm") ? 20 : 23;
 
-            let totalVal = parseFloat(s.TOTAL_USD || s.TOTAL || 0).toFixed(2);
-            let cardHtml = `<div class="solicitud-card"><div style="font-size: 10px; color: #94a3b8; margin-bottom: 5px; font-weight:bold;">FECHA: ${s.FECHA}</div><div class="cliente-nombre">${s.CLIENTE}</div><p class="info-txt"><b>RIF:</b> ${s.RIF || s.RIF_CI || '-'}</p><p class="info-txt"><b>Tlf:</b> ${s.TELEFONO}</p><p class="info-txt"><b>Obra:</b> ${s.UBICACION}</p><div class="monto-box"><span>VALOR COTIZADO:</span><b>$${totalVal}</b></div><div class="items-box"><p style="font-size:11px; font-weight:bold; color:var(--p); margin: 0 0 10px 0;">MATERIAL SOLICITADO:</p>${htmlItems}</div>`;
+        if (color === "Beige") precioM2Rev += 2; if (color === "Gris 1%") precioM2Rev += 3; if (color === "Gris 2%") precioM2Rev += 5; if (color === "Gris 3%") precioM2Rev += 8;
+        if (textura === "Lisa" || textura === "Gruesa") { precioM2Rev += 2; } else if (textura === "Veta" && espesor === "1.2 cm") { precioM2Rev += 1; }
 
-            if(canApprove) {
-                cardHtml += `<div class="btn-group"><button class="btn-marcar" onclick="aprobarAPlanta('${s.CLIENTE}', '${s.FECHA}')">✅ PAGADO / ENVIAR A PLANTA</button><button class="btn-eliminar" onclick="eliminar('${s.CLIENTE}', '${s.FECHA}')">🗑️</button></div>`;
-            }
-            cardHtml += `</div>`; container.innerHTML += cardHtml;
+        const dim = formato.toLowerCase().split('x'); const areaPieza = (parseFloat(dim[0]) * parseFloat(dim[1])) / 10000;
+        let m2Material = despCheck ? metros * 1.10 : metros; let piezas = Math.ceil(m2Material / areaPieza); m2Material = parseFloat((piezas * areaPieza).toFixed(2));
+        const totalRevestimiento = precioM2Rev * m2Material;
+
+        let totalCarateo = 0; let cantSacos = 0;
+        if (carateoCheck && metros > 0) { cantSacos = Math.ceil(metros / 40); totalCarateo = cantSacos * ((color === "Beige" || color.includes("Gris")) ? 60 : 50); }
+        let totalSellador = 0; let cantGalones = 0;
+        if (selladorCheck && metros > 0) { cantGalones = Math.ceil(metros / 35); totalSellador = cantGalones * 100; }
+
+        const granTotal = totalRevestimiento + totalCarateo + totalSellador;
+
+        document.getElementById('ui-espesor').innerText = espesor; document.getElementById('res-pcs').innerText = piezas; document.getElementById('res-m2').innerText = m2Material.toFixed(2) + " m²"; document.getElementById('ui-total-rev').innerText = totalRevestimiento.toFixed(2);
+        
+        const rowCarateo = document.getElementById('row-carateo'); if(carateoCheck) { rowCarateo.style.display = 'flex'; document.getElementById('ui-sacos').innerText = cantSacos; document.getElementById('ui-total-carateo').innerText = totalCarateo.toFixed(2); } else { rowCarateo.style.display = 'none'; }
+        const rowSellador = document.getElementById('row-sellador'); if(selladorCheck) { rowSellador.style.display = 'flex'; document.getElementById('ui-galones').innerText = cantGalones; document.getElementById('ui-total-sellador').innerText = totalSellador.toFixed(2); } else { rowSellador.style.display = 'none'; }
+
+        document.getElementById('total-presupuesto').innerText = granTotal.toFixed(2); document.getElementById('box-resultados').style.display = 'block';
+        
+        // Incluye PrecioM2 para el carrito
+        window.ultimoCalculo = { titulo: `${formato} | ${textura} | ${color}`, formato: formato, uso: uso, textura: textura, color: color, espesor: espesor, piezas: piezas, m2Final: m2Material, precioM2: precioM2Rev, totalRev: totalRevestimiento, carCheck: carateoCheck, cantSacos: cantSacos, totalCar: totalCarateo, selCheck: selladorCheck, cantGalones: cantGalones, totalSel: totalSellador, total: granTotal };
+    }
+
+    let carrito = [];
+    function agregarAlCarrito() { if (!window.ultimoCalculo || window.ultimoCalculo.m2Final <= 0) { alert("Ingresa los metros cuadrados para cotizar."); return; } carrito.push({...window.ultimoCalculo}); document.getElementById('cart-section').style.display = 'block'; document.getElementById('metros').value = ""; document.getElementById('box-resultados').style.display = 'none'; actualizarUI_Carrito(); }
+
+    function actualizarUI_Carrito() {
+        const listaUI = document.getElementById('cart-list'); listaUI.innerHTML = ''; let grandTotal = 0;
+        carrito.forEach((item, index) => {
+            grandTotal += item.total; const li = document.createElement('li'); li.className = 'cart-item';
+            let htmlHTML = `<div class="cart-item-title"><span>${item.titulo}</span><button class="btn-del-item" onclick="eliminarDelCarrito(${index})">X Eliminar</button></div>
+            <div class="cart-row"><span>Precio Unitario:</span> <b>$${item.precioM2.toFixed(2)} /m²</b></div>
+            <div class="cart-row"><span>Revestimiento (${item.espesor}):</span> <b>$${item.totalRev.toFixed(2)}</b></div>
+            <div class="cart-row"><span>Piezas a fabricar:</span> <b>${item.piezas}</b></div><div class="cart-row"><span>Área Final:</span> <b>${item.m2Final.toFixed(2)} m²</b></div>`;
+            
+            if(item.carCheck) htmlHTML += `<div class="cart-row" style="color:#fde047;"><span>Carateo (${item.cantSacos} sacos):</span> <b>$${item.totalCar.toFixed(2)}</b></div>`;
+            if(item.selCheck) htmlHTML += `<div class="cart-row" style="color:#fde047;"><span>Sellador (${item.cantGalones} gal):</span> <b>$${item.totalSel.toFixed(2)}</b></div>`;
+            
+            htmlHTML += `<div class="cart-total-row"><span>Subtotal:</span> <b>$${item.total.toFixed(2)}</b></div>`; li.innerHTML = htmlHTML; listaUI.appendChild(li);
         });
+        document.getElementById('grand-total').innerText = grandTotal.toFixed(2);
     }
 
-    function aprobarAPlanta(cliente, fecha) { if(!confirm("¿Confirmas el pago? El pedido será enviado a Planta.")) return; document.getElementById('loader').style.display = 'flex'; fetch(API_URL + "?action=marcar_pagado_solicitud", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: cliente, fecha: fecha }) }).finally(() => { setTimeout(() => { cargarSolicitudes(); }, 1500); }); }
-    function eliminar(cliente, fecha) { if(!confirm("¿Eliminar esta solicitud descartada?")) return; document.getElementById('loader').style.display = 'flex'; fetch(API_URL + "?action=eliminar_solicitud", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: cliente, fecha: fecha }) }).finally(() => { setTimeout(() => { cargarSolicitudes(); }, 1500); }); }
+    function eliminarDelCarrito(index) { carrito.splice(index, 1); if(carrito.length === 0) document.getElementById('cart-section').style.display = 'none'; actualizarUI_Carrito(); }
+    function vaciarCarrito() { carrito = []; document.getElementById('cart-section').style.display = 'none'; actualizarUI_Carrito(); }
+
+    async function enviarPedido() {
+        const nom = document.getElementById('c-nombre').value; const rif = document.getElementById('c-rif').value; const tlf = document.getElementById('c-telefono').value; const obr = document.getElementById('c-ubicacion').value;
+        if(!nom || !rif || !tlf || !obr) { alert("Por favor complete los datos del cliente."); return; } if(carrito.length === 0) return;
+        document.getElementById('loader-overlay').style.display = 'flex'; document.getElementById('loader-overlay').innerHTML = "⏳ CARGANDO PEDIDO...";
+        let carritoLimpio = carrito.map(item => ({ formato: item.formato, uso: item.uso, color: item.color, textura: item.textura, m2: item.m2Final, carateo: item.cantSacos, sellador: item.cantGalones, total: item.total }));
+        const paquete = { cliente: nom.toUpperCase(), rif: rif.toUpperCase(), telefono: tlf, ubicacion: obr, total: document.getElementById('grand-total').innerText, detalles: carritoLimpio };
+        try { await fetch(API_URL + "?action=nuevo_pedido", { method: "POST", mode: "no-cors", body: JSON.stringify(paquete) }); document.getElementById('loader-overlay').style.display = 'none'; document.getElementById('main-content').style.display = 'none'; document.getElementById('cart-section').style.display = 'none'; document.getElementById('success-screen').style.display = 'block'; } catch(e) { alert("Error de conexión. Intente de nuevo."); document.getElementById('loader-overlay').style.display = 'none'; }
+    }
 </script>
 </body>
 </html>
