@@ -24,7 +24,7 @@
         .item-row b { color: #60a5fa; }
         .btn-group { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
         .btn-marcar { flex: 1; min-width: 150px; background: #166534; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px;}
-        .btn-presupuesto { background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px;}
+        .btn-presupuesto { flex: 1; min-width: 150px; background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px;}
         .btn-eliminar { background: #450a0a; color: #fca5a5; border: 1px solid #7f1d1d; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28,28,28,0.95); display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--a); z-index: 100; font-size: 18px; }
     </style>
@@ -74,8 +74,17 @@
             items.forEach(i => { let m2Final = i.m2Final || i.m2; htmlItems += `<div class="item-row"><b>${m2Final} m² de ${i.formato || 'Material'}</b> - ${i.color || ''} (${i.textura || ''})</div>`; });
 
             let totalVal = parseFloat(s.TOTAL_USD || s.TOTAL || 0).toFixed(2);
+            
+            // GENERADOR DE NÚMERO DE PRESUPUESTO AUTOMÁTICO (Ej: PRE-1742026-JUAN)
+            let fechaLimpia = String(s.FECHA).replace(/\//g, '');
+            let nombreLimpio = String(s.CLIENTE).replace(/[^a-zA-Z0-9]/g, '').substring(0, 4).toUpperCase();
+            let numPresupuesto = "PRE-" + fechaLimpia + "-" + nombreLimpio;
+
             let cardHtml = `<div class="solicitud-card">
-                <div style="font-size: 10px; color: #9ca3af; margin-bottom: 5px; font-weight:bold;">FECHA: ${s.FECHA}</div>
+                <div style="font-size: 10px; color: #9ca3af; margin-bottom: 5px; font-weight:bold; display:flex; justify-content:space-between;">
+                    <span>FECHA: ${s.FECHA}</span>
+                    <span style="color:#c49660;">N°: ${numPresupuesto}</span>
+                </div>
                 <div class="cliente-nombre">${s.CLIENTE}</div>
                 <p class="info-txt"><b>RIF:</b> ${s.RIF || s.RIF_CI || '-'}</p>
                 <p class="info-txt"><b>Tlf:</b> ${s.TELEFONO}</p>
@@ -83,21 +92,22 @@
                 <div class="monto-box"><span>VALOR ESTIMADO:</span><b>$${totalVal}</b></div>
                 <div class="items-box"><p style="font-size:11px; font-weight:bold; color:#fff; margin: 0 0 10px 0;">PEDIDO:</p>${htmlItems}</div>
                 <div class="btn-group">
-                    <button class="btn-presupuesto" onclick="generarPDFCotizacion('${s.FECHA}', '${s.CLIENTE}')">📄 PDF PRESUPUESTO</button>`;
+                    <button class="btn-presupuesto" onclick="generarPDFCotizacion('${s.FECHA}', '${s.CLIENTE}', '${numPresupuesto}')">📄 PDF PRESUPUESTO</button>`;
             
-            if(canApprove) { cardHtml += `<button class="btn-marcar" onclick="aprobarAPlanta('${s.CLIENTE}', '${s.FECHA}')">✅ PAGADO / ENVIAR PLANTA</button>`; }
+            if(canApprove) { cardHtml += `<button class="btn-marcar" onclick="aprobarAPlanta('${s.CLIENTE}', '${s.FECHA}')">✅ PAGADO / A PLANTA</button>`; }
             cardHtml += `<button class="btn-eliminar" onclick="eliminar('${s.CLIENTE}', '${s.FECHA}')">🗑️</button></div></div>`;
             container.innerHTML += cardHtml;
         });
     }
 
-    function generarPDFCotizacion(fecha, cliente) {
+    // AHORA RECIBE EL NÚMERO DE PRESUPUESTO
+    function generarPDFCotizacion(fecha, cliente, numPresupuesto) {
         let s = solicitudesGlobal.find(x => x.FECHA === fecha && x.CLIENTE === cliente);
         if(!s) return;
         let items = JSON.parse(s.DETALLES_JSON);
         let total = parseFloat(s.TOTAL_USD || s.TOTAL || 0);
 
-        let htmlPDF = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>COTIZACIÓN - ${s.CLIENTE}</title>
+        let htmlPDF = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>COTIZACIÓN ${numPresupuesto} - ${s.CLIENTE}</title>
         <style>
             body { font-family: Arial, sans-serif; color: #333; margin: 40px; font-size: 13px; line-height: 1.4; }
             .header { border-bottom: 3px solid #1e2328; padding-bottom: 15px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:flex-end;}
@@ -105,6 +115,7 @@
             .empresa p { margin: 2px 0; color: #475569; font-size:11px; font-weight: bold;}
             .titulo-doc { text-align: right;}
             .titulo-doc h2 { margin: 0 0 5px 0; color: #1e2328; font-size:18px;}
+            .titulo-doc p { margin: 2px 0; color: #475569; font-size: 12px; }
             .info-grid { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;}
             table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
             th { background: #475569; color: white; padding: 10px; text-align: left; font-size:11px; text-transform: uppercase;}
@@ -116,7 +127,7 @@
         <body>
             <div class="header">
                 <div class="empresa"><h1>REVESTIMIENTOS CORALROCK C.A.</h1><p>RIF: J-50317540-0</p><p>Caracas - Venezuela</p></div>
-                <div class="titulo-doc"><h2>PRESUPUESTO FORMAL</h2><p><b>Fecha:</b> ${s.FECHA}</p></div>
+                <div class="titulo-doc"><h2>PRESUPUESTO FORMAL</h2><p><b>N°:</b> ${numPresupuesto}</p><p><b>Fecha:</b> ${s.FECHA}</p></div>
             </div>
             <div class="info-grid">
                 <p><b>Cliente:</b> ${s.CLIENTE}</p>
@@ -126,7 +137,7 @@
             </div>
             <table><thead><tr><th>FORMATO</th><th>USO</th><th>COLOR</th><th>ÁREA</th><th>TOTAL</th></tr></thead><tbody>`;
             items.forEach(i => {
-                htmlPDF += `<tr><td>${i.formato}</td><td>${i.uso}</td><td>${i.color}</td><td>${i.m2 || i.m2Final} m²</td><td><b>$${i.total}</b></td></tr>`;
+                htmlPDF += `<tr><td>${i.formato}</td><td>${i.uso}</td><td>${i.color}</td><td>${i.m2 || i.m2Final} m²</td><td><b>$${i.total.toFixed(2)}</b></td></tr>`;
             });
             htmlPDF += `</tbody></table>
             <div class="total-box">TOTAL PRESUPUESTO: $${total.toFixed(2)}</div>
