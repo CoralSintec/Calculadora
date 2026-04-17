@@ -13,7 +13,6 @@
             --text-muted: #9ca3af; 
             --green: #10b981; 
             --blue: #3b82f6; 
-            --a: #b0b0b0;
         }
         body { 
             font-family: -apple-system, sans-serif; 
@@ -43,27 +42,22 @@
         .btn-marcar { flex: 1; background: #166534; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;}
         .btn-marcar:active { transform: scale(0.98); }
         .btn-eliminar { background: #450a0a; color: #fca5a5; border: 1px solid #7f1d1d; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28,28,28,0.95); display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--a); z-index: 100; font-size: 18px; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28,28,28,0.95); display: flex; justify-content: center; align-items: center; font-weight: bold; color: #c49660; z-index: 100; font-size: 18px; }
     </style>
 </head>
 <body>
     <div id="loader">⏳ Buscando solicitudes...</div>
     <main class="app-main">
         <div class="top-bar">
-            <button class="btn-volver" onclick="navegar('index')">⬅ MENÚ</button>
+            <button class="btn-volver" onclick="location.href='index.html'">⬅ MENÚ</button>
             <div id="badge-usuario" style="background: #451a03; color: #fde047; border: 1px solid #854d0e; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;"></div>
         </div>
-        <div class="header"><h2>📥 Bandeja de Cotizaciones</h2><p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;">Enviadas por los clientes</p></div>
+        <div class="header"><h2>📥 Bandeja de Cotizaciones</h2><p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;">Enviadas por los clientes desde la web</p></div>
         <div id="lista-solicitudes"></div>
     </main>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
-
-    function navegar(pagina) {
-        document.getElementById('loader').style.display = 'flex';
-        window.location.href = pagina + ".html";
-    }
 
     window.onload = () => {
         const u = localStorage.getItem('usuarioCoralsintec') || 'DESCONOCIDO';
@@ -73,7 +67,7 @@
 
     function cargarSolicitudes() {
         document.getElementById('loader').style.display = 'flex';
-        fetch(API_URL + "?action=get_solicitudes").then(r => r.json()).then(data => { render(data); document.getElementById('loader').style.display = 'none'; }).catch(e => { document.getElementById('loader').style.display = 'none'; });
+        fetch(API_URL + "?action=get_solicitudes&t=" + Date.now()).then(r => r.json()).then(data => { render(data); document.getElementById('loader').style.display = 'none'; }).catch(e => { document.getElementById('loader').style.display = 'none'; });
     }
 
     function render(solicitudes) {
@@ -93,13 +87,15 @@
             let totalVal = parseFloat(s.TOTAL_USD || s.TOTAL || 0).toFixed(2);
             let cardHtml = `<div class="solicitud-card"><div style="font-size: 10px; color: #9ca3af; margin-bottom: 5px; font-weight:bold;">FECHA: ${s.FECHA}</div><div class="cliente-nombre">${s.CLIENTE}</div><p class="info-txt"><b>RIF:</b> ${s.RIF || s.RIF_CI || '-'}</p><p class="info-txt"><b>Tlf:</b> ${s.TELEFONO}</p><p class="info-txt"><b>Obra:</b> ${s.UBICACION}</p><div class="monto-box"><span>VALOR COTIZADO:</span><b>$${totalVal}</b></div><div class="items-box"><p style="font-size:11px; font-weight:bold; color:#fff; margin: 0 0 10px 0;">MATERIAL SOLICITADO:</p>${htmlItems}</div>`;
 
-            if(canApprove) { cardHtml += `<div class="btn-group"><button class="btn-marcar" onclick="aprobarAPlanta('${s.CLIENTE}', '${s.FECHA}')">✅ PAGADO / ENVIAR A PLANTA</button><button class="btn-eliminar" onclick="eliminar('${s.CLIENTE}', '${s.FECHA}')">🗑️</button></div>`; }
+            if(canApprove) {
+                cardHtml += `<div class="btn-group"><button class="btn-marcar" onclick="aprobarAPlanta('${s.CLIENTE}', '${s.FECHA}')">✅ PAGADO / ENVIAR A PLANTA</button><button class="btn-eliminar" onclick="eliminar('${s.CLIENTE}', '${s.FECHA}')">🗑️</button></div>`;
+            }
             cardHtml += `</div>`; container.innerHTML += cardHtml;
         });
     }
 
-    function aprobarAPlanta(cliente, fecha) { if(!confirm("¿Confirmas el pago? Se enviará a Planta.")) return; document.getElementById('loader').style.display = 'flex'; fetch(API_URL + "?action=marcar_pagado_solicitud", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: cliente, fecha: fecha }) }).finally(() => { setTimeout(() => { cargarSolicitudes(); }, 1500); }); }
-    function eliminar(cliente, fecha) { if(!confirm("¿Eliminar solicitud?")) return; document.getElementById('loader').style.display = 'flex'; fetch(API_URL + "?action=eliminar_solicitud", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: cliente, fecha: fecha }) }).finally(() => { setTimeout(() => { cargarSolicitudes(); }, 1500); }); }
+    function aprobarAPlanta(cliente, fecha) { if(!confirm("¿Confirmas el pago? El pedido será enviado a Planta.")) return; document.getElementById('loader').style.display = 'flex'; fetch(API_URL + "?action=marcar_pagado_solicitud", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: cliente, fecha: fecha }) }).finally(() => { setTimeout(() => { cargarSolicitudes(); }, 1500); }); }
+    function eliminar(cliente, fecha) { if(!confirm("¿Eliminar esta solicitud descartada?")) return; document.getElementById('loader').style.display = 'flex'; fetch(API_URL + "?action=eliminar_solicitud", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: cliente, fecha: fecha }) }).finally(() => { setTimeout(() => { cargarSolicitudes(); }, 1500); }); }
 </script>
 </body>
 </html>
