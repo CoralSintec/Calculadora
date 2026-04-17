@@ -5,62 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Producción Coralsintec</title>
     <style>
-        :root { --p: #1e2328; --border: #cbd5e1; --accent: #f59e0b; --blue: #3b82f6; --green: #10b981; --red: #ef4444; }
-        body { font-family: -apple-system, sans-serif; background: #f3f4f6; margin: 0; padding: 15px; }
+        :root { 
+            --bg: #1c1c1c; 
+            --card-bg: #2d2d2d; 
+            --input-bg: #3a3a3a; 
+            --border: #555555; 
+            --text-main: #e0e0e0; 
+            --text-muted: #9ca3af; 
+            /* Gris Cemento Mate */
+            --accent: #b0b0b0; 
+            --blue: #3b82f6; 
+            --green: #10b981; 
+            --red: #ef4444; 
+        }
+        body { 
+            font-family: -apple-system, sans-serif; 
+            background-image: linear-gradient(rgba(28,28,28,0.95), rgba(28,28,28,0.95)), url('cabecera.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            margin: 0; 
+            padding: 15px; 
+            color: var(--text-main); 
+        }
         .app-main { width: 100%; max-width: 600px; margin: 0 auto; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .btn-volver { background: white; border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--p); box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
-        .user-badge { background: #e2e8f0; color: #475569; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
-        .user-eduardo { background: #fef08a; color: #854d0e; border: 1px solid #fde047; }
-        .header { background: var(--p); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .order-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--accent); position: relative;}
+        .btn-volver { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--text-main); }
+        .user-badge { background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+        .user-eduardo { background: #422006; color: #fde047; border-color: #854d0e; }
+        .header { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        
+        .order-card { background: var(--card-bg); padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-top: 5px solid var(--accent); position: relative;}
         .doc-buttons { position: absolute; top: 12px; right: 12px; display: flex; gap: 5px; }
-        .btn-doc { background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 5px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
-        .btn-doc:hover { background: #e2e8f0; color: var(--p); border-color: #94a3b8; }
+        .btn-doc { background: var(--input-bg); border: 1px solid var(--border); color: var(--text-muted); padding: 5px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-doc:hover { background: #555; color: #fff; }
+        
         .status-tag { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 20px; }
-        .st-nuevo { background: #fee2e2; color: #991b1b; border: 1px solid #f87171;}
-        .st-proceso { background: #fef3c7; color: #92400e; border: 1px solid #fbbf24;}
-        .st-coordinar { background: #dbeafe; color: #1e40af; border: 1px solid #60a5fa;}
-        .st-listo { background: #dcfce7; color: #166534; border: 1px solid #4ade80;}
-        .order-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 15px; }
-        .order-tab { flex: 1; background: none; border: none; padding: 10px; font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: 0.2s;}
-        .order-tab.active { color: var(--p); border-bottom-color: var(--p); }
+        .st-nuevo { background: #450a0a; color: #fca5a5; border: 1px solid #7f1d1d;}
+        .st-proceso { background: #451a03; color: #fdba74; border: 1px solid #7c2d12;}
+        .st-coordinar { background: #172554; color: #93c5fd; border: 1px solid #1e3a8a;}
+        .st-listo { background: #052e16; color: #86efac; border: 1px solid #14532d;}
+        
+        .order-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 15px; }
+        .order-tab { flex: 1; background: none; border: none; padding: 10px; font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: 0.2s;}
+        .order-tab.active { color: #fff; border-bottom-color: var(--accent); }
         .order-tab-content { display: none; }
         .order-tab-content.active { display: block; }
-        .receta-item { background: #f8fafc; border-left: 4px solid var(--blue); padding: 12px; margin-bottom: 10px; border-radius: 6px; }
-        .receta-title { font-weight: 900; font-size: 13px; color: var(--p); margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;}
-        .receta-lista { margin: 0; padding-left: 20px; font-size: 13px; color: #334155; }
+        
+        .receta-item { background: var(--input-bg); border-left: 4px solid var(--blue); padding: 12px; margin-bottom: 10px; border-radius: 6px; }
+        .receta-title { font-weight: 900; font-size: 13px; color: #fff; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 4px;}
+        .receta-lista { margin: 0; padding-left: 20px; font-size: 13px; color: #ddd; }
         .receta-lista li { margin-bottom: 3px; }
+        
         table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0 0 10px 0; }
-        th { text-align: left; padding: 8px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; font-size: 11px; color: var(--p);}
-        td { padding: 8px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #334155;}
-        .qty-badge { background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-weight: 800; display: inline-block;}
-        .pcs-badge { color: #166534; font-weight: 900; font-size: 15px;}
-        .extras-box { background: #fffbeb; padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px dashed #fcd34d; }
-        .extras-title { margin: 0 0 10px 0; color: #92400e; border-bottom: 1px solid #fde68a; padding-bottom: 5px; font-size: 12px; text-transform: uppercase;}
-        .btn-group { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 15px;}
+        th { text-align: left; padding: 8px; background: var(--input-bg); border-bottom: 2px solid var(--border); font-size: 11px; color: var(--text-muted);}
+        td { padding: 8px; border-bottom: 1px solid var(--border); font-weight: 600; color: var(--text-main);}
+        .qty-badge { background: #1e3a8a; color: #93c5fd; padding: 4px 8px; border-radius: 4px; font-weight: 800; display: inline-block;}
+        .pcs-badge { color: #4ade80; font-weight: 900; font-size: 15px;}
+        
+        .extras-box { background: var(--input-bg); padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px dashed #b45309; }
+        .extras-title { margin: 0 0 10px 0; color: #fbbf24; border-bottom: 1px solid #7c2d12; padding-bottom: 5px; font-size: 12px; text-transform: uppercase;}
+        
+        .btn-group { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;}
         .btn-action { border: none; padding: 14px; border-radius: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; font-size: 12px; transition: transform 0.1s;}
         .btn-action:active { transform: scale(0.98); }
-        .btn-aceptar { background: #1e2328; }
+        .btn-aceptar { background: #3b82f6; }
         .btn-entregado { background: #10b981; }
         .btn-pago { background: #059669; }
         .btn-eliminar { background: #ef4444; }
-        #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(243, 244, 246, 0.95); z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: var(--p); font-size: 18px;}
-        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; justify-content: center; align-items: center; }
-        .modal-card { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 420px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
-        .modal-card h3 { margin: 0 0 15px 0; color: var(--p); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;}
-        .modal-input { width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; font-weight:600;}
+        
+        #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28,28,28,0.95); z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: var(--accent); font-size: 18px;}
+        
+        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; }
+        .modal-card { background: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 420px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+        .modal-card h3 { margin: 0 0 15px 0; color: #fff; border-bottom: 2px solid var(--border); padding-bottom: 10px;}
+        .modal-input { width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); background: var(--input-bg); color: #fff; border-radius: 8px; font-size: 14px; font-weight:600;}
         .modal-row { display: flex; gap: 10px; }
-        .payment-panel { background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 12px; display: inline-block; width: 100%; box-sizing: border-box;}
+        
+        .payment-panel { background: var(--input-bg); padding: 12px; border-radius: 10px; border: 1px solid var(--border); margin-top: 12px; display: inline-block; width: 100%; box-sizing: border-box;}
         .payment-grid { display: flex; justify-content: space-between; align-items: center; }
         .payment-box { display: flex; flex-direction: column; }
-        .payment-label { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 2px; }
-        .payment-val { font-size: 16px; font-weight: 900; color: #1e2328; }
-        .val-green { color: #059669; }
-        .val-red { color: #e11d48; }
-        .payment-divider { width: 2px; background: #e2e8f0; height: 30px; }
-        .calendar-btn { background: #f8fafc; padding: 10px 12px; border-radius: 10px; border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s;}
-        .calendar-btn:hover { border-color: var(--blue); background: #eff6ff; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(59,130,246,0.1);}
+        .payment-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 2px; }
+        .payment-val { font-size: 16px; font-weight: 900; color: #fff; }
+        .val-green { color: #4ade80; }
+        .val-red { color: #f87171; }
+        .payment-divider { width: 2px; background: var(--border); height: 30px; }
+        
+        .calendar-btn { background: var(--input-bg); padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s;}
+        .calendar-btn:hover { border-color: var(--accent); background: #444; }
     </style>
 </head>
 <body>
@@ -68,21 +99,21 @@
     
     <div id="modal-timeline" class="modal-bg">
         <div class="modal-card">
-            <h3 style="color:var(--p); margin: 0 0 5px 0;">📅 Monitoreo de Producción</h3>
+            <h3 style="color:#fff; margin: 0 0 5px 0;">📅 Monitoreo de Producción</h3>
             <p id="tl-cliente" style="margin: 0 0 20px 0; font-weight: 900; color: var(--blue); font-size: 16px; text-transform: uppercase;"></p>
             <div style="position: relative; margin: 30px 10px 40px 10px;">
-                <div style="height: 12px; background: #e2e8f0; border-radius: 6px; width: 100%; position: absolute;"></div>
+                <div style="height: 12px; background: #404040; border-radius: 6px; width: 100%; position: absolute;"></div>
                 <div style="height: 12px; width: 100%; position: absolute; border-radius: 6px; overflow: hidden;">
                     <div id="tl-gradient" style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(to right, #3b82f6 0%, #facc15 50%, #10b981 100%); clip-path: inset(0 100% 0 0); transition: clip-path 0.8s ease-out;"></div>
                 </div>
-                <div id="tl-circle" style="width: 22px; height: 22px; background: white; border: 3px solid var(--p); border-radius: 50%; position: absolute; top: -8px; left: 0%; transform: translateX(-50%); box-shadow: 0 2px 6px rgba(0,0,0,0.4); transition: left 0.8s ease-out, background-color 0.8s ease-out, border-color 0.8s ease-out;"></div>
+                <div id="tl-circle" style="width: 22px; height: 22px; background: #2d2d2d; border: 3px solid #666; border-radius: 50%; position: absolute; top: -8px; left: 0%; transform: translateX(-50%); box-shadow: 0 2px 6px rgba(0,0,0,0.8); transition: left 0.8s ease-out, background-color 0.8s ease-out, border-color 0.8s ease-out;"></div>
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 25px;">
-                <div><span style="display:block; text-transform:uppercase;">Inicio Producción</span><span id="tl-inicio" style="color:var(--p); font-size:13px;"></span></div>
-                <div style="text-align: right;"><span style="display:block; text-transform:uppercase;">Fecha de Entrega</span><span id="tl-fin" style="color:var(--p); font-size:13px;"></span></div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 25px;">
+                <div><span style="display:block; text-transform:uppercase;">Inicio Producción</span><span id="tl-inicio" style="color:#fff; font-size:13px;"></span></div>
+                <div style="text-align: right;"><span style="display:block; text-transform:uppercase;">Fecha de Entrega</span><span id="tl-fin" style="color:#fff; font-size:13px;"></span></div>
             </div>
             <div id="tl-texto-dias" style="text-align: center; padding: 12px; border-radius: 8px; font-weight: 900; font-size: 15px; margin-bottom: 20px;"></div>
-            <button onclick="document.getElementById('modal-timeline').style.display='none'" style="background:var(--p); color:white; padding:14px; width:100%; border:none; border-radius:10px; font-weight:900; cursor:pointer; text-transform:uppercase;">Cerrar Visualizador</button>
+            <button onclick="document.getElementById('modal-timeline').style.display='none'" style="background:var(--accent); color:#121212; padding:14px; width:100%; border:none; border-radius:10px; font-weight:900; cursor:pointer; text-transform:uppercase;">Cerrar Visualizador</button>
         </div>
     </div>
 
@@ -96,7 +127,7 @@
             <div class="modal-row"><input type="text" id="ch-anio" class="modal-input" placeholder="Año"><input type="text" id="ch-color" class="modal-input" placeholder="Color"></div>
             <input type="text" id="ch-placa" class="modal-input" placeholder="Placas del vehículo">
             <button onclick="ejecutarNotaEntrega()" style="background:var(--blue); color:white; padding:14px; width:100%; border:none; border-radius:10px; font-weight:900; cursor:pointer; margin-bottom:10px; text-transform:uppercase;">✅ Generar Nota en PDF</button>
-            <button onclick="document.getElementById('modal-chofer').style.display='none'" style="background:#e2e8f0; color:#475569; padding:12px; width:100%; border:none; border-radius:10px; font-weight:900; cursor:pointer; text-transform:uppercase;">Cancelar</button>
+            <button onclick="document.getElementById('modal-chofer').style.display='none'" style="background:var(--border); color:#fff; padding:12px; width:100%; border:none; border-radius:10px; font-weight:900; cursor:pointer; text-transform:uppercase;">Cancelar</button>
         </div>
     </div>
 
@@ -107,7 +138,7 @@
         </div>
         <div class="header">
             <h2 style="margin:0; letter-spacing: 1px;">HOJAS DE RUTA</h2>
-            <p style="margin:5px 0 0 0; font-size:12px; color:#cbd5e1;" id="header-user">Departamento de Producción</p>
+            <p style="margin:5px 0 0 0; font-size:12px; color:var(--text-muted);" id="header-user">Departamento de Producción</p>
         </div>
         <div id="lista-pedidos"></div>
     </main>
@@ -126,7 +157,7 @@
     window.onload = () => {
         const badge = document.getElementById('badge-usuario'); const headerSub = document.getElementById('header-user');
         badge.innerText = "👤 " + usuarioActual;
-        if(p_master) { headerSub.innerText = "⭐ VISTA GERENCIAL"; headerSub.style.color = "#fef08a"; badge.innerText = "👑 MODO GERENTE"; badge.classList.add('user-eduardo'); }
+        if(p_master) { headerSub.innerText = "⭐ VISTA GERENCIAL"; headerSub.style.color = "#fde047"; badge.innerText = "👑 MODO GERENTE"; badge.classList.add('user-eduardo'); }
         loadData();
     }
 
@@ -148,13 +179,14 @@
         let dFin = parseFechaLocal(fFin); let hoy = new Date(); dFin.setHours(0,0,0,0); hoy.setHours(0,0,0,0);
         let restanMs = dFin.getTime() - hoy.getTime(); let diasRestantes = Math.ceil(restanMs / (1000*60*60*24)); let semanasRestantes = (Math.abs(diasRestantes) / 7).toFixed(1);
         let cajaTexto = document.getElementById('tl-texto-dias');
-        if (diasRestantes > 0) { cajaTexto.innerHTML = `Faltan ${diasRestantes} días para la entrega<br><span style="font-size:12px; font-weight:800; opacity:0.7;">(${semanasRestantes} SEMANAS APROX.)</span>`; cajaTexto.style.background = "#f1f5f9"; cajaTexto.style.color = "#475569"; } 
-        else if (diasRestantes === 0) { cajaTexto.innerHTML = `¡HOY ES EL DÍA DE ENTREGA!`; cajaTexto.style.background = "#fef08a"; cajaTexto.style.color = "#854d0e"; } 
-        else { cajaTexto.innerHTML = `¡Orden atrasada por ${Math.abs(diasRestantes)} días!<br><span style="font-size:12px; font-weight:800; opacity:0.8;">(${semanasRestantes} SEMANAS DE ATRASO)</span>`; cajaTexto.style.background = "#fee2e2"; cajaTexto.style.color = "#b91c1c"; }
         
-        let circle = document.getElementById('tl-circle'); document.getElementById('tl-gradient').style.clipPath = `inset(0 100% 0 0)`; circle.style.left = `0%`; circle.style.backgroundColor = "white"; circle.style.borderColor = "var(--p)";
+        if (diasRestantes > 0) { cajaTexto.innerHTML = `Faltan ${diasRestantes} días para la entrega<br><span style="font-size:12px; font-weight:800; opacity:0.7;">(${semanasRestantes} SEMANAS APROX.)</span>`; cajaTexto.style.background = "#3a3a3a"; cajaTexto.style.color = "#e0e0e0"; } 
+        else if (diasRestantes === 0) { cajaTexto.innerHTML = `¡HOY ES EL DÍA DE ENTREGA!`; cajaTexto.style.background = "#451a03"; cajaTexto.style.color = "#fbbf24"; } 
+        else { cajaTexto.innerHTML = `¡Orden atrasada por ${Math.abs(diasRestantes)} días!<br><span style="font-size:12px; font-weight:800; opacity:0.8;">(${semanasRestantes} SEMANAS DE ATRASO)</span>`; cajaTexto.style.background = "#450a0a"; cajaTexto.style.color = "#fca5a5"; }
+        
+        let circle = document.getElementById('tl-circle'); document.getElementById('tl-gradient').style.clipPath = `inset(0 100% 0 0)`; circle.style.left = `0%`; circle.style.backgroundColor = "#2d2d2d"; circle.style.borderColor = "#666";
         document.getElementById('modal-timeline').style.display = 'flex';
-        setTimeout(() => { let invertedPct = 100 - pct; document.getElementById('tl-gradient').style.clipPath = `inset(0 ${invertedPct}% 0 0)`; circle.style.left = `${pct}%`; circle.style.backgroundColor = getTimelineColor(pct); circle.style.borderColor = "white"; }, 100);
+        setTimeout(() => { let invertedPct = 100 - pct; document.getElementById('tl-gradient').style.clipPath = `inset(0 ${invertedPct}% 0 0)`; circle.style.left = `${pct}%`; circle.style.backgroundColor = getTimelineColor(pct); circle.style.borderColor = "#fff"; }, 100);
     }
 
     function switchTab(btn, targetId) { let card = btn.closest('.order-card'); card.querySelectorAll('.order-tab-content').forEach(c => c.classList.remove('active')); card.querySelectorAll('.order-tab').forEach(b => b.classList.remove('active')); card.querySelector('#' + targetId).classList.add('active'); btn.classList.add('active'); }
@@ -162,7 +194,7 @@
 
     function render(pedidos, formulas) {
         const container = document.getElementById('lista-pedidos'); container.innerHTML = '';
-        if(pedidos.length === 0) { container.innerHTML = "<p style='text-align:center; color:#64748b; font-weight:bold; margin-top:20px;'>No hay órdenes activas.</p>"; return; }
+        if(pedidos.length === 0) { container.innerHTML = "<p style='text-align:center; color:var(--text-muted); font-weight:bold; margin-top:20px;'>No hay órdenes activas.</p>"; return; }
 
         [...pedidos].reverse().forEach(p => {
             if(!p.DETALLES_JSON) return; let items = JSON.parse(p.DETALLES_JSON);
@@ -181,7 +213,7 @@
             let tablaDetallesHtml = `<table><thead><tr><th>FORMATO</th><th>USO</th><th>COLOR</th><th>TEXTURA</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`; let recetaHtml = `<div>`;
             items.forEach(i => {
                 let m = parseFloat(i.m2Final || i.m2 || 0); let formatoReal = i.formato || 'N/A'; let colorReal = i.color || 'N/A'; let usoReal = i.uso || 'N/A'; let texturaReal = i.textura || 'N/A';
-                let pcs = i.piezas || i.pieces || Math.ceil(m / (((i.formato.split('x')[0] || 1)*(i.formato.split('x')[1] || 1))/10000));
+                let pcs = i.piezas || i.pieces || Math.ceil(m / (((formatoReal.split('x')[0] || 1)*(formatoReal.split('x')[1] || 1))/10000));
                 totalCarateo += i.carateo || i.cantSacos || 0; totalSellador += i.sellador || i.cantGalones || 0;
                 tablaDetallesHtml += `<tr><td>${formatoReal}</td><td><b>${usoReal}</b></td><td>${colorReal}</td><td>${texturaReal}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
                 
@@ -194,7 +226,7 @@
             });
             tablaDetallesHtml += `</tbody></table></div>`;
 
-            let html = `<div class="order-card">${botonesPDF}<div style="text-align:center;"><span class="status-tag ${stClass}">${estado}</span></div><div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:15px;"><div style="width: 100%;"><div style="display:flex; justify-content: space-between; align-items: flex-start;"><div><div style="font-size:18px; font-weight:900; color:var(--p); text-transform:uppercase;">${p.CLIENTE}</div><div style="font-size:12px; color:#64748b; margin-top:3px;"><b>RIF:</b> ${p.RIF_CI || '-'}</div></div><div class="calendar-btn" onclick="abrirTimeline('${p.FECHA_ORDEN}', '${p.FECHA_LIMITE_HABIL}', '${p.CLIENTE}')"><span style="font-size: 26px;">📅</span><div style="width: 100px;"><div style="font-size:9px; font-weight:900; color:#64748b; text-transform:uppercase; text-align:left;">FECHA LÍMITE</div><div style="color:#1e2328; font-size:14px; font-weight:900; margin-top:1px; text-align:left;">${p.FECHA_LIMITE_HABIL}</div><div style="width: 100%; height: 5px; background: #e2e8f0; border-radius: 3px; margin-top: 4px; position: relative;"><div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(to right, #3b82f6, #facc15, #10b981); border-radius: 3px; clip-path: inset(0 ${clipMini}% 0 0);"></div></div></div></div></div>${etiquetaPrecio}</div></div>`;
+            let html = `<div class="order-card">${botonesPDF}<div style="text-align:center;"><span class="status-tag ${stClass}">${estado}</span></div><div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:15px;"><div style="width: 100%;"><div style="display:flex; justify-content: space-between; align-items: flex-start;"><div><div style="font-size:18px; font-weight:900; color:#fff; text-transform:uppercase;">${p.CLIENTE}</div><div style="font-size:12px; color:var(--text-muted); margin-top:3px;"><b>RIF:</b> ${p.RIF_CI || '-'}</div></div><div class="calendar-btn" onclick="abrirTimeline('${p.FECHA_ORDEN}', '${p.FECHA_LIMITE_HABIL}', '${p.CLIENTE}')"><span style="font-size: 26px;">📅</span><div style="width: 100px;"><div style="font-size:9px; font-weight:900; color:var(--text-muted); text-transform:uppercase; text-align:left;">FECHA LÍMITE</div><div style="color:#fff; font-size:14px; font-weight:900; margin-top:1px; text-align:left;">${p.FECHA_LIMITE_HABIL}</div><div style="width: 100%; height: 5px; background: #404040; border-radius: 3px; margin-top: 4px; position: relative;"><div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(to right, #3b82f6, #facc15, #10b981); border-radius: 3px; clip-path: inset(0 ${clipMini}% 0 0);"></div></div></div></div></div>${etiquetaPrecio}</div></div>`;
             
             if(sysPerms.p_receta) { html += `<div class="order-tabs"><button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button><button class="order-tab" onclick="switchTab(this, 'receta-${safeId}')">🧪 RECETA</button></div>`; } else { html += `<div class="order-tabs"><button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button></div>`; }
             html += `<div id="detalles-${safeId}" class="order-tab-content active" style="overflow-x: auto;">${tablaDetallesHtml}</div>`;
