@@ -7,8 +7,7 @@
     <style>
         :root { 
             --p: #e0e0e0; 
-            /* Gris Cemento Mate */
-            --a: #b0b0b0; 
+            --a: #c49660; 
             --bg: #1c1c1c; 
             --card-bg: #2d2d2d; 
             --input-bg: #3a3a3a; 
@@ -96,10 +95,10 @@
 
         <div id="dashboard-screen" class="screen">
             <h2 id="welcome">HOLA</h2>
-            <div id="btn-ventas" onclick="navegar('cotizador')" class="menu-card"><h3>🛒 MI COTIZADOR</h3></div>
-            <div id="btn-solicitudes" onclick="navegar('solicitudes')" class="menu-card" style="border-left-color: #10b981;"><h3>📥 SOLICITUDES CLIENTES</h3></div>
-            <div id="btn-planta" onclick="navegar('planta')" class="menu-card" style="border-left-color: #f59e0b;"><h3>🏭 PRODUCCIÓN (PLANTA)</h3></div>
-            <div id="btn-gerencia" onclick="navegar('gerencia')" class="menu-card" style="border-left-color: #3b82f6;"><h3>📊 FINANZAS (GERENCIA)</h3></div>
+            <div id="btn-ventas" onclick="location.href='cotizador.html'" class="menu-card"><h3>🛒 MI COTIZADOR</h3></div>
+            <div id="btn-solicitudes" onclick="location.href='solicitudes.html'" class="menu-card" style="border-left-color: #10b981;"><h3>📥 SOLICITUDES CLIENTES</h3></div>
+            <div id="btn-planta" onclick="location.href='planta.html'" class="menu-card" style="border-left-color: #f59e0b;"><h3>🏭 PRODUCCIÓN (PLANTA)</h3></div>
+            <div id="btn-gerencia" onclick="location.href='gerencia.html'" class="menu-card" style="border-left-color: #3b82f6;"><h3>📊 FINANZAS (GERENCIA)</h3></div>
             
             <div id="btn-admin" onclick="abrirAdmin()" class="menu-card" style="border-left-color: #a855f7; display:none; background:#302538;">
                 <h3 style="color:#d8b4fe;">🔑 GESTIÓN DE USUARIOS</h3>
@@ -118,17 +117,23 @@
                 
                 <div class="module-group">
                     <label class="module-header"><input type="checkbox" id="m_ventas"> Módulo Cotizador</label>
-                    <div class="sub-perms"><label class="sub-perm-label" style="color:#4ade80;"><input type="checkbox" id="v_crear"> Botón "Agregar a la Lista"</label></div>
+                    <div class="sub-perms">
+                        <label class="sub-perm-label" style="color:#4ade80;"><input type="checkbox" id="v_crear"> Botón "Agregar a la Lista"</label>
+                    </div>
                 </div>
 
                 <div class="module-group">
                     <label class="module-header"><input type="checkbox" id="m_soli"> Módulo Solicitudes</label>
-                    <div class="sub-perms"><label class="sub-perm-label" style="color:#4ade80;"><input type="checkbox" id="s_aprobar"> Botón "Aprobar y Enviar"</label></div>
+                    <div class="sub-perms">
+                        <label class="sub-perm-label" style="color:#4ade80;"><input type="checkbox" id="s_aprobar"> Botón "Aprobar y Enviar"</label>
+                    </div>
                 </div>
 
                 <div class="module-group">
                     <label class="module-header"><input type="checkbox" id="m_gerencia"> Módulo Gerencia</label>
-                    <div class="sub-perms"><label class="sub-perm-label" style="color:#4ade80;"><input type="checkbox" id="g_editar"> Botones de Editar Datos</label></div>
+                    <div class="sub-perms">
+                        <label class="sub-perm-label" style="color:#4ade80;"><input type="checkbox" id="g_editar"> Botones de Editar Datos</label>
+                    </div>
                 </div>
 
                 <div class="module-group">
@@ -140,10 +145,12 @@
                         <label class="sub-perm-label"><input type="checkbox" id="p_pla_pdf"> Botones de PDF</label>
                     </div>
                 </div>
+
                 <button class="btn-main" style="background:#a855f7; color:#fff;" onclick="guardarUsuario()">💾 GUARDAR USUARIO</button>
             </div>
             <button onclick="cerrarAdmin()" style="background:none; border:none; font-weight:bold; color:var(--text-muted); margin-top:15px; cursor:pointer;">Volver al Menú</button>
         </div>
+
     </div>
 
     <script>
@@ -151,23 +158,20 @@
 
         const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
         
-        // ENRUTADOR PARA GITHUB
-        function navegar(pagina) {
-            document.getElementById('loader').style.display = 'flex';
-            window.location.href = pagina + ".html";
-        }
-
         let dbUsuarios = [];
+
         window.onload = () => {
             document.getElementById('loader').style.display = 'flex';
-            fetch(API_URL + "?action=get_usuarios").then(r => r.json()).then(data => {
+            fetch(API_URL + "?action=get_usuarios")
+            .then(r => r.json())
+            .then(data => {
                 dbUsuarios = data;
                 document.getElementById('loader').style.display = 'none';
                 const userRegistrado = localStorage.getItem('usuarioCoralsintec');
                 if(userRegistrado) aplicarInterfaz(userRegistrado);
                 else document.getElementById('login-screen').classList.add('active');
             }).catch(e => { 
-                alert("Error de red. Verifica tu conexión."); 
+                alert("Error de conexión con la base de datos."); 
                 document.getElementById('loader').style.display = 'none'; 
                 document.getElementById('login-screen').classList.add('active');
             });
@@ -179,8 +183,86 @@
             
             if(u === "EDUARDO" && p === "1234") {
                 let masterPerms = { m_ventas:true, v_crear:true, m_soli:true, s_aprobar:true, m_gerencia:true, g_editar:true, m_planta:true, p_precios:true, p_receta:true, p_acciones:true, p_pdf:true };
-                localStorage.setItem('usuarioCoralsintec', u); localStorage.setItem('permisosCoralsintec', JSON.stringify(masterPerms));
-                aplicarInterfaz(u); return;
+                localStorage.setItem('usuarioCoralsintec', u); 
+                localStorage.setItem('permisosCoralsintec', JSON.stringify(masterPerms));
+                aplicarInterfaz(u); 
+                return;
             }
 
-            const userRow = dbUsuarios.find(x => String(x.USUARIO).trim().toUpperCase() === u && String(x.PIN).trim
+            const userRow = dbUsuarios.find(x => String(x.USUARIO).trim().toUpperCase() === u && String(x.PIN).trim() === p);
+            if(userRow) {
+                localStorage.setItem('usuarioCoralsintec', u);
+                localStorage.setItem('permisosCoralsintec', userRow.PERMISOS_JSON || "{}");
+                aplicarInterfaz(u);
+            } else { 
+                alert("Usuario o PIN incorrecto."); 
+            }
+        }
+
+        function aplicarInterfaz(u) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('dashboard-screen').classList.add('active');
+            document.getElementById('welcome').innerText = "HOLA " + u;
+
+            let perms = {}; try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
+            const isMaster = (u === "EDUARDO");
+
+            document.getElementById('btn-ventas').style.display = (isMaster || perms.m_ventas) ? 'block' : 'none';
+            document.getElementById('btn-solicitudes').style.display = (isMaster || perms.m_soli) ? 'block' : 'none';
+            document.getElementById('btn-gerencia').style.display = (isMaster || perms.m_gerencia) ? 'block' : 'none';
+            document.getElementById('btn-planta').style.display = (isMaster || perms.m_planta) ? 'block' : 'none';
+            document.getElementById('btn-admin').style.display = isMaster ? 'block' : 'none';
+        }
+
+        function abrirAdmin() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('admin-screen').classList.add('active');
+            const listaUI = document.getElementById('lista-usuarios-ui'); listaUI.innerHTML = "";
+            dbUsuarios.forEach(user => {
+                if(user.USUARIO && user.USUARIO.toUpperCase() !== "EDUARDO") {
+                    listaUI.innerHTML += `<div class="user-item"><span>👤 ${user.USUARIO}</span><button class="btn-sm" onclick="eliminarUser('${user.USUARIO}')">Borrar</button></div>`;
+                }
+            });
+        }
+        
+        function cerrarAdmin() { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('dashboard-screen').classList.add('active'); }
+
+        function guardarUsuario() {
+            const u = document.getElementById('new-user').value.trim().toUpperCase();
+            const p = document.getElementById('new-pin').value.trim();
+            
+            if(u === "" || p === "") { alert("⚠️ POR FAVOR: Escribe un Nombre de Usuario y un PIN antes de guardar."); return; }
+
+            const permisos = {
+                m_ventas: document.getElementById('m_ventas').checked,
+                v_crear: document.getElementById('v_crear').checked,
+                m_soli: document.getElementById('m_soli').checked,
+                s_aprobar: document.getElementById('s_aprobar').checked,
+                m_gerencia: document.getElementById('m_gerencia').checked,
+                g_editar: document.getElementById('g_editar').checked,
+                m_planta: document.getElementById('m_planta').checked,
+                p_precios: document.getElementById('p_pla_precio').checked,
+                p_receta: document.getElementById('p_pla_receta').checked,
+                p_acciones: document.getElementById('p_pla_accion').checked,
+                p_pdf: document.getElementById('p_pla_pdf').checked
+            };
+
+            document.getElementById('loader').innerText = `⏳ Guardando los accesos para ${u}...`;
+            document.getElementById('loader').style.display = 'flex';
+
+            fetch(API_URL + "?action=guardar_usuario", { method: "POST", mode: "no-cors", body: JSON.stringify({ usuario: u, pin: p, permisos: permisos }) })
+            .then(() => { alert(`✅ ¡Listo! El usuario ${u} ha sido guardado correctamente.`); location.reload(); })
+            .catch(error => { alert("❌ Falló la conexión: " + error.message); document.getElementById('loader').style.display = 'none'; });
+        }
+
+        function eliminarUser(u) {
+            if(!confirm("¿Borrar acceso de " + u + "?")) return;
+            document.getElementById('loader').innerText = "🗑️ Borrando usuario...";
+            document.getElementById('loader').style.display = 'flex';
+            fetch(API_URL + "?action=eliminar_usuario", { method: "POST", mode: "no-cors", body: JSON.stringify({ usuario: u }) })
+            .then(() => { location.reload(); });
+        }
+        function logout() { localStorage.clear(); location.reload(); }
+    </script>
+</body>
+</html>
