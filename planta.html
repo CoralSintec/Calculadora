@@ -22,15 +22,15 @@
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .btn-volver { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--text-main); }
         .user-badge { background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
-        .user-eduardo { background: #3a3a3a; color: #fff; border-color: #555555; }
+        .user-eduardo { background: #3a3a3a; color: #ffffff; border-color: #555555; }
         .header { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .order-card { background: var(--card-bg); padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-top: 5px solid var(--accent); position: relative;}
         .doc-buttons { position: absolute; top: 12px; right: 12px; display: flex; gap: 5px; }
         .btn-doc { background: var(--input-bg); border: 1px solid var(--border); color: var(--text-muted); padding: 5px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
         .btn-doc:hover { background: #555; color: #fff; }
         .status-tag { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; margin-top: 20px; }
-        .st-nuevo { background: #3a3a3a; color: #fff; border: 1px solid #555;}
-        .st-proceso { background: #1e3a8a; color: #93c5fd; border: 1px solid #172554;}
+        .st-nuevo { background: #3a3a3a; color: #ffffff; border: 1px solid #555555;}
+        .st-proceso { background: #374151; color: #e0e0e0; border: 1px solid #555555;}
         .st-coordinar { background: #172554; color: #93c5fd; border: 1px solid #1e3a8a;}
         .st-listo { background: #052e16; color: #86efac; border: 1px solid #14532d;}
         .order-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 15px; }
@@ -47,7 +47,7 @@
         .qty-badge { background: #1e3a8a; color: #93c5fd; padding: 4px 8px; border-radius: 4px; font-weight: 800; display: inline-block;}
         .pcs-badge { color: #4ade80; font-weight: 900; font-size: 15px;}
         .extras-box { background: var(--input-bg); padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px dashed #555555; }
-        .extras-title { margin: 0 0 10px 0; color: #ffffff; border-bottom: 1px solid #555555; padding-bottom: 5px; font-size: 12px; text-transform: uppercase;}
+        .extras-title { margin: 0 0 10px 0; color: #b0b0b0; border-bottom: 1px solid #555555; padding-bottom: 5px; font-size: 12px; text-transform: uppercase;}
         .btn-group { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;}
         .btn-action { border: none; padding: 14px; border-radius: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; font-size: 12px; transition: transform 0.1s;}
         .btn-action:active { transform: scale(0.98); }
@@ -123,10 +123,10 @@
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
-    
+
     const usuarioActual = localStorage.getItem('usuarioCoralsintec') || 'PLANTA';
     
-    // AQUÍ ESTÁ LA SOLUCIÓN DEL ESPACIO EN EDUARDO: .trim()
+    // RECONOCE A EDUARDO INCLUSO CON ESPACIO AL FINAL
     let p_master = (String(usuarioActual).trim().toUpperCase() === 'EDUARDO');
     
     let sysPerms = { p_precios: false, p_receta: true, p_acciones: true, p_pdf: true };
@@ -175,9 +175,9 @@
         let restanMs = dFin.getTime() - hoy.getTime(); let diasRestantes = Math.ceil(restanMs / (1000*60*60*24)); let semanasRestantes = (Math.abs(diasRestantes) / 7).toFixed(1);
         let cajaTexto = document.getElementById('tl-texto-dias');
         
-        if (diasRestantes > 0) { cajaTexto.innerHTML = `Faltan ${diasRestantes} días para la entrega<br><span style="font-size:12px; font-weight:800; opacity:0.7;">(${semanasRestantes} SEMANAS APROX.)</span>`; cajaTexto.style.background = "#3a3a3a"; cajaTexto.style.color = "#e0e0e0"; } 
+        if (diasRestantes > 0) { cajaTexto.innerHTML = `Faltan ${diasRestantes} días para la entrega<br><span style="font-size:12px; font-weight:800; opacity:0.7;">(${semanasRestantes} SEMANAS APROX.)</span>`; cajaTexto.style.background = "#3a3a3a"; cajaTexto.style.color = "#ffffff"; } 
         else if (diasRestantes === 0) { cajaTexto.innerHTML = `¡HOY ES EL DÍA DE ENTREGA!`; cajaTexto.style.background = "#3a3a3a"; cajaTexto.style.color = "#ffffff"; } 
-        else { cajaTexto.innerHTML = `¡Orden atrasada por ${Math.abs(diasRestantes)} días!<br><span style="font-size:12px; font-weight:800; opacity:0.8;">(${semanasRestantes} SEMANAS DE ATRASO)</span>`; cajaTexto.style.background = "#450a0a"; cajaTexto.style.color = "#fca5a5"; }
+        else { cajaTexto.innerHTML = `¡Orden atrasada por ${Math.abs(diasRestantes)} días!<br><span style="font-size:12px; font-weight:800; opacity:0.8;">(${semanasRestantes} SEMANAS DE ATRASO)</span>`; cajaTexto.style.background = "#450a0a"; cajaTexto.style.color = "#e0e0e0"; }
         
         let circle = document.getElementById('tl-circle'); document.getElementById('tl-gradient').style.clipPath = `inset(0 100% 0 0)`; circle.style.left = `0%`; circle.style.backgroundColor = "#2d2d2d"; circle.style.borderColor = "#666";
         document.getElementById('modal-timeline').style.display = 'flex';
