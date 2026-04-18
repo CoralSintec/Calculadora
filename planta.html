@@ -16,6 +16,7 @@
         .order-card { background: var(--card-bg); padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-top: 5px solid var(--accent); position: relative;}
         .doc-buttons { position: absolute; top: 12px; right: 12px; display: flex; gap: 5px; }
         .btn-doc { background: var(--input-bg); border: 1px solid var(--border); color: var(--text-muted); padding: 5px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-doc:hover { background: #555; color: #fff; }
         .status-tag { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; margin-top: 20px; }
         .st-nuevo { background: #450a0a; color: #fca5a5; border: 1px solid #7f1d1d;}
         .st-proceso { background: #451a03; color: #fdba74; border: 1px solid #7c2d12;}
@@ -99,7 +100,7 @@
 
     <main class="app-main">
         <div class="top-bar">
-            <button class="btn-volver" onclick="window.location.href='index.html'">⬅ MENÚ</button>
+            <button class="btn-volver" onclick="navegar('index')">⬅ MENÚ</button>
             <div id="badge-usuario" class="user-badge">👤 PLANTA</div>
         </div>
         <div class="header">
@@ -111,11 +112,28 @@
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
+
+    function navegar(pagina) {
+        document.getElementById('loader-overlay').style.display = 'flex';
+        window.location.href = pagina + ".html";
+    }
     
     const usuarioActual = localStorage.getItem('usuarioCoralsintec') || 'PLANTA';
     let p_master = (usuarioActual === 'EDUARDO');
-    let sysPerms = { p_precios: false, p_receta: true, p_acciones: false, p_pdf: false };
-    try { let saved = JSON.parse(localStorage.getItem('permisosCoralsintec')); if(saved) { if(saved.p_precios !== undefined) sysPerms.p_precios = saved.p_precios; if(saved.p_receta !== undefined) sysPerms.p_receta = saved.p_receta; if(saved.p_acciones !== undefined) sysPerms.p_acciones = saved.p_acciones; if(saved.p_pdf !== undefined) sysPerms.p_pdf = saved.p_pdf; } } catch(e){}
+    
+    // CORRECCIÓN: Los botones de Acción y PDF ahora están activos (true) por defecto para la Planta.
+    let sysPerms = { p_precios: false, p_receta: true, p_acciones: true, p_pdf: true };
+    
+    try { 
+        let saved = JSON.parse(localStorage.getItem('permisosCoralsintec')); 
+        if(saved) { 
+            if(saved.p_precios !== undefined) sysPerms.p_precios = saved.p_precios; 
+            if(saved.p_receta !== undefined) sysPerms.p_receta = saved.p_receta; 
+            if(saved.p_acciones !== undefined) sysPerms.p_acciones = saved.p_acciones; 
+            if(saved.p_pdf !== undefined) sysPerms.p_pdf = saved.p_pdf; 
+        } 
+    } catch(e){}
+    
     if(p_master) { sysPerms = { p_precios: true, p_receta: true, p_acciones: true, p_pdf: true }; }
 
     let pedidosGlobal = [];
