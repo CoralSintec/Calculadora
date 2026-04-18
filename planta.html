@@ -12,7 +12,7 @@
             --border: #555555; 
             --text-main: #e0e0e0; 
             --text-muted: #9ca3af; 
-            --accent: #b0b0b0; 
+            --accent: #b0b0b0; /* Gris Cemento */
             --blue: #3b82f6; 
             --green: #10b981; 
             --red: #ef4444; 
@@ -22,22 +22,29 @@
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .btn-volver { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--text-main); }
         .user-badge { background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
-        .user-eduardo { background: #3a3a3a; color: #ffffff; border-color: #555555; }
+        
+        /* CHAPA GERENTE SIN DORADO */
+        .user-eduardo { background: #3a3a3a; color: #ffffff; border-color: #b0b0b0; }
+        
         .header { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .order-card { background: var(--card-bg); padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-top: 5px solid var(--accent); position: relative;}
         .doc-buttons { position: absolute; top: 12px; right: 12px; display: flex; gap: 5px; }
         .btn-doc { background: var(--input-bg); border: 1px solid var(--border); color: var(--text-muted); padding: 5px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
         .btn-doc:hover { background: #555; color: #fff; }
+        
         .status-tag { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; margin-top: 20px; }
+        /* ESTADOS DE ORDEN SIN COLORES AMARILLOS/MARRONES */
         .st-nuevo { background: #3a3a3a; color: #ffffff; border: 1px solid #555555;}
-        .st-proceso { background: #374151; color: #e0e0e0; border: 1px solid #555555;}
+        .st-proceso { background: #1e3a8a; color: #93c5fd; border: 1px solid #172554;}
         .st-coordinar { background: #172554; color: #93c5fd; border: 1px solid #1e3a8a;}
         .st-listo { background: #052e16; color: #86efac; border: 1px solid #14532d;}
+        
         .order-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 15px; }
         .order-tab { flex: 1; background: none; border: none; padding: 10px; font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: 0.2s;}
         .order-tab.active { color: #fff; border-bottom-color: var(--accent); }
         .order-tab-content { display: none; }
         .order-tab-content.active { display: block; }
+        
         .receta-item { background: var(--input-bg); border-left: 4px solid var(--blue); padding: 12px; margin-bottom: 10px; border-radius: 6px; }
         .receta-title { font-weight: 900; font-size: 13px; color: #fff; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 4px;}
         .receta-lista { margin: 0; padding-left: 20px; font-size: 13px; color: #ddd; }
@@ -46,8 +53,10 @@
         td { padding: 8px; border-bottom: 1px solid var(--border); font-weight: 600; color: var(--text-main);}
         .qty-badge { background: #1e3a8a; color: #93c5fd; padding: 4px 8px; border-radius: 4px; font-weight: 800; display: inline-block;}
         .pcs-badge { color: #4ade80; font-weight: 900; font-size: 15px;}
+        
         .extras-box { background: var(--input-bg); padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px dashed #555555; }
-        .extras-title { margin: 0 0 10px 0; color: #b0b0b0; border-bottom: 1px solid #555555; padding-bottom: 5px; font-size: 12px; text-transform: uppercase;}
+        .extras-title { margin: 0 0 10px 0; color: var(--accent); border-bottom: 1px solid #555555; padding-bottom: 5px; font-size: 12px; text-transform: uppercase;}
+        
         .btn-group { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;}
         .btn-action { border: none; padding: 14px; border-radius: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; font-size: 12px; transition: transform 0.1s;}
         .btn-action:active { transform: scale(0.98); }
@@ -55,12 +64,16 @@
         .btn-entregado { background: #10b981; }
         .btn-pago { background: #059669; }
         .btn-eliminar { background: #ef4444; }
+        
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28,28,28,0.95); z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: var(--accent); font-size: 18px;}
+        
         .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; }
         .modal-card { background: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 420px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
         .modal-card h3 { margin: 0 0 15px 0; color: #fff; border-bottom: 2px solid var(--border); padding-bottom: 10px;}
         .modal-input { width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); background: var(--input-bg); color: #fff; border-radius: 8px; font-size: 14px; font-weight:600;}
         .modal-row { display: flex; gap: 10px; }
+        
+        /* PANEL DE PAGOS RECUPERADO */
         .payment-panel { background: var(--input-bg); padding: 12px; border-radius: 10px; border: 1px solid var(--border); margin-top: 12px; display: inline-block; width: 100%; box-sizing: border-box;}
         .payment-grid { display: flex; justify-content: space-between; align-items: center; }
         .payment-box { display: flex; flex-direction: column; }
@@ -69,6 +82,7 @@
         .val-green { color: #4ade80; }
         .val-red { color: #f87171; }
         .payment-divider { width: 2px; background: var(--border); height: 30px; }
+        
         .calendar-btn { background: var(--input-bg); padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s;}
     </style>
 </head>
@@ -126,21 +140,28 @@
 
     const usuarioActual = localStorage.getItem('usuarioCoralsintec') || 'PLANTA';
     
-    // RECONOCE A EDUARDO INCLUSO CON ESPACIO AL FINAL
-    let p_master = (String(usuarioActual).trim().toUpperCase() === 'EDUARDO');
+    // REGLA ABSOLUTA DE GERENCIA (IGNORA EL ESPACIO DEL EXCEL)
+    let p_master = String(usuarioActual).toUpperCase().includes('EDUARDO');
     
-    let sysPerms = { p_precios: false, p_receta: true, p_acciones: true, p_pdf: true };
+    let sysPerms = { p_precios: false, p_receta: true, p_acciones: false, p_pdf: false };
+    
     try { 
         let saved = JSON.parse(localStorage.getItem('permisosCoralsintec')); 
         if(saved) { 
-            if(saved.p_precios !== undefined) sysPerms.p_precios = saved.p_precios; 
-            if(saved.p_receta !== undefined) sysPerms.p_receta = saved.p_receta; 
-            if(saved.p_acciones !== undefined) sysPerms.p_acciones = saved.p_acciones; 
-            if(saved.p_pdf !== undefined) sysPerms.p_pdf = saved.p_pdf; 
+            if(saved.p_precios === true) sysPerms.p_precios = true; 
+            if(saved.p_receta === true) sysPerms.p_receta = true; 
+            if(saved.p_acciones === true) sysPerms.p_acciones = true; 
+            if(saved.p_pdf === true) sysPerms.p_pdf = true; 
         } 
     } catch(e){}
     
-    if(p_master) { sysPerms = { p_precios: true, p_receta: true, p_acciones: true, p_pdf: true }; }
+    // SI ERES EDUARDO, TODOS LOS BOTONES Y PAGOS SE ENCIENDEN SÍ O SÍ
+    if(p_master) { 
+        sysPerms.p_precios = true; 
+        sysPerms.p_receta = true; 
+        sysPerms.p_acciones = true; 
+        sysPerms.p_pdf = true; 
+    }
 
     let pedidosGlobal = [];
 
@@ -149,7 +170,7 @@
         badge.innerText = "👤 " + String(usuarioActual).trim();
         if(p_master) { 
             headerSub.innerText = "⭐ VISTA GERENCIAL"; 
-            headerSub.style.color = "#ffffff"; 
+            headerSub.style.color = "#b0b0b0"; 
             badge.innerText = "👑 MODO GERENTE"; 
             badge.classList.add('user-eduardo'); 
         }
@@ -166,7 +187,7 @@
 
     function parseFechaLocal(fechaStr) { if(!fechaStr || fechaStr.includes("-")) return new Date(); let partes = fechaStr.split('/'); if(partes.length === 3) return new Date(partes[2], partes[1] - 1, partes[0]); return new Date(); }
     function obtenerProgreso(fInicio, fFin) { let start = parseFechaLocal(fInicio).getTime(); let end = parseFechaLocal(fFin).getTime(); let now = new Date().getTime(); if (now <= start) return 0; if (now >= end) return 100; if (end === start) return 100; return ((now - start) / (end - start)) * 100; }
-    function getTimelineColor(p) { if(p < 50) { let ratio = p / 50; return `rgb(${Math.round(59 + (250 - 59) * ratio)},${Math.round(130 + (204 - 130) * ratio)},${Math.round(246 + (21 - 246) * ratio)})`; } else { let ratio = (p - 50) / 50; return `rgb(${Math.round(250 + (16 - 250) * ratio)},${Math.round(204 + (185 - 204) * ratio)},${Math.round(21 + (129 - 21) * ratio)})`; } }
+    function getTimelineColor(p) { if(p < 50) { let ratio = p / 50; return `rgb(${Math.round(59 + (117 - 59) * ratio)},${Math.round(130 + (130 - 130) * ratio)},${Math.round(246 + (246 - 246) * ratio)})`; } else { let ratio = (p - 50) / 50; return `rgb(${Math.round(117 + (16 - 117) * ratio)},${Math.round(130 + (185 - 130) * ratio)},${Math.round(246 + (129 - 246) * ratio)})`; } }
     
     function abrirTimeline(fInicio, fFin, cliente) {
         let pct = obtenerProgreso(fInicio, fFin);
@@ -175,9 +196,9 @@
         let restanMs = dFin.getTime() - hoy.getTime(); let diasRestantes = Math.ceil(restanMs / (1000*60*60*24)); let semanasRestantes = (Math.abs(diasRestantes) / 7).toFixed(1);
         let cajaTexto = document.getElementById('tl-texto-dias');
         
-        if (diasRestantes > 0) { cajaTexto.innerHTML = `Faltan ${diasRestantes} días para la entrega<br><span style="font-size:12px; font-weight:800; opacity:0.7;">(${semanasRestantes} SEMANAS APROX.)</span>`; cajaTexto.style.background = "#3a3a3a"; cajaTexto.style.color = "#ffffff"; } 
+        if (diasRestantes > 0) { cajaTexto.innerHTML = `Faltan ${diasRestantes} días para la entrega<br><span style="font-size:12px; font-weight:800; opacity:0.7;">(${semanasRestantes} SEMANAS APROX.)</span>`; cajaTexto.style.background = "#3a3a3a"; cajaTexto.style.color = "#e0e0e0"; } 
         else if (diasRestantes === 0) { cajaTexto.innerHTML = `¡HOY ES EL DÍA DE ENTREGA!`; cajaTexto.style.background = "#3a3a3a"; cajaTexto.style.color = "#ffffff"; } 
-        else { cajaTexto.innerHTML = `¡Orden atrasada por ${Math.abs(diasRestantes)} días!<br><span style="font-size:12px; font-weight:800; opacity:0.8;">(${semanasRestantes} SEMANAS DE ATRASO)</span>`; cajaTexto.style.background = "#450a0a"; cajaTexto.style.color = "#e0e0e0"; }
+        else { cajaTexto.innerHTML = `¡Orden atrasada por ${Math.abs(diasRestantes)} días!<br><span style="font-size:12px; font-weight:800; opacity:0.8;">(${semanasRestantes} SEMANAS DE ATRASO)</span>`; cajaTexto.style.background = "#450a0a"; cajaTexto.style.color = "#fca5a5"; }
         
         let circle = document.getElementById('tl-circle'); document.getElementById('tl-gradient').style.clipPath = `inset(0 100% 0 0)`; circle.style.left = `0%`; circle.style.backgroundColor = "#2d2d2d"; circle.style.borderColor = "#666";
         document.getElementById('modal-timeline').style.display = 'flex';
@@ -221,13 +242,23 @@
             });
             tablaDetallesHtml += `</tbody></table></div>`;
 
-            let html = `<div class="order-card">${botonesPDF}<div style="text-align:center;"><span class="status-tag ${stClass}">${estado}</span></div><div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:15px;"><div style="width: 100%;"><div style="display:flex; justify-content: space-between; align-items: flex-start;"><div><div style="font-size:18px; font-weight:900; color:#fff; text-transform:uppercase;">${p.CLIENTE}</div><div style="font-size:12px; color:var(--text-muted); margin-top:3px;"><b>RIF:</b> ${p.RIF_CI || '-'}</div></div><div class="calendar-btn" onclick="abrirTimeline('${p.FECHA_ORDEN}', '${p.FECHA_LIMITE_HABIL}', '${p.CLIENTE}')"><span style="font-size: 26px;">📅</span><div style="width: 100px;"><div style="font-size:9px; font-weight:900; color:var(--text-muted); text-transform:uppercase; text-align:left;">FECHA LÍMITE</div><div style="color:#fff; font-size:14px; font-weight:900; margin-top:1px; text-align:left;">${p.FECHA_LIMITE_HABIL}</div><div style="width: 100%; height: 5px; background: #404040; border-radius: 3px; margin-top: 4px; position: relative;"><div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(to right, #3b82f6, #b0b0b0, #10b981); border-radius: 3px; clip-path: inset(0 ${clipMini}% 0 0);"></div></div></div></div></div>${etiquetaPrecio}</div></div>`;
+            let html = `<div class="order-card">${botonesPDF}<div style="text-align:center;"><span class="status-tag ${stClass}">${estado}</span></div><div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:15px;"><div style="width: 100%;"><div style="display:flex; justify-content: space-between; align-items: flex-start;"><div><div style="font-size:18px; font-weight:900; color:#fff; text-transform:uppercase;">${p.CLIENTE}</div><div style="font-size:12px; color:var(--text-muted); margin-top:3px;"><b>RIF:</b> ${p.RIF_CI || '-'}</div></div><div class="calendar-btn" onclick="abrirTimeline('${p.FECHA_ORDEN}', '${p.FECHA_LIMITE_HABIL}', '${p.CLIENTE}')"><span style="font-size: 26px;">📅</span><div style="width: 100px;"><div style="font-size:9px; font-weight:900; color:var(--text-muted); text-transform:uppercase; text-align:left;">FECHA LÍMITE</div><div style="color:#fff; font-size:14px; font-weight:900; margin-top:1px; text-align:left;">${p.FECHA_LIMITE_HABIL}</div><div style="width: 100%; height: 5px; background: #404040; border-radius: 3px; margin-top: 4px; position: relative;"><div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(to right, #3b82f6, #b0b0b0, #10b981); border-radius: 3px; clip-path: inset(0 ${clipMini}% 0 0);"></div></div></div></div></div>
+            
+            ${etiquetaPrecio}
+            
+            </div></div>`;
             
             if(sysPerms.p_receta) { html += `<div class="order-tabs"><button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button><button class="order-tab" onclick="switchTab(this, 'receta-${safeId}')">🧪 RECETA</button></div>`; } else { html += `<div class="order-tabs"><button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button></div>`; }
             html += `<div id="detalles-${safeId}" class="order-tab-content active" style="overflow-x: auto;">${tablaDetallesHtml}</div>`;
             if(sysPerms.p_receta) { html += `<div id="receta-${safeId}" class="order-tab-content">${recetaHtml}</div>`; }
             
-            if(sysPerms.p_acciones || p_master) { html += `<div class="btn-group">`; if(sysPerms.p_acciones) { html += `<button class="btn-action btn-aceptar" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN PROCESO')">✅ ACEPTAR E INICIAR</button><button class="btn-action btn-entregado" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 MARCAR ENTREGADO</button>`; } if(p_master) { html += `<button class="btn-action btn-pago" onclick="registrarPago('${p.CLIENTE}', '${p.FECHA_ORDEN}', ${pagado})">💵 REGISTRAR ABONO</button><button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN</button>`; } html += `</div>`; }
+            // LOS BOTONES DE ACEPTAR Y MARCAR ENTREGADO SE INSERTAN AQUÍ
+            if(sysPerms.p_acciones) { 
+                html += `<div class="btn-group">`; 
+                html += `<button class="btn-action btn-aceptar" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN PROCESO')">✅ ACEPTAR E INICIAR</button><button class="btn-action btn-entregado" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 MARCAR ENTREGADO</button>`; 
+                if(p_master) { html += `<button class="btn-action btn-pago" onclick="registrarPago('${p.CLIENTE}', '${p.FECHA_ORDEN}', ${pagado})">💵 REGISTRAR ABONO</button><button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN</button>`; } 
+                html += `</div>`; 
+            }
             html += `</div>`; container.innerHTML += html;
         });
     }
