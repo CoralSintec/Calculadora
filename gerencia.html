@@ -34,7 +34,7 @@
         .kpi-title { font-size: 11px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
         .kpi-val { font-size: 20px; font-weight: 900; }
         .kpi-full { grid-column: span 2; background: var(--input-bg); color: white; border: 1px solid var(--border);}
-        .kpi-full .kpi-val { color: #fde047; font-size: 26px; }
+        .kpi-full .kpi-val { color: #ffffff; font-size: 26px; }
         .tabs { display: flex; background: var(--card-bg); border-radius: 10px; margin-bottom: 15px; overflow: hidden; border: 1px solid var(--border);}
         .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; color: var(--text-muted); }
         .tab-btn.active { background: var(--input-bg); color: #fff; border-bottom: 2px solid var(--accent); }
@@ -54,7 +54,7 @@
     <main class="app-main">
         <div class="header-bar">
             <button class="btn-volver" onclick="window.location.href='index.html'">⬅ MENÚ</button>
-            <div style="background: #451a03; color: #fde047; border: 1px solid #854d0e; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;" id="badge-usuario">👑 GERENCIA</div>
+            <div style="background: #3a3a3a; color: #ffffff; border: 1px solid #555555; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;" id="badge-usuario">👑 GERENCIA</div>
         </div>
         <div class="kpi-grid">
             <div class="kpi-card" style="border-top-color:var(--blue);"><div class="kpi-title">Ventas (Aprobadas)</div><div class="kpi-val" id="k-v" style="color:var(--blue);">$0.00</div></div>
@@ -76,7 +76,7 @@
     
     window.onload = () => {
         const u = localStorage.getItem('usuarioCoralsintec') || 'DESCONOCIDO';
-        document.getElementById('badge-usuario').innerText = "👤 " + u;
+        document.getElementById('badge-usuario').innerText = "👤 " + String(u).trim();
         cargarTodo();
     };
 
@@ -85,8 +85,8 @@
     async function cargarTodo() {
         document.getElementById('loader').style.display = 'flex';
         
-        const usuarioActual = localStorage.getItem('usuarioCoralsintec');
-        let p_master = (usuarioActual === 'EDUARDO');
+        const usuarioActual = localStorage.getItem('usuarioCoralsintec') || '';
+        let p_master = (String(usuarioActual).trim().toUpperCase() === 'EDUARDO');
         let perms = {}; try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
         const canEdit = p_master || perms.g_editar === true;
 
