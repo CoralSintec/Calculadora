@@ -94,22 +94,22 @@
             <h3>2. Configurar Material</h3>
             <div class="form-row">
                 <label>Formato:</label>
-                <select id="formato" onchange="calcularPresupuesto()">
+                <select id="formato" onchange="calcularVisual()">
                     <option value="30x30">30x30</option><option value="40x40">40x40</option><option value="50x50">50x50</option><option value="60x60">60x60</option><option value="20x60">20x60</option><option value="30x60">30x60</option><option value="40x60">40x60</option><option value="40x70">40x70</option><option value="15x75">15x75</option><option value="10x100">10x100</option><option value="20x100">20x100</option><option value="30x100">30x100</option><option value="40x100">40x100</option><option value="60x100">60x100</option>
                 </select>
             </div>
             <div class="form-row" style="display:flex; gap:10px;">
-                <div style="flex:1;"><label>Uso:</label><select id="uso" onchange="calcularPresupuesto()"><option value="Pared">Pared</option><option value="Piso">Piso</option></select></div>
+                <div style="flex:1;"><label>Uso:</label><select id="uso" onchange="calcularVisual()"><option value="Pared">Pared</option><option value="Piso">Piso</option></select></div>
                 <div style="flex:1;"><label>Textura:</label><select id="textura" onchange="manejarTexturaColor()"><option value="Media">Media</option><option value="Lisa">Lisa</option><option value="Gruesa">Gruesa</option><option value="Veta">Veta</option></select></div>
             </div>
-            <div class="form-row"><label>Color:</label><select id="color" onchange="calcularPresupuesto()"><option value="Gris Claro">Gris Claro</option><option value="Beige">Beige</option><option value="Gris 1%">Gris 1%</option><option value="Gris 2%">Gris 2%</option><option value="Gris 3%">Gris 3%</option></select></div>
-            <div class="form-row"><label>Metros (m²):</label><input type="number" id="metros" placeholder="10" min="0.1" step="0.1" oninput="calcularPresupuesto()"></div>
+            <div class="form-row"><label>Color:</label><select id="color" onchange="calcularVisual()"><option value="Gris Claro">Gris Claro</option><option value="Beige">Beige</option><option value="Gris 1%">Gris 1%</option><option value="Gris 2%">Gris 2%</option><option value="Gris 3%">Gris 3%</option></select></div>
+            <div class="form-row"><label>Metros (m²):</label><input type="number" id="metros" placeholder="10" min="0.1" step="0.1" oninput="calcularVisual()"></div>
 
             <div class="options-group">
-                <label class="option-item" style="color:var(--c-accent);"><span>+10% Desperdicio (Sugerido)</span><input type="checkbox" id="desperdicio" onchange="calcularPresupuesto()" checked></label>
+                <label class="option-item" style="color:var(--c-accent);"><span>+10% Desperdicio (Sugerido)</span><input type="checkbox" id="desperdicio" onchange="calcularVisual()" checked></label>
                 <div class="divider"></div>
-                <label class="option-item"><span>Incluir Carateo (Sacos)</span><input type="checkbox" id="carateo" onchange="calcularPresupuesto()"></label>
-                <label class="option-item"><span>Incluir Sellador (Galones)</span><input type="checkbox" id="sellador" onchange="calcularPresupuesto()"></label>
+                <label class="option-item"><span>Incluir Carateo (Sacos)</span><input type="checkbox" id="carateo" onchange="calcularVisual()"></label>
+                <label class="option-item"><span>Incluir Sellador (Galones)</span><input type="checkbox" id="sellador" onchange="calcularVisual()"></label>
             </div>
 
             <div class="results-card" id="box-resultados" style="display:none;">
@@ -144,7 +144,7 @@
     
     let db = [];
     let granTotalMatematico = 0; 
-    let ultimoCalculo = null; // AQUI SE GUARDA LA MEMORIA
+    let carrito = [];
 
     window.onload = () => {
         document.getElementById('loader-overlay').style.display = 'flex';
@@ -168,27 +168,22 @@
             colorSelect.style.opacity = '1'; 
             colorSelect.style.pointerEvents = 'auto'; 
         }
-        calcularPresupuesto();
+        calcularVisual();
     }
 
-    function calcularPresupuesto() {
+    // EL MOTOR DE CÁLCULO AHORA DEVUELVE UN OBJETO EN VEZ DE SOLO PINTAR LA PANTALLA
+    function motorCalculo() {
         const formato = document.getElementById('formato').value; 
         const uso = document.getElementById('uso').value; 
         const textura = document.getElementById('textura').value; 
         const color = document.getElementById('color').value; 
-        
-        let inputMetros = document.getElementById('metros').value;
-        const metros = parseFloat(inputMetros) || 0;
+        const metros = parseFloat(document.getElementById('metros').value) || 0;
         
         const despCheck = document.getElementById('desperdicio').checked; 
         const carateoCheck = document.getElementById('carateo').checked; 
         const selladorCheck = document.getElementById('sellador').checked;
 
-        if (metros <= 0) { 
-            document.getElementById('box-resultados').style.display = 'none'; 
-            ultimoCalculo = null; // SI NO HAY METROS, BORRA LA MEMORIA
-            return; 
-        }
+        if (metros <= 0) return null;
 
         const formatosLargos = ["10x100", "20x100", "30x100", "40x100", "60x100"];
         let espesor = (formatosLargos.includes(formato) || uso === "Piso") ? "2.2 cm" : "1.2 cm";
@@ -228,34 +223,7 @@
 
         const granTotal = totalRevestimiento + totalCarateo + totalSellador;
 
-        document.getElementById('ui-espesor').innerText = espesor; 
-        document.getElementById('res-pcs').innerText = piezas; 
-        document.getElementById('res-m2').innerText = m2Material.toFixed(2) + " m²"; 
-        document.getElementById('ui-total-rev').innerText = totalRevestimiento.toFixed(2);
-        
-        const rowCarateo = document.getElementById('row-carateo'); 
-        if(carateoCheck) { 
-            rowCarateo.style.display = 'flex'; 
-            document.getElementById('ui-sacos').innerText = cantSacos; 
-            document.getElementById('ui-total-carateo').innerText = totalCarateo.toFixed(2); 
-        } else { 
-            rowCarateo.style.display = 'none'; 
-        }
-        
-        const rowSellador = document.getElementById('row-sellador'); 
-        if(selladorCheck) { 
-            rowSellador.style.display = 'flex'; 
-            document.getElementById('ui-galones').innerText = cantGalones; 
-            document.getElementById('ui-total-sellador').innerText = totalSellador.toFixed(2); 
-        } else { 
-            rowSellador.style.display = 'none'; 
-        }
-
-        document.getElementById('total-presupuesto').innerText = granTotal.toFixed(2); 
-        document.getElementById('box-resultados').style.display = 'block';
-        
-        // ESTA ES LA MEMORIA BLINDADA. SE GUARDA SIEMPRE QUE HAYA UN CALCULO VALIDO.
-        ultimoCalculo = { 
+        return { 
             titulo: `${formato} | ${textura} | ${color}`, 
             formato: formato, 
             uso: uso, 
@@ -276,18 +244,54 @@
         };
     }
 
+    function calcularVisual() {
+        const calc = motorCalculo();
+        
+        if (!calc) {
+            document.getElementById('box-resultados').style.display = 'none'; 
+            return;
+        }
+
+        document.getElementById('ui-espesor').innerText = calc.espesor; 
+        document.getElementById('res-pcs').innerText = calc.piezas; 
+        document.getElementById('res-m2').innerText = calc.m2Final.toFixed(2) + " m²"; 
+        document.getElementById('ui-total-rev').innerText = calc.totalRev.toFixed(2);
+        
+        const rowCarateo = document.getElementById('row-carateo'); 
+        if(calc.carCheck) { 
+            rowCarateo.style.display = 'flex'; 
+            document.getElementById('ui-sacos').innerText = calc.cantSacos; 
+            document.getElementById('ui-total-carateo').innerText = calc.totalCar.toFixed(2); 
+        } else { 
+            rowCarateo.style.display = 'none'; 
+        }
+        
+        const rowSellador = document.getElementById('row-sellador'); 
+        if(calc.selCheck) { 
+            rowSellador.style.display = 'flex'; 
+            document.getElementById('ui-galones').innerText = calc.cantGalones; 
+            document.getElementById('ui-total-sellador').innerText = calc.totalSel.toFixed(2); 
+        } else { 
+            rowSellador.style.display = 'none'; 
+        }
+
+        document.getElementById('total-presupuesto').innerText = calc.total.toFixed(2); 
+        document.getElementById('box-resultados').style.display = 'block';
+    }
+
     function agregarAlCarrito() { 
-        // AL PRESIONAR EL BOTON, REVISA SI LA MEMORIA EXISTE
-        if (!ultimoCalculo || ultimoCalculo.m2Final <= 0) { 
-            alert("Por favor, asegúrate de ingresar los metros cuadrados y que se calcule un presupuesto válido."); 
+        // AL PRESIONAR EL BOTON, FUERZA EL CALCULO EN ESE MISMO INSTANTE
+        const calcFresco = motorCalculo();
+        
+        if (!calcFresco || calcFresco.m2Final <= 0) { 
+            alert("Por favor, asegúrate de ingresar los metros cuadrados."); 
             return; 
         } 
         
-        carrito.push({...ultimoCalculo}); 
+        carrito.push({...calcFresco}); 
         document.getElementById('cart-section').style.display = 'block'; 
         document.getElementById('metros').value = ""; 
         document.getElementById('box-resultados').style.display = 'none'; 
-        ultimoCalculo = null; // LIMPIAMOS LA MEMORIA DESPUES DE AGREGAR AL CARRITO
         
         actualizarUI_Carrito(); 
     }
@@ -370,7 +374,7 @@
             rif: rif.toUpperCase(), 
             telefono: tlf, 
             ubicacion: obr, 
-            total: granTotalMatematico,
+            total: granTotalMatematico, 
             detalles: carritoLimpio 
         };
         
