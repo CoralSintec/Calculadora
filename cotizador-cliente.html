@@ -9,7 +9,7 @@
             --c-bg: #1c1c1c; 
             --c-card: #2d2d2d; 
             --c-input: #3a3a3a; 
-            --c-accent: #b0b0b0; /* Gris Cemento */
+            --c-accent: #b0b0b0; 
             --c-text: #e0e0e0; 
             --c-border: #555555; 
             --c-muted: #9ca3af; 
@@ -116,6 +116,8 @@
                 <div class="breakdown-row"><span>Revestimiento (<span id="ui-espesor">1.2 cm</span>)</span><span class="breakdown-val">$<span id="ui-total-rev">0</span></span></div>
                 <div class="breakdown-row"><span>Piezas a fabricar</span><span class="breakdown-val" id="res-pcs">0</span></div>
                 <div class="breakdown-row"><span>Área Final</span><span class="breakdown-val" id="res-m2">0 m²</span></div>
+                <div class="breakdown-row" id="row-carateo" style="display:none; color:var(--c-accent); margin-top:8px;"><span>Carateo (<span id="ui-sacos">0</span> sacos)</span><span class="breakdown-val">$<span id="ui-total-carateo">0</span></span></div>
+                <div class="breakdown-row" id="row-sellador" style="display:none; color:var(--c-accent);"><span>Sellador (<span id="ui-galones">0</span> galones)</span><span class="breakdown-val">$<span id="ui-total-sellador">0</span></span></div>
                 <div class="divider"></div>
                 <div class="total-price-container"><div class="total-label">PRESUPUESTO ESTIMADO USD</div><div class="total-price">$<span id="total-presupuesto">0</span></div></div>
             </div>
@@ -140,10 +142,9 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
     
-    // Variables globales para almacenar el estado
     let db = [];
-    let granTotalMatematico = 0; // Variable crucial para evitar errores de envío
-    let ultimoCalculo = null;
+    let granTotalMatematico = 0; 
+    let ultimoCalculo = null; // AQUI SE GUARDA LA MEMORIA
 
     window.onload = () => {
         document.getElementById('loader-overlay').style.display = 'flex';
@@ -176,7 +177,6 @@
         const textura = document.getElementById('textura').value; 
         const color = document.getElementById('color').value; 
         
-        // Extracción segura de metros
         let inputMetros = document.getElementById('metros').value;
         const metros = parseFloat(inputMetros) || 0;
         
@@ -186,7 +186,7 @@
 
         if (metros <= 0) { 
             document.getElementById('box-resultados').style.display = 'none'; 
-            ultimoCalculo = null;
+            ultimoCalculo = null; // SI NO HAY METROS, BORRA LA MEMORIA
             return; 
         }
 
@@ -228,7 +228,6 @@
 
         const granTotal = totalRevestimiento + totalCarateo + totalSellador;
 
-        // Actualización de la UI de resultados
         document.getElementById('ui-espesor').innerText = espesor; 
         document.getElementById('res-pcs').innerText = piezas; 
         document.getElementById('res-m2').innerText = m2Material.toFixed(2) + " m²"; 
@@ -255,7 +254,7 @@
         document.getElementById('total-presupuesto').innerText = granTotal.toFixed(2); 
         document.getElementById('box-resultados').style.display = 'block';
         
-        // Guardamos el objeto limpio
+        // ESTA ES LA MEMORIA BLINDADA. SE GUARDA SIEMPRE QUE HAYA UN CALCULO VALIDO.
         ultimoCalculo = { 
             titulo: `${formato} | ${textura} | ${color}`, 
             formato: formato, 
@@ -277,9 +276,8 @@
         };
     }
 
-    let carrito = [];
-    
     function agregarAlCarrito() { 
+        // AL PRESIONAR EL BOTON, REVISA SI LA MEMORIA EXISTE
         if (!ultimoCalculo || ultimoCalculo.m2Final <= 0) { 
             alert("Por favor, asegúrate de ingresar los metros cuadrados y que se calcule un presupuesto válido."); 
             return; 
@@ -289,7 +287,7 @@
         document.getElementById('cart-section').style.display = 'block'; 
         document.getElementById('metros').value = ""; 
         document.getElementById('box-resultados').style.display = 'none'; 
-        ultimoCalculo = null; // Limpiamos la variable tras agregar
+        ultimoCalculo = null; // LIMPIAMOS LA MEMORIA DESPUES DE AGREGAR AL CARRITO
         
         actualizarUI_Carrito(); 
     }
@@ -297,7 +295,7 @@
     function actualizarUI_Carrito() {
         const listaUI = document.getElementById('cart-list'); 
         listaUI.innerHTML = ''; 
-        granTotalMatematico = 0; // Reiniciamos la variable matemática
+        granTotalMatematico = 0; 
         
         carrito.forEach((item, index) => {
             granTotalMatematico += item.total; 
@@ -356,7 +354,6 @@
         document.getElementById('loader-overlay').style.display = 'flex'; 
         document.getElementById('loader-overlay').innerHTML = "⏳ ENVIANDO SOLICITUD...";
         
-        // Creamos una versión limpia del carrito para mandar al servidor
         let carritoLimpio = carrito.map(item => ({ 
             formato: item.formato, 
             uso: item.uso, 
@@ -368,13 +365,12 @@
             total: item.total 
         }));
         
-        // Usamos la variable granTotalMatematico para evitar errores de lectura de texto
         const paquete = { 
             cliente: nom.toUpperCase(), 
             rif: rif.toUpperCase(), 
             telefono: tlf, 
             ubicacion: obr, 
-            total: granTotalMatematico, // PASAMOS EL NUMERO DIRECTAMENTE
+            total: granTotalMatematico,
             detalles: carritoLimpio 
         };
         
