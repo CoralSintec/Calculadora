@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Producción Coralsintec</title>
     <style>
         :root { 
@@ -51,7 +54,6 @@
         .btn-action:active { transform: scale(0.98); }
         .btn-aceptar { background: #3b82f6; }
         .btn-entregado { background: #10b981; }
-        .btn-pago { background: #059669; }
         .btn-eliminar { background: #ef4444; }
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28,28,28,0.95); z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: var(--accent); font-size: 18px;}
         .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; }
@@ -59,14 +61,21 @@
         .modal-card h3 { margin: 0 0 15px 0; color: #fff; border-bottom: 2px solid var(--border); padding-bottom: 10px;}
         .modal-input { width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); background: var(--input-bg); color: #fff; border-radius: 8px; font-size: 14px; font-weight:600;}
         .modal-row { display: flex; gap: 10px; }
-        .payment-panel { background: var(--input-bg); padding: 12px; border-radius: 10px; border: 1px solid var(--border); margin-top: 12px; display: inline-block; width: 100%; box-sizing: border-box;}
+        
+        /* PANEL DE PAGOS INTERACTIVO */
+        .payment-panel { background: var(--input-bg); padding: 15px; border-radius: 10px; border: 1px solid var(--border); margin-top: 15px; display: inline-block; width: 100%; box-sizing: border-box;}
         .payment-grid { display: flex; justify-content: space-between; align-items: center; }
         .payment-box { display: flex; flex-direction: column; }
-        .payment-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 2px; }
-        .payment-val { font-size: 16px; font-weight: 900; color: #fff; }
+        .payment-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+        .payment-val { font-size: 18px; font-weight: 900; color: #fff; }
         .val-green { color: #4ade80; }
         .val-red { color: #fca5a5; }
-        .payment-divider { width: 2px; background: var(--border); height: 30px; }
+        .payment-divider { width: 2px; background: var(--border); height: 40px; }
+        .input-abono { width: 70px; background: #1c1c1c; border: 1px solid #555; color: #4ade80; font-weight: 900; border-radius: 6px; padding: 6px; font-size: 14px; text-align: center; }
+        .input-abono:focus { outline: none; border-color: #10b981; }
+        .btn-guardar-abono { background: #059669; border: none; color: white; border-radius: 6px; cursor: pointer; padding: 7px 10px; font-size: 12px; font-weight: bold; transition: 0.1s; }
+        .btn-guardar-abono:active { transform: scale(0.9); }
+        
         .calendar-btn { background: var(--input-bg); padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s;}
     </style>
 </head>
@@ -207,7 +216,7 @@
         }
 
         [...pedidos].reverse().forEach(p => {
-            // CÁLCULO SEGURO DE DATOS Y PORCENTAJES
+            // Protección contra JSON dañado en la base de datos
             let items = [];
             try { items = JSON.parse(p.DETALLES_JSON); } catch(e) { return; }
             if (items.length === 0) return;
@@ -219,7 +228,7 @@
             let pctMini = obtenerProgreso(p.FECHA_ORDEN, p.FECHA_LIMITE_HABIL); 
             let clipMini = 100 - pctMini;
             
-            // Extraer números limpiando posibles caracteres raros o espacios de la DB
+            // Extraer números limpiando caracteres raros
             let rawTotal = String(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || "0").replace(/[^0-9.]/g, '');
             let rawPagado = String(p.PAGADO_USD || p.PAGADO || (Object.values(p).length > 11 ? Object.values(p)[11] : "0")).replace(/[^0-9.]/g, '');
             
@@ -230,7 +239,7 @@
             let porcentaje = total > 0 ? Math.round((pagado / total) * 100) : 0; 
             let porcentajeResta = total > 0 ? Math.round((falta / total) * 100) : 0;
 
-            // 1. PANEL DE DINERO GARANTIZADO SI TIENES PERMISO O ERES JEFE
+            // 1. EL CUADRITO INTERACTIVO DE PAGOS
             let etiquetaPrecio = "";
             if(sysPerms.p_precios || soyElJefe) { 
                 etiquetaPrecio = `
@@ -242,13 +251,16 @@
                         </div>
                         <div class="payment-divider"></div>
                         <div class="payment-box">
-                            <span class="payment-label">Abonado (${porcentaje}%)</span>
-                            <span class="payment-val val-green">$${pagado.toFixed(2)}</span>
+                            <span class="payment-label">Abonado (<span id="pct-abono-${safeId}">${porcentaje}</span>%)</span>
+                            <div style="display:flex; align-items:center; gap:5px; margin-top:2px;">
+                                <input type="number" id="abono-${safeId}" value="${pagado.toFixed(2)}" class="input-abono">
+                                <button onclick="guardarAbono('${p.CLIENTE}', '${p.FECHA_ORDEN}', '${safeId}', ${total})" class="btn-guardar-abono">💾</button>
+                            </div>
                         </div>
                         <div class="payment-divider"></div>
                         <div class="payment-box">
-                            <span class="payment-label">Resta (${porcentajeResta}%)</span>
-                            <span class="payment-val val-red">$${falta.toFixed(2)}</span>
+                            <span class="payment-label">Resta (<span id="pct-resta-${safeId}">${porcentajeResta}</span>%)</span>
+                            <span class="payment-val val-red" id="val-resta-${safeId}">$${falta.toFixed(2)}</span>
                         </div>
                     </div>
                 </div>`; 
@@ -275,8 +287,10 @@
                 tablaDetallesHtml += `<tr><td>${formatoReal}</td><td><b>${usoReal}</b></td><td>${colorReal}</td><td>${texturaReal}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
                 
                 if(sysPerms.p_receta || soyElJefe) {
+                    let formulasArray = Array.isArray(formulas) ? formulas : [];
                     let colorClean = ultraClean(colorReal); let textClean = ultraClean(texturaReal).substring(0, 4); let usoClean = ultraClean(usoReal);
-                    let formulaEncontrada = formulas.find(f => { return ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(colorClean) && ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(textClean) && ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(usoClean); });
+                    let formulaEncontrada = formulasArray.find(f => { return f && ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(colorClean) && ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(textClean) && ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(usoClean); });
+                    
                     recetaHtml += `<div class="receta-item"><div class="receta-title">▶ Para fabricar: ${m}m² de ${colorReal} (${texturaReal}) - ${usoReal}</div>`;
                     if(formulaEncontrada) { 
                         let keys = Object.keys(formulaEncontrada); let vals = Object.values(formulaEncontrada); 
@@ -332,14 +346,13 @@
             html += `<div id="detalles-${safeId}" class="order-tab-content active" style="overflow-x: auto;">${tablaDetallesHtml}</div>`;
             if(sysPerms.p_receta || soyElJefe) { html += `<div id="receta-${safeId}" class="order-tab-content">${recetaHtml}</div>`; }
             
-            // 4. BOTONES DE ACCIÓN (INICIAR, ENTREGAR, ABONAR, ELIMINAR) GARANTIZADOS
+            // 4. BOTONES DE ACCIÓN GARANTIZADOS
             if(sysPerms.p_acciones || soyElJefe) { 
                 html += `<div class="btn-group">`; 
                 html += `<button class="btn-action btn-aceptar" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN PROCESO')">✅ ACEPTAR E INICIAR</button>`;
                 html += `<button class="btn-action btn-entregado" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 MARCAR ENTREGADO</button>`; 
                 
                 if(soyElJefe) { 
-                    html += `<button class="btn-action btn-pago" onclick="registrarPago('${p.CLIENTE}', '${p.FECHA_ORDEN}', ${pagado})">💵 REGISTRAR ABONO</button>`;
                     html += `<button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN</button>`; 
                 } 
                 html += `</div>`; 
@@ -350,18 +363,40 @@
         });
     }
 
+    // FUNCION DE GUARDAR EL ABONO DEL CUADRITO INTERACTIVO
+    function guardarAbono(cliente, fecha, idInput, total) {
+        let abonoInput = document.getElementById('abono-' + idInput).value;
+        let nuevoAbono = parseFloat(abonoInput) || 0;
+        let nuevaResta = total - nuevoAbono;
+        
+        let nuevoPctAbono = total > 0 ? Math.round((nuevoAbono / total) * 100) : 0;
+        let nuevoPctResta = total > 0 ? Math.round((nuevaResta / total) * 100) : 0;
+        
+        // Actualizamos visualmente de inmediato
+        document.getElementById('pct-abono-' + idInput).innerText = nuevoPctAbono;
+        document.getElementById('pct-resta-' + idInput).innerText = nuevoPctResta;
+        document.getElementById('val-resta-' + idInput).innerText = '$' + nuevaResta.toFixed(2);
+        
+        document.getElementById('loader-overlay').innerText = "⏳ Guardando abono...";
+        document.getElementById('loader-overlay').style.display = 'flex';
+        
+        fetch(API_URL + "?action=registrar_pago", { 
+            method: "POST", 
+            mode: "no-cors", 
+            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, monto_pagado: nuevoAbono }) 
+        }).finally(() => { 
+            setTimeout(() => { 
+                document.getElementById('loader-overlay').innerText = "⏳ Sincronizando Planta...";
+                loadData(); 
+            }, 1500); 
+        });
+    }
+
     function prepararPDF(fechaOrden, tipo) { if(tipo === 'entrega') { document.getElementById('ch-id-pedido').value = fechaOrden; document.getElementById('modal-chofer').style.display = 'flex'; } else { generarPDF(fechaOrden, tipo, null); } }
     function ejecutarNotaEntrega() { let fechaOrden = document.getElementById('ch-id-pedido').value; let datosChofer = { destino: document.getElementById('ch-destino').value || 'No especificado', nombre: document.getElementById('ch-nombre').value || 'No especificado', modelo: document.getElementById('ch-modelo').value || 'N/A', anio: document.getElementById('ch-anio').value || 'N/A', color: document.getElementById('ch-color').value || 'N/A', placa: document.getElementById('ch-placa').value || 'N/A' }; document.getElementById('modal-chofer').style.display = 'none'; generarPDF(fechaOrden, 'entrega', datosChofer); }
     function generarPDF(fechaOrden, tipo, datosChofer) { let p = pedidosGlobal.find(x => x.FECHA_ORDEN === fechaOrden); if(!p) return; let items = JSON.parse(p.DETALLES_JSON); let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0); let tituloDoc = tipo === 'cotizacion' ? "COTIZACIÓN FORMAL" : tipo === 'produccion' ? "ORDEN DE PRODUCCIÓN" : "NOTA DE ENTREGA / GUÍA DE DESPACHO"; let htmlPDF = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${tituloDoc} - ${p.CLIENTE}</title><style>body { font-family: Arial, sans-serif; color: #333; margin: 40px; font-size: 13px; line-height: 1.4; } .header { border-bottom: 3px solid #1e2328; padding-bottom: 15px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:flex-end;} .empresa h1 { margin: 0 0 5px 0; color: #1e2328; font-size:20px; text-transform:uppercase; letter-spacing: 1px;} .empresa p { margin: 2px 0; color: #475569; font-size:11px; font-weight: bold;} .empresa .slogan { font-style: italic; color: #475569; margin-top: 4px; font-weight: normal;} .titulo-doc { text-align: right;} .titulo-doc h2 { margin: 0 0 5px 0; color: #1e2328; font-size:18px;} .info-grid { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;} .info-box p { margin: 5px 0; } table { width: 100%; border-collapse: collapse; margin-bottom: 20px; } th { background: #475569; color: white; padding: 10px; text-align: left; font-size:11px; text-transform: uppercase;} td { border-bottom: 1px solid #e2e8f0; padding: 10px; font-size:12px;} .total-box { text-align: right; font-size: 16px; font-weight: 900; margin-top: 15px; padding: 10px; background: #ecfccb; display: inline-block; float: right; border-radius: 6px;} .firmas { margin-top: 60px; display: flex; justify-content: space-around; text-align: center; } .firma-linea { border-top: 1px solid #000; width: 200px; padding-top: 5px; font-weight: bold; font-size: 11px; } @media print { body { margin: 0; } .no-print { display: none; } }</style></head><body><div class="header"><div class="empresa"><h1>REVESTIMIENTOS CORALROCK C.A.</h1><p>RIF: J-50317540-0</p><p>by Coralsintec</p><p class="slogan">Playing with concrete since 1986</p><p>Caracas - Venezuela</p></div><div class="titulo-doc"><h2>${tituloDoc}</h2><p><b>Fecha:</b> ${p.FECHA_ORDEN}</p></div></div><div class="info-grid"><div class="info-box"><p><b>Cliente:</b> ${p.CLIENTE}</p><p><b>RIF/CI:</b> ${p.RIF_CI || 'No registrado'}</p><p><b>Teléfono:</b> ${p.TELEFONO || 'No registrado'}</p><p><b>Obra / Ubicación:</b> ${p.UBICACION}</p></div></div>`; if(tipo === 'entrega' && datosChofer) { htmlPDF += `<div style="border: 2px dashed #cbd5e1; padding: 15px; margin-bottom: 20px; border-radius: 8px;"><h4 style="margin: 0 0 10px 0; color: #3b82f6;">📦 Datos de Transporte</h4><p style="margin: 3px 0;"><b>Destino:</b> ${datosChofer.destino}</p><p style="margin: 3px 0;"><b>Chofer:</b> ${datosChofer.nombre}</p><p style="margin: 3px 0;"><b>Vehículo:</b> ${datosChofer.modelo} (${datosChofer.anio}) | ${datosChofer.color} | Placa: ${datosChofer.placa}</p></div>`; } htmlPDF += `<table><thead><tr><th>FORMATO</th><th>USO</th><th>TEXTURA</th><th>COLOR</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`; items.forEach(i => { let m = parseFloat(i.m2Final || i.m2 || 0); let pcs = i.piezas || i.pieces || Math.ceil(m / (((i.formato.split('x')[0] || 1)*(i.formato.split('x')[1] || 1))/10000)); htmlPDF += `<tr><td>${i.formato}</td><td>${i.uso}</td><td>${i.textura}</td><td>${i.color}</td><td><b>${m} m²</b></td><td>${pcs}</td></tr>`; }); htmlPDF += `</tbody></table>`; if(tipo === 'cotizacion') { htmlPDF += `<div class="total-box">TOTAL PRESUPUESTO: $${total.toFixed(2)}</div><br><br><br>`; } let textoFirma1 = tipo === 'entrega' ? 'Despachado por (Planta)' : 'Emitido por la Empresa'; let textoFirma2 = tipo === 'cotizacion' ? 'Firma de Aceptación (Cliente)' : tipo === 'produccion' ? 'Firma del Gerente de Producción' : 'Recibido Conforme (Chofer/Cliente)'; htmlPDF += `<div class="firmas"><div class="firma-linea">${textoFirma1}</div><div class="firma-linea">${textoFirma2}</div></div><script>window.onload = function() { setTimeout(() => { window.print(); }, 500); }<\/script></body></html>`; let printWindow = window.open('', '_blank'); printWindow.document.write(htmlPDF); printWindow.document.close(); }
     
     function accion(c, f, e) { if(!confirm("¿Confirmar cambio a: " + e + "?")) return; document.getElementById('loader-overlay').style.display = 'flex'; fetch(API_URL + "?action=actualizar_estado", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: c, fecha_orden: f, nuevo_estado: e }) }).finally(() => { setTimeout(() => { loadData(); }, 2000); }); }
-    
-    function registrarPago(c, f, actual) { 
-        let monto = prompt("Ingresa el monto total abonado hasta la fecha (USD):", actual); 
-        if(monto === null || isNaN(monto) || monto === "") return; 
-        document.getElementById('loader-overlay').style.display = 'flex'; 
-        fetch(API_URL + "?action=registrar_pago", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: c, fecha_orden: f, monto_pagado: monto }) }).finally(() => { setTimeout(() => { loadData(); }, 2000); }); 
-    }
     
     function eliminar(c, f) { 
         if(!confirm("⚠️ ¿Eliminar orden permanentemente?")) return; 
