@@ -12,7 +12,7 @@
             --border: #555555; 
             --text-main: #e0e0e0; 
             --text-muted: #9ca3af; 
-            --accent: #b0b0b0; 
+            --accent: #b0b0b0; /* Gris Cemento */
             --blue: #3b82f6; 
             --green: #10b981; 
             --red: #ef4444; 
@@ -46,8 +46,6 @@
         td { padding: 8px; border-bottom: 1px solid var(--border); font-weight: 600; color: var(--text-main);}
         .qty-badge { background: #1e3a8a; color: #93c5fd; padding: 4px 8px; border-radius: 4px; font-weight: 800; display: inline-block;}
         .pcs-badge { color: #4ade80; font-weight: 900; font-size: 15px;}
-        .extras-box { background: var(--input-bg); padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px dashed #555555; }
-        .extras-title { margin: 0 0 10px 0; color: var(--accent); border-bottom: 1px solid #555555; padding-bottom: 5px; font-size: 12px; text-transform: uppercase;}
         .btn-group { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;}
         .btn-action { border: none; padding: 14px; border-radius: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; font-size: 12px; transition: transform 0.1s;}
         .btn-action:active { transform: scale(0.98); }
@@ -124,11 +122,12 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
 
-    // EXTRACCIÓN DE SEGURIDAD ABSOLUTA
-    const uActual = localStorage.getItem('usuarioCoralsintec') || '';
-    const soyElJefe = uActual.toUpperCase().includes('EDUARDO');
+    // IDENTIFICADOR DE JEFE BLINDADO
+    const uActual = (localStorage.getItem('usuarioCoralsintec') || '').trim().toUpperCase();
+    const soyElJefe = (uActual === 'EDUARDO' || uActual.includes('EDUARDO'));
 
-    let sysPerms = { p_precios: false, p_receta: true, p_acciones: false, p_pdf: false };
+    // CARGAMOS PERMISOS
+    let sysPerms = { p_precios: false, p_receta: false, p_acciones: false, p_pdf: false };
     try { 
         let saved = JSON.parse(localStorage.getItem('permisosCoralsintec')); 
         if(saved) { 
@@ -139,11 +138,21 @@
         } 
     } catch(e){}
 
+    // SI ERES EL DUEÑO, ACTIVAMOS TODO SÍ O SÍ
+    if(soyElJefe) { 
+        sysPerms.p_precios = true; 
+        sysPerms.p_receta = true; 
+        sysPerms.p_acciones = true; 
+        sysPerms.p_pdf = true; 
+    }
+
     let pedidosGlobal = [];
 
     window.onload = () => {
-        const badge = document.getElementById('badge-usuario'); const headerSub = document.getElementById('header-user');
-        badge.innerText = "👤 " + String(uActual).trim();
+        const badge = document.getElementById('badge-usuario'); 
+        const headerSub = document.getElementById('header-user');
+        badge.innerText = "👤 " + uActual;
+        
         if(soyElJefe) { 
             headerSub.innerText = "⭐ VISTA GERENCIAL"; 
             headerSub.style.color = "#b0b0b0"; 
@@ -157,8 +166,12 @@
         document.getElementById('loader-overlay').style.display = 'flex';
         try {
             const [pedidos, formulas] = await Promise.all([fetch(API_URL + "?action=get_pedidos&t=" + Date.now()).then(r => r.json()), fetch(API_URL + "?action=get_formulas&t=" + Date.now()).then(r => r.json())]);
-            pedidosGlobal = pedidos; document.getElementById('loader-overlay').style.display = 'none'; render(pedidos, formulas);
-        } catch(e) { document.getElementById('loader-overlay').style.display = 'none'; }
+            pedidosGlobal = pedidos; 
+            document.getElementById('loader-overlay').style.display = 'none'; 
+            render(pedidos, formulas);
+        } catch(e) { 
+            document.getElementById('loader-overlay').style.display = 'none'; 
+        }
     }
 
     function parseFechaLocal(fechaStr) { if(!fechaStr || fechaStr.includes("-")) return new Date(); let partes = fechaStr.split('/'); if(partes.length === 3) return new Date(partes[2], partes[1] - 1, partes[0]); return new Date(); }
@@ -185,37 +198,55 @@
     function ultraClean(str) { if(!str) return ""; return String(str).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase(); }
 
     function render(pedidos, formulas) {
-        const container = document.getElementById('lista-pedidos'); container.innerHTML = '';
-        if(pedidos.length === 0) { container.innerHTML = "<p style='text-align:center; color:var(--text-muted); font-weight:bold; margin-top:20px;'>No hay órdenes activas.</p>"; return; }
+        const container = document.getElementById('lista-pedidos'); 
+        container.innerHTML = '';
+        
+        if(!pedidos || pedidos.length === 0) { 
+            container.innerHTML = "<p style='text-align:center; color:var(--text-muted); font-weight:bold; margin-top:20px;'>No hay órdenes activas.</p>"; 
+            return; 
+        }
 
         [...pedidos].reverse().forEach(p => {
-            if(!p.DETALLES_JSON) return; let items = JSON.parse(p.DETALLES_JSON);
-            let estado = p.ESTADO || "NUEVO / POR ACEPTAR"; let stClass = estado === "ACEPTADO / EN PROCESO" ? "st-proceso" : estado === "PROCESANDO / COORDINAR ENTREGA" ? "st-coordinar" : estado === "ENTREGADO" ? "st-listo" : "st-nuevo";
-            let totalCarateo = 0, totalSellador = 0; let safeId = p.FECHA_ORDEN.replace(/[^a-zA-Z0-9]/g, '');
-            let pctMini = obtenerProgreso(p.FECHA_ORDEN, p.FECHA_LIMITE_HABIL); let clipMini = 100 - pctMini;
-            let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0); let pagado = parseFloat(p.PAGADO_USD || p.PAGADO || Object.values(p)[11] || 0); let falta = total - pagado;
-            let porcentaje = total > 0 ? ((pagado / total) * 100).toFixed(0) : 0; let porcentajeResta = total > 0 ? ((falta / total) * 100).toFixed(0) : 0;
+            // Protección contra JSON dañado en la base de datos
+            let items = [];
+            try { items = JSON.parse(p.DETALLES_JSON); } catch(e) { return; }
+            if (items.length === 0) return;
 
-            // ESTA ES LA REGLA ABSOLUTA QUE PINTA EL DINERO
+            let estado = p.ESTADO || "NUEVO / POR ACEPTAR"; 
+            let stClass = estado === "ACEPTADO / EN PROCESO" ? "st-proceso" : estado === "PROCESANDO / COORDINAR ENTREGA" ? "st-coordinar" : estado === "ENTREGADO" ? "st-listo" : "st-nuevo";
+            let totalCarateo = 0, totalSellador = 0; 
+            let safeId = String(p.FECHA_ORDEN).replace(/[^a-zA-Z0-9]/g, '');
+            let pctMini = obtenerProgreso(p.FECHA_ORDEN, p.FECHA_LIMITE_HABIL); 
+            let clipMini = 100 - pctMini;
+            
+            let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0) || 0; 
+            let pagado = parseFloat(p.PAGADO_USD || p.PAGADO || (Object.values(p).length > 11 ? Object.values(p)[11] : 0) || 0) || 0; 
+            let falta = total - pagado;
+            let porcentaje = total > 0 ? ((pagado / total) * 100).toFixed(0) : 0; 
+            let porcentajeResta = total > 0 ? ((falta / total) * 100).toFixed(0) : 0;
+
+            // 1. DIBUJAMOS EL PANEL DE DINERO Y PORCENTAJE
             let etiquetaPrecio = "";
-            if(sysPerms.p_precios || soyElJefe) { 
+            if(sysPerms.p_precios) { 
                 etiquetaPrecio = `<div class="payment-panel"><div class="payment-grid"><div class="payment-box"><span class="payment-label">Total Orden</span><span class="payment-val">$${total.toFixed(2)}</span></div><div class="payment-divider"></div><div class="payment-box"><span class="payment-label">Abonado (${porcentaje}%)</span><span class="payment-val val-green">$${pagado.toFixed(2)}</span></div><div class="payment-divider"></div><div class="payment-box"><span class="payment-label">Resta (${porcentajeResta}%)</span><span class="payment-val val-red">$${falta.toFixed(2)}</span></div></div></div>`; 
             }
 
-            // ESTA ES LA REGLA ABSOLUTA QUE PINTA LOS BOTONES PDF
+            // 2. DIBUJAMOS LOS BOTONES PDF (NOTAS DE ENTREGA Y PRESUPUESTOS)
             let botonesPDF = "";
-            if(sysPerms.p_pdf || soyElJefe) { 
+            if(sysPerms.p_pdf) { 
                 botonesPDF = `<div class="doc-buttons"><button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'cotizacion')">📄 COTIZ.</button><button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'produccion')">🏭 PROD.</button><button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'entrega')">🚚 ENVÍO</button></div>`; 
             }
 
-            let tablaDetallesHtml = `<table><thead><tr><th>FORMATO</th><th>USO</th><th>COLOR</th><th>TEXTURA</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`; let recetaHtml = `<div>`;
+            // 3. DIBUJAMOS LA TABLA DE DETALLES
+            let tablaDetallesHtml = `<table><thead><tr><th>FORMATO</th><th>USO</th><th>COLOR</th><th>TEXTURA</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`; 
+            let recetaHtml = `<div>`;
+            
             items.forEach(i => {
                 let m = parseFloat(i.m2Final || i.m2 || 0); let formatoReal = i.formato || 'N/A'; let colorReal = i.color || 'N/A'; let usoReal = i.uso || 'N/A'; let texturaReal = i.textura || 'N/A';
                 let pcs = i.piezas || i.pieces || Math.ceil(m / (((formatoReal.split('x')[0] || 1)*(formatoReal.split('x')[1] || 1))/10000));
-                totalCarateo += i.carateo || i.cantSacos || 0; totalSellador += i.sellador || i.cantGalones || 0;
                 tablaDetallesHtml += `<tr><td>${formatoReal}</td><td><b>${usoReal}</b></td><td>${colorReal}</td><td>${texturaReal}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
                 
-                if(sysPerms.p_receta || soyElJefe) {
+                if(sysPerms.p_receta) {
                     let colorClean = ultraClean(colorReal); let textClean = ultraClean(texturaReal).substring(0, 4); let usoClean = ultraClean(usoReal);
                     let formulaEncontrada = formulas.find(f => { return ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(colorClean) && ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(textClean) && ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(usoClean); });
                     recetaHtml += `<div class="receta-item"><div class="receta-title">▶ Para fabricar: ${m}m² de ${colorReal} (${texturaReal}) - ${usoReal}</div>`;
@@ -224,23 +255,29 @@
             });
             tablaDetallesHtml += `</tbody></table></div>`;
 
+            // CONSTRUIMOS LA TARJETA PRINCIPAL
             let html = `<div class="order-card">${botonesPDF}<div style="text-align:center;"><span class="status-tag ${stClass}">${estado}</span></div><div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:15px;"><div style="width: 100%;"><div style="display:flex; justify-content: space-between; align-items: flex-start;"><div><div style="font-size:18px; font-weight:900; color:#fff; text-transform:uppercase;">${p.CLIENTE}</div><div style="font-size:12px; color:var(--text-muted); margin-top:3px;"><b>RIF:</b> ${p.RIF_CI || '-'}</div></div><div class="calendar-btn" onclick="abrirTimeline('${p.FECHA_ORDEN}', '${p.FECHA_LIMITE_HABIL}', '${p.CLIENTE}')"><span style="font-size: 26px;">📅</span><div style="width: 100px;"><div style="font-size:9px; font-weight:900; color:var(--text-muted); text-transform:uppercase; text-align:left;">FECHA LÍMITE</div><div style="color:#fff; font-size:14px; font-weight:900; margin-top:1px; text-align:left;">${p.FECHA_LIMITE_HABIL}</div><div style="width: 100%; height: 5px; background: #404040; border-radius: 3px; margin-top: 4px; position: relative;"><div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(to right, #3b82f6, #b0b0b0, #10b981); border-radius: 3px; clip-path: inset(0 ${clipMini}% 0 0);"></div></div></div></div></div>${etiquetaPrecio}</div></div>`;
             
-            if(sysPerms.p_receta || soyElJefe) { html += `<div class="order-tabs"><button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button><button class="order-tab" onclick="switchTab(this, 'receta-${safeId}')">🧪 RECETA</button></div>`; } else { html += `<div class="order-tabs"><button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button></div>`; }
+            if(sysPerms.p_receta) { html += `<div class="order-tabs"><button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button><button class="order-tab" onclick="switchTab(this, 'receta-${safeId}')">🧪 RECETA</button></div>`; } else { html += `<div class="order-tabs"><button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button></div>`; }
             html += `<div id="detalles-${safeId}" class="order-tab-content active" style="overflow-x: auto;">${tablaDetallesHtml}</div>`;
-            if(sysPerms.p_receta || soyElJefe) { html += `<div id="receta-${safeId}" class="order-tab-content">${recetaHtml}</div>`; }
+            if(sysPerms.p_receta) { html += `<div id="receta-${safeId}" class="order-tab-content">${recetaHtml}</div>`; }
             
-            // ESTA ES LA REGLA ABSOLUTA QUE PINTA LOS BOTONES DE ACCIÓN
-            if(sysPerms.p_acciones || soyElJefe) { 
+            // 4. DIBUJAMOS LOS BOTONES DE ACCIÓN (INICIAR, ENTREGAR, ABONAR, ELIMINAR)
+            if(sysPerms.p_acciones) { 
                 html += `<div class="btn-group">`; 
-                html += `<button class="btn-action btn-aceptar" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN PROCESO')">✅ ACEPTAR E INICIAR</button><button class="btn-action btn-entregado" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 MARCAR ENTREGADO</button>`; 
+                html += `<button class="btn-action btn-aceptar" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN PROCESO')">✅ ACEPTAR E INICIAR</button>`;
+                html += `<button class="btn-action btn-entregado" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 MARCAR ENTREGADO</button>`; 
                 
+                // Estos 2 botones solo salen si eres EDUARDO o tienes permiso expreso
                 if(soyElJefe) { 
-                    html += `<button class="btn-action btn-pago" onclick="registrarPago('${p.CLIENTE}', '${p.FECHA_ORDEN}', ${pagado})">💵 REGISTRAR ABONO</button><button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN</button>`; 
+                    html += `<button class="btn-action btn-pago" onclick="registrarPago('${p.CLIENTE}', '${p.FECHA_ORDEN}', ${pagado})">💵 REGISTRAR ABONO</button>`;
+                    html += `<button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN</button>`; 
                 } 
                 html += `</div>`; 
             }
-            html += `</div>`; container.innerHTML += html;
+            
+            html += `</div>`; 
+            container.innerHTML += html;
         });
     }
 
@@ -249,8 +286,19 @@
     function generarPDF(fechaOrden, tipo, datosChofer) { let p = pedidosGlobal.find(x => x.FECHA_ORDEN === fechaOrden); if(!p) return; let items = JSON.parse(p.DETALLES_JSON); let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0); let tituloDoc = tipo === 'cotizacion' ? "COTIZACIÓN FORMAL" : tipo === 'produccion' ? "ORDEN DE PRODUCCIÓN" : "NOTA DE ENTREGA / GUÍA DE DESPACHO"; let htmlPDF = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${tituloDoc} - ${p.CLIENTE}</title><style>body { font-family: Arial, sans-serif; color: #333; margin: 40px; font-size: 13px; line-height: 1.4; } .header { border-bottom: 3px solid #1e2328; padding-bottom: 15px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:flex-end;} .empresa h1 { margin: 0 0 5px 0; color: #1e2328; font-size:20px; text-transform:uppercase; letter-spacing: 1px;} .empresa p { margin: 2px 0; color: #475569; font-size:11px; font-weight: bold;} .empresa .slogan { font-style: italic; color: #475569; margin-top: 4px; font-weight: normal;} .titulo-doc { text-align: right;} .titulo-doc h2 { margin: 0 0 5px 0; color: #1e2328; font-size:18px;} .info-grid { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;} .info-box p { margin: 5px 0; } table { width: 100%; border-collapse: collapse; margin-bottom: 20px; } th { background: #475569; color: white; padding: 10px; text-align: left; font-size:11px; text-transform: uppercase;} td { border-bottom: 1px solid #e2e8f0; padding: 10px; font-size:12px;} .total-box { text-align: right; font-size: 16px; font-weight: 900; margin-top: 15px; padding: 10px; background: #ecfccb; display: inline-block; float: right; border-radius: 6px;} .firmas { margin-top: 60px; display: flex; justify-content: space-around; text-align: center; } .firma-linea { border-top: 1px solid #000; width: 200px; padding-top: 5px; font-weight: bold; font-size: 11px; } @media print { body { margin: 0; } .no-print { display: none; } }</style></head><body><div class="header"><div class="empresa"><h1>REVESTIMIENTOS CORALROCK C.A.</h1><p>RIF: J-50317540-0</p><p>by Coralsintec</p><p class="slogan">Playing with concrete since 1986</p><p>Caracas - Venezuela</p></div><div class="titulo-doc"><h2>${tituloDoc}</h2><p><b>Fecha:</b> ${p.FECHA_ORDEN}</p></div></div><div class="info-grid"><div class="info-box"><p><b>Cliente:</b> ${p.CLIENTE}</p><p><b>RIF/CI:</b> ${p.RIF_CI || 'No registrado'}</p><p><b>Teléfono:</b> ${p.TELEFONO || 'No registrado'}</p><p><b>Obra / Ubicación:</b> ${p.UBICACION}</p></div></div>`; if(tipo === 'entrega' && datosChofer) { htmlPDF += `<div style="border: 2px dashed #cbd5e1; padding: 15px; margin-bottom: 20px; border-radius: 8px;"><h4 style="margin: 0 0 10px 0; color: #3b82f6;">📦 Datos de Transporte</h4><p style="margin: 3px 0;"><b>Destino:</b> ${datosChofer.destino}</p><p style="margin: 3px 0;"><b>Chofer:</b> ${datosChofer.nombre}</p><p style="margin: 3px 0;"><b>Vehículo:</b> ${datosChofer.modelo} (${datosChofer.anio}) | ${datosChofer.color} | Placa: ${datosChofer.placa}</p></div>`; } htmlPDF += `<table><thead><tr><th>FORMATO</th><th>USO</th><th>TEXTURA</th><th>COLOR</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`; items.forEach(i => { let m = parseFloat(i.m2Final || i.m2 || 0); let pcs = i.piezas || i.pieces || Math.ceil(m / (((i.formato.split('x')[0] || 1)*(i.formato.split('x')[1] || 1))/10000)); htmlPDF += `<tr><td>${i.formato}</td><td>${i.uso}</td><td>${i.textura}</td><td>${i.color}</td><td><b>${m} m²</b></td><td>${pcs}</td></tr>`; }); htmlPDF += `</tbody></table>`; if(tipo === 'cotizacion') { htmlPDF += `<div class="total-box">TOTAL PRESUPUESTO: $${total.toFixed(2)}</div><br><br><br>`; } let textoFirma1 = tipo === 'entrega' ? 'Despachado por (Planta)' : 'Emitido por la Empresa'; let textoFirma2 = tipo === 'cotizacion' ? 'Firma de Aceptación (Cliente)' : tipo === 'produccion' ? 'Firma del Gerente de Producción' : 'Recibido Conforme (Chofer/Cliente)'; htmlPDF += `<div class="firmas"><div class="firma-linea">${textoFirma1}</div><div class="firma-linea">${textoFirma2}</div></div><script>window.onload = function() { setTimeout(() => { window.print(); }, 500); }<\/script></body></html>`; let printWindow = window.open('', '_blank'); printWindow.document.write(htmlPDF); printWindow.document.close(); }
     
     function accion(c, f, e) { if(!confirm("¿Confirmar cambio a: " + e + "?")) return; document.getElementById('loader-overlay').style.display = 'flex'; fetch(API_URL + "?action=actualizar_estado", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: c, fecha_orden: f, nuevo_estado: e }) }).finally(() => { setTimeout(() => { loadData(); }, 2000); }); }
-    function registrarPago(c, f, actual) { let monto = prompt("Ingresa el monto total abonado hasta la fecha (USD):", actual); if(monto === null || isNaN(monto) || monto === "") return; document.getElementById('loader-overlay').style.display = 'flex'; fetch(API_URL + "?action=registrar_pago", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: c, fecha_orden: f, monto_pagado: monto }) }).finally(() => { setTimeout(() => { loadData(); }, 2000); }); }
-    function eliminar(c, f) { if(!confirm("⚠️ ¿Eliminar orden permanentemente?")) return; document.getElementById('loader-overlay').style.display = 'flex'; fetch(API_URL + "?action=eliminar_pedido", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: c, fecha_orden: f }) }).finally(() => { setTimeout(() => { loadData(); }, 2000); }); }
+    
+    function registrarPago(c, f, actual) { 
+        let monto = prompt("Ingresa el monto total abonado hasta la fecha (USD):", actual); 
+        if(monto === null || isNaN(monto) || monto === "") return; 
+        document.getElementById('loader-overlay').style.display = 'flex'; 
+        fetch(API_URL + "?action=registrar_pago", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: c, fecha_orden: f, monto_pagado: monto }) }).finally(() => { setTimeout(() => { loadData(); }, 2000); }); 
+    }
+    
+    function eliminar(c, f) { 
+        if(!confirm("⚠️ ¿Eliminar orden permanentemente?")) return; 
+        document.getElementById('loader-overlay').style.display = 'flex'; 
+        fetch(API_URL + "?action=eliminar_pedido", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: c, fecha_orden: f }) }).finally(() => { setTimeout(() => { loadData(); }, 2000); }); 
+    }
 </script>
 </body>
 </html>
