@@ -62,7 +62,7 @@
         .modal-input { width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 12px; border: 1px solid #cbd5e1; background: #f8fafc; color: #333; border-radius: 8px; font-size: 14px; font-weight:600;}
         .modal-row { display: flex; gap: 10px; }
         
-        /* PANEL DE PAGOS INTERACTIVO EN BLANCO */
+        /* PANEL DE PAGOS INTERACTIVO */
         .payment-panel { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; margin-top: 15px; display: inline-block; width: 100%; box-sizing: border-box;}
         .payment-grid { display: flex; justify-content: space-between; align-items: center; }
         .payment-box { display: flex; flex-direction: column; }
@@ -72,12 +72,10 @@
         .val-red { color: #ef4444; }
         .payment-divider { width: 2px; background: #e2e8f0; height: 40px; }
         
-        .input-abono { width: 90px; background: #fff; border: 1px solid #cbd5e1; color: #16a34a; font-weight: 900; border-radius: 6px; padding: 6px; font-size: 14px; text-align: center; }
-        .input-abono:focus { outline: none; border-color: #3b82f6; }
-        .input-avance { width: 60px; background: #fff; border: 1px solid #cbd5e1; color: #475569; font-weight: 700; border-radius: 6px; padding: 6px; font-size: 12px; text-align: center; margin-top:4px;}
-        .input-avance:focus { outline: none; border-color: #3b82f6; }
-        .btn-guardar-abono { background: #10b981; border: none; color: white; border-radius: 6px; cursor: pointer; padding: 6px 10px; font-size: 11px; font-weight: bold; transition: 0.1s; }
-        .btn-guardar-abono:active { transform: scale(0.9); }
+        .input-abono { width: 80px; background: transparent; border: 1px solid #cbd5e1; color: #16a34a; font-weight: 900; border-radius: 6px; padding: 4px; font-size: 16px; text-align: center; }
+        .input-abono:focus { outline: none; border-color: #3b82f6; background: #fff;}
+        .btn-guardar-abono { background: #10b981; border: none; color: white; border-radius: 6px; cursor: pointer; padding: 6px 10px; font-size: 11px; font-weight: bold; transition: 0.1s; margin-top: 5px; width: 100%;}
+        .btn-guardar-abono:active { transform: scale(0.95); }
         
         .calendar-btn { background: #f8fafc; padding: 10px 12px; border-radius: 10px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s;}
     </style>
@@ -134,11 +132,9 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
 
-    // IDENTIFICADOR DE JEFE EXTREMADAMENTE BLINDADO
     const uActual = String(localStorage.getItem('usuarioCoralsintec') || '').trim().toUpperCase();
     const soyElJefe = (uActual === 'EDUARDO' || uActual.indexOf('EDUARDO') !== -1);
 
-    // CARGAMOS PERMISOS
     let sysPerms = { p_precios: false, p_receta: false, p_acciones: false, p_pdf: false };
     try { 
         let saved = JSON.parse(localStorage.getItem('permisosCoralsintec')); 
@@ -211,6 +207,18 @@
     function switchTab(btn, targetId) { let card = btn.closest('.order-card'); card.querySelectorAll('.order-tab-content').forEach(c => c.classList.remove('active')); card.querySelectorAll('.order-tab').forEach(b => b.classList.remove('active')); card.querySelector('#' + targetId).classList.add('active'); btn.classList.add('active'); }
     function ultraClean(str) { if(!str) return ""; return String(str).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase(); }
 
+    // FUNCION DE CÁLCULO EN TIEMPO REAL
+    function recalcularAbono(id, total) {
+        let val = parseFloat(document.getElementById('abono-' + id).value) || 0;
+        let resta = total - val;
+        let pctAbono = total > 0 ? Math.round((val / total) * 100) : 0;
+        let pctResta = total > 0 ? Math.round((resta / total) * 100) : 0;
+        
+        document.getElementById('pct-abono-' + id).innerText = pctAbono;
+        document.getElementById('pct-resta-' + id).innerText = pctResta;
+        document.getElementById('val-resta-' + id).innerText = '$' + resta.toFixed(2);
+    }
+
     function render(pedidos, formulas) {
         const container = document.getElementById('lista-pedidos'); 
         container.innerHTML = '';
@@ -227,12 +235,11 @@
 
             let estado = p.ESTADO || "NUEVO / POR ACEPTAR"; 
             let stClass = estado === "ACEPTADO / EN PROCESO" ? "st-proceso" : estado === "PROCESANDO / COORDINAR ENTREGA" ? "st-coordinar" : estado === "ENTREGADO" ? "st-listo" : "st-nuevo";
-            let safeId = String(p.FECHA_ORDEN).replace(/[^a-zA-Z0-9]/g, '');
-            let safeCliente = String(p.CLIENTE || 'Cliente').replace(/'/g, "\\'"); // PREVIENE ERRORES SI EL NOMBRE LLEVA COMILLAS
+            let safeId = String(p.FECHA_ORDEN + p.CLIENTE).replace(/[^a-zA-Z0-9]/g, '') + Math.floor(Math.random() * 10000); 
+            let safeCliente = String(p.CLIENTE || 'Cliente').replace(/'/g, "\\'"); 
             let pctMini = obtenerProgreso(p.FECHA_ORDEN, p.FECHA_LIMITE_HABIL); 
             let clipMini = 100 - pctMini;
             
-            // CÁLCULO FINANCIERO SEGURO
             let rawTotal = String(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || "0").replace(/[^0-9.]/g, '');
             let rawPagado = String(p.PAGADO_USD || p.PAGADO || (Object.values(p).length > 11 ? Object.values(p)[11] : "0")).replace(/[^0-9.]/g, '');
             let total = parseFloat(rawTotal) || 0; 
@@ -242,7 +249,6 @@
             let porcentaje = total > 0 ? Math.round((pagado / total) * 100) : 0; 
             let porcentajeResta = total > 0 ? Math.round((falta / total) * 100) : 0;
 
-            // 1. PANEL INTERACTIVO DE ABONOS CON DISEÑO BLANCO
             let etiquetaPrecio = "";
             if(sysPerms.p_precios || soyElJefe) { 
                 etiquetaPrecio = `
@@ -255,17 +261,14 @@
                         <div class="payment-divider"></div>
                         <div class="payment-box">
                             <span class="payment-label">Abonado (<span id="pct-abono-${safeId}">${porcentaje}</span>%)</span>
-                            <div style="display:flex; flex-direction:column; align-items:center; gap:3px;">
-                                <input type="number" id="abono-${safeId}" value="${pagado.toFixed(2)}" class="input-abono">
-                                <span style="font-size:9px; color:#64748b; text-transform:uppercase;">+ Nuevo Avance</span>
-                                <div style="display:flex; align-items:center; gap:4px;">
-                                    <input type="number" id="avance-${safeId}" placeholder="0" class="input-avance">
-                                    <button onclick="guardarNuevoAbono('${safeCliente}', '${p.FECHA_ORDEN}', '${safeId}', ${total})" class="btn-guardar-abono">💾 Guardar</button>
-                                </div>
+                            <div style="display:flex; align-items:center; gap:2px;">
+                                <span style="color:#16a34a; font-weight:900; font-size:16px;">$</span>
+                                <input type="number" id="abono-${safeId}" value="${pagado.toFixed(2)}" class="input-abono" oninput="recalcularAbono('${safeId}', ${total})">
                             </div>
+                            <button onclick="guardarAbonoDirecto('${safeCliente}', '${p.FECHA_ORDEN}', '${safeId}')" class="btn-guardar-abono" style="margin-top:5px; width:100%;">💾 Guardar Abono</button>
                         </div>
                         <div class="payment-divider"></div>
-                        <div class="payment-box">
+                        <div class="payment-box" style="align-items:flex-end;">
                             <span class="payment-label">Resta (<span id="pct-resta-${safeId}">${porcentajeResta}</span>%)</span>
                             <span class="payment-val val-red" id="val-resta-${safeId}">$${falta.toFixed(2)}</span>
                         </div>
@@ -273,7 +276,6 @@
                 </div>`; 
             }
 
-            // 2. BOTONES PDF
             let botonesPDF = "";
             if(sysPerms.p_pdf || soyElJefe) { 
                 botonesPDF = `
@@ -284,7 +286,6 @@
                 </div>`; 
             }
 
-            // 3. TABLA DETALLES Y RECETAS
             let tablaDetallesHtml = `<table><thead><tr><th>FORMATO</th><th>USO</th><th>COLOR</th><th>TEXTURA</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`; 
             let recetaHtml = `<div>`;
             
@@ -313,9 +314,9 @@
                     recetaHtml += `</div>`;
                 }
             });
-            tablaDetallesHtml += `</tbody></table></div>`;
+            tablaDetallesHtml += `</tbody></table>`; // <--- AQUI HABÍA UN </div> EXTRA QUE ROMPIA TODO. YA FUE ELIMINADO.
+            recetaHtml += `</div>`;
 
-            // 4. CONSTRUCCIÓN DE LA TARJETA
             let html = `
             <div class="order-card">
                 ${botonesPDF}
@@ -353,7 +354,6 @@
             html += `<div id="detalles-${safeId}" class="order-tab-content active" style="overflow-x: auto;">${tablaDetallesHtml}</div>`;
             if(sysPerms.p_receta || soyElJefe) { html += `<div id="receta-${safeId}" class="order-tab-content">${recetaHtml}</div>`; }
             
-            // 5. BOTONES DE ACCIÓN PARA EL JEFE (AHORA SÍ FUNCIONALES Y EN SU SITIO)
             if(sysPerms.p_acciones || soyElJefe) { 
                 html += `<div class="jefe-actions-grid">`; 
                 html += `<button class="btn-action btn-aceptar" onclick="accion('${safeCliente}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN PROCESO')">✅ 1. INICIAR PROD.</button>`;
@@ -372,34 +372,18 @@
         });
     }
 
-    // FUNCION DE GUARDAR EL ABONO DEL CUADRITO INTERACTIVO
-    function guardarNuevoAbono(cliente, fecha, idInput, total) {
-        let rawAbonoActual = String(document.getElementById('abono-' + idInput).value).replace(/[^0-9.]/g, '');
-        let abonoAcumulado = parseFloat(rawAbonoActual) || 0;
-        
-        let abonoInput = document.getElementById('avance-' + idInput).value;
-        let nuevoAvance = parseFloat(abonoInput) || 0;
-        
-        let nuevoTotalPagado = abonoAcumulado + nuevoAvance;
-        let nuevaResta = total - nuevoTotalPagado;
-        
-        let nuevoPctAbono = total > 0 ? Math.round((nuevoTotalPagado / total) * 100) : 0;
-        let nuevoPctResta = total > 0 ? Math.round((nuevaResta / total) * 100) : 0;
-        
-        document.getElementById('abono-' + idInput).value = nuevoTotalPagado.toFixed(2);
-        document.getElementById('pct-abono-' + idInput).innerText = nuevoPctAbono;
-        document.getElementById('pct-resta-' + idInput).innerText = nuevoPctResta;
-        document.getElementById('val-resta-' + idInput).innerText = '$' + nuevaResta.toFixed(2);
-        
-        document.getElementById('avance-' + idInput).value = "";
-        
-        document.getElementById('loader-overlay').innerText = "⏳ Guardando abono...";
+    function guardarAbonoDirecto(cliente, fecha, idInput) {
+        let val = document.getElementById('abono-' + idInput).value;
+        let nuevoAbono = parseFloat(val);
+        if(isNaN(nuevoAbono)) return;
+
+        document.getElementById('loader-overlay').innerText = "⏳ Guardando pago...";
         document.getElementById('loader-overlay').style.display = 'flex';
         
         fetch(API_URL + "?action=registrar_pago", { 
             method: "POST", 
             mode: "no-cors", 
-            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, monto_pagado: nuevoTotalPagado }) 
+            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, monto_pagado: nuevoAbono }) 
         }).finally(() => { 
             setTimeout(() => { 
                 document.getElementById('loader-overlay').innerText = "⏳ Sincronizando Planta...";
