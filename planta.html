@@ -207,7 +207,7 @@
         }
 
         [...pedidos].reverse().forEach(p => {
-            // Protección contra JSON dañado en la base de datos
+            // CÁLCULO SEGURO DE DATOS Y PORCENTAJES
             let items = [];
             try { items = JSON.parse(p.DETALLES_JSON); } catch(e) { return; }
             if (items.length === 0) return;
@@ -219,25 +219,53 @@
             let pctMini = obtenerProgreso(p.FECHA_ORDEN, p.FECHA_LIMITE_HABIL); 
             let clipMini = 100 - pctMini;
             
-            let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0) || 0; 
-            let pagado = parseFloat(p.PAGADO_USD || p.PAGADO || (Object.values(p).length > 11 ? Object.values(p)[11] : 0) || 0) || 0; 
+            // Extraer números limpiando posibles caracteres raros o espacios de la DB
+            let rawTotal = String(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || "0").replace(/[^0-9.]/g, '');
+            let rawPagado = String(p.PAGADO_USD || p.PAGADO || (Object.values(p).length > 11 ? Object.values(p)[11] : "0")).replace(/[^0-9.]/g, '');
+            
+            let total = parseFloat(rawTotal) || 0; 
+            let pagado = parseFloat(rawPagado) || 0; 
             let falta = total - pagado;
-            let porcentaje = total > 0 ? ((pagado / total) * 100).toFixed(0) : 0; 
-            let porcentajeResta = total > 0 ? ((falta / total) * 100).toFixed(0) : 0;
+            
+            let porcentaje = total > 0 ? Math.round((pagado / total) * 100) : 0; 
+            let porcentajeResta = total > 0 ? Math.round((falta / total) * 100) : 0;
 
-            // 1. DIBUJAMOS EL PANEL DE DINERO Y PORCENTAJE
+            // 1. PANEL DE DINERO GARANTIZADO SI TIENES PERMISO O ERES JEFE
             let etiquetaPrecio = "";
-            if(sysPerms.p_precios) { 
-                etiquetaPrecio = `<div class="payment-panel"><div class="payment-grid"><div class="payment-box"><span class="payment-label">Total Orden</span><span class="payment-val">$${total.toFixed(2)}</span></div><div class="payment-divider"></div><div class="payment-box"><span class="payment-label">Abonado (${porcentaje}%)</span><span class="payment-val val-green">$${pagado.toFixed(2)}</span></div><div class="payment-divider"></div><div class="payment-box"><span class="payment-label">Resta (${porcentajeResta}%)</span><span class="payment-val val-red">$${falta.toFixed(2)}</span></div></div></div>`; 
+            if(sysPerms.p_precios || soyElJefe) { 
+                etiquetaPrecio = `
+                <div class="payment-panel">
+                    <div class="payment-grid">
+                        <div class="payment-box">
+                            <span class="payment-label">Total Orden</span>
+                            <span class="payment-val">$${total.toFixed(2)}</span>
+                        </div>
+                        <div class="payment-divider"></div>
+                        <div class="payment-box">
+                            <span class="payment-label">Abonado (${porcentaje}%)</span>
+                            <span class="payment-val val-green">$${pagado.toFixed(2)}</span>
+                        </div>
+                        <div class="payment-divider"></div>
+                        <div class="payment-box">
+                            <span class="payment-label">Resta (${porcentajeResta}%)</span>
+                            <span class="payment-val val-red">$${falta.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>`; 
             }
 
-            // 2. DIBUJAMOS LOS BOTONES PDF (NOTAS DE ENTREGA Y PRESUPUESTOS)
+            // 2. BOTONES PDF GARANTIZADOS
             let botonesPDF = "";
-            if(sysPerms.p_pdf) { 
-                botonesPDF = `<div class="doc-buttons"><button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'cotizacion')">📄 COTIZ.</button><button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'produccion')">🏭 PROD.</button><button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'entrega')">🚚 ENVÍO</button></div>`; 
+            if(sysPerms.p_pdf || soyElJefe) { 
+                botonesPDF = `
+                <div class="doc-buttons">
+                    <button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'cotizacion')">📄 COTIZ.</button>
+                    <button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'produccion')">🏭 PROD.</button>
+                    <button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'entrega')">🚚 ENVÍO</button>
+                </div>`; 
             }
 
-            // 3. DIBUJAMOS LA TABLA DE DETALLES
+            // 3. TABLA DE DETALLES Y RECETA
             let tablaDetallesHtml = `<table><thead><tr><th>FORMATO</th><th>USO</th><th>COLOR</th><th>TEXTURA</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`; 
             let recetaHtml = `<div>`;
             
@@ -246,29 +274,70 @@
                 let pcs = i.piezas || i.pieces || Math.ceil(m / (((formatoReal.split('x')[0] || 1)*(formatoReal.split('x')[1] || 1))/10000));
                 tablaDetallesHtml += `<tr><td>${formatoReal}</td><td><b>${usoReal}</b></td><td>${colorReal}</td><td>${texturaReal}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
                 
-                if(sysPerms.p_receta) {
+                if(sysPerms.p_receta || soyElJefe) {
                     let colorClean = ultraClean(colorReal); let textClean = ultraClean(texturaReal).substring(0, 4); let usoClean = ultraClean(usoReal);
                     let formulaEncontrada = formulas.find(f => { return ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(colorClean) && ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(textClean) && ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(usoClean); });
                     recetaHtml += `<div class="receta-item"><div class="receta-title">▶ Para fabricar: ${m}m² de ${colorReal} (${texturaReal}) - ${usoReal}</div>`;
-                    if(formulaEncontrada) { let keys = Object.keys(formulaEncontrada); let vals = Object.values(formulaEncontrada); recetaHtml += `<div style="font-size:10px; color:#10b981; margin-bottom:5px; font-weight:bold;">✅ Fórmula: ${vals[0]}</div><ul class="receta-lista"><li><b>CEMENTO ${String(vals[1]).toUpperCase()}:</b> ${(parseFloat(vals[2] || 0) * m).toFixed(2)} kg</li>`; for(let c = 3; c < keys.length; c++) { let qty = (parseFloat(vals[c] || 0) * m).toFixed(2); if(qty > 0) recetaHtml += `<li><b>${keys[c]}:</b> ${qty}</li>`; } recetaHtml += `</ul>`; } else { recetaHtml += `<div style="color:#ef4444; font-size:12px; font-weight:bold;">⚠️ Fórmula no registrada.</div>`; } recetaHtml += `</div>`;
+                    if(formulaEncontrada) { 
+                        let keys = Object.keys(formulaEncontrada); let vals = Object.values(formulaEncontrada); 
+                        recetaHtml += `<div style="font-size:10px; color:#10b981; margin-bottom:5px; font-weight:bold;">✅ Fórmula: ${vals[0]}</div><ul class="receta-lista"><li><b>CEMENTO ${String(vals[1]).toUpperCase()}:</b> ${(parseFloat(vals[2] || 0) * m).toFixed(2)} kg</li>`; 
+                        for(let c = 3; c < keys.length; c++) { 
+                            let qty = (parseFloat(vals[c] || 0) * m).toFixed(2); 
+                            if(qty > 0) recetaHtml += `<li><b>${keys[c]}:</b> ${qty}</li>`; 
+                        } 
+                        recetaHtml += `</ul>`; 
+                    } else { 
+                        recetaHtml += `<div style="color:#ef4444; font-size:12px; font-weight:bold;">⚠️ Fórmula no registrada.</div>`; 
+                    } 
+                    recetaHtml += `</div>`;
                 }
             });
             tablaDetallesHtml += `</tbody></table></div>`;
 
-            // CONSTRUIMOS LA TARJETA PRINCIPAL
-            let html = `<div class="order-card">${botonesPDF}<div style="text-align:center;"><span class="status-tag ${stClass}">${estado}</span></div><div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:15px;"><div style="width: 100%;"><div style="display:flex; justify-content: space-between; align-items: flex-start;"><div><div style="font-size:18px; font-weight:900; color:#fff; text-transform:uppercase;">${p.CLIENTE}</div><div style="font-size:12px; color:var(--text-muted); margin-top:3px;"><b>RIF:</b> ${p.RIF_CI || '-'}</div></div><div class="calendar-btn" onclick="abrirTimeline('${p.FECHA_ORDEN}', '${p.FECHA_LIMITE_HABIL}', '${p.CLIENTE}')"><span style="font-size: 26px;">📅</span><div style="width: 100px;"><div style="font-size:9px; font-weight:900; color:var(--text-muted); text-transform:uppercase; text-align:left;">FECHA LÍMITE</div><div style="color:#fff; font-size:14px; font-weight:900; margin-top:1px; text-align:left;">${p.FECHA_LIMITE_HABIL}</div><div style="width: 100%; height: 5px; background: #404040; border-radius: 3px; margin-top: 4px; position: relative;"><div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(to right, #3b82f6, #b0b0b0, #10b981); border-radius: 3px; clip-path: inset(0 ${clipMini}% 0 0);"></div></div></div></div></div>${etiquetaPrecio}</div></div>`;
+            // CONSTRUCCIÓN DE LA TARJETA FINAL
+            let html = `
+            <div class="order-card">
+                ${botonesPDF}
+                <div style="text-align:center;">
+                    <span class="status-tag ${stClass}">${estado}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:15px;">
+                    <div style="width: 100%;">
+                        <div style="display:flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size:18px; font-weight:900; color:#fff; text-transform:uppercase;">${p.CLIENTE}</div>
+                                <div style="font-size:12px; color:var(--text-muted); margin-top:3px;"><b>RIF:</b> ${p.RIF_CI || '-'}</div>
+                            </div>
+                            <div class="calendar-btn" onclick="abrirTimeline('${p.FECHA_ORDEN}', '${p.FECHA_LIMITE_HABIL}', '${p.CLIENTE}')">
+                                <span style="font-size: 26px;">📅</span>
+                                <div style="width: 100px;">
+                                    <div style="font-size:9px; font-weight:900; color:var(--text-muted); text-transform:uppercase; text-align:left;">FECHA LÍMITE</div>
+                                    <div style="color:#fff; font-size:14px; font-weight:900; margin-top:1px; text-align:left;">${p.FECHA_LIMITE_HABIL}</div>
+                                    <div style="width: 100%; height: 5px; background: #404040; border-radius: 3px; margin-top: 4px; position: relative;">
+                                        <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(to right, #3b82f6, #b0b0b0, #10b981); border-radius: 3px; clip-path: inset(0 ${clipMini}% 0 0);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        ${etiquetaPrecio}
+                    </div>
+                </div>`;
             
-            if(sysPerms.p_receta) { html += `<div class="order-tabs"><button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button><button class="order-tab" onclick="switchTab(this, 'receta-${safeId}')">🧪 RECETA</button></div>`; } else { html += `<div class="order-tabs"><button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button></div>`; }
+            if(sysPerms.p_receta || soyElJefe) { 
+                html += `<div class="order-tabs"><button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button><button class="order-tab" onclick="switchTab(this, 'receta-${safeId}')">🧪 RECETA</button></div>`; 
+            } else { 
+                html += `<div class="order-tabs"><button class="order-tab active" onclick="switchTab(this, 'detalles-${safeId}')">📝 DETALLES</button></div>`; 
+            }
+            
             html += `<div id="detalles-${safeId}" class="order-tab-content active" style="overflow-x: auto;">${tablaDetallesHtml}</div>`;
-            if(sysPerms.p_receta) { html += `<div id="receta-${safeId}" class="order-tab-content">${recetaHtml}</div>`; }
+            if(sysPerms.p_receta || soyElJefe) { html += `<div id="receta-${safeId}" class="order-tab-content">${recetaHtml}</div>`; }
             
-            // 4. DIBUJAMOS LOS BOTONES DE ACCIÓN (INICIAR, ENTREGAR, ABONAR, ELIMINAR)
-            if(sysPerms.p_acciones) { 
+            // 4. BOTONES DE ACCIÓN (INICIAR, ENTREGAR, ABONAR, ELIMINAR) GARANTIZADOS
+            if(sysPerms.p_acciones || soyElJefe) { 
                 html += `<div class="btn-group">`; 
                 html += `<button class="btn-action btn-aceptar" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN PROCESO')">✅ ACEPTAR E INICIAR</button>`;
                 html += `<button class="btn-action btn-entregado" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 MARCAR ENTREGADO</button>`; 
                 
-                // Estos 2 botones solo salen si eres EDUARDO o tienes permiso expreso
                 if(soyElJefe) { 
                     html += `<button class="btn-action btn-pago" onclick="registrarPago('${p.CLIENTE}', '${p.FECHA_ORDEN}', ${pagado})">💵 REGISTRAR ABONO</button>`;
                     html += `<button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN</button>`; 
