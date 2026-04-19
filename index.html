@@ -7,7 +7,7 @@
     <style>
         :root { 
             --p: #e0e0e0; 
-            --a: #b0b0b0; /* Gris Cemento */
+            --a: #b0b0b0; /* Gris Cemento Mate */
             --bg: #1c1c1c; 
             --card-bg: #2d2d2d; 
             --input-bg: #3a3a3a; 
@@ -44,22 +44,37 @@
 <body>
     <div id="loader">⏳ Conectando...</div>
     <div class="container">
-        <div class="logo-container"><img src="marca.png" alt="Coralsintec Logo" class="logo-main" onerror="this.style.display='none'"></div>
+        <div class="logo-container">
+            <img src="marca.png" alt="Coralsintec Logo" class="logo-main" onerror="this.style.display='none'">
+        </div>
+        
         <div id="login-screen" class="screen active">
             <p style="font-size:12px; color:var(--text-muted); font-weight:bold; margin-top:-5px; margin-bottom:20px;">SISTEMA DE GESTIÓN</p>
             <input type="text" id="username" placeholder="USUARIO" style="text-transform: uppercase;">
             <input type="password" id="pin" placeholder="PIN">
             <button class="btn-main" onclick="validar()">ENTRAR AL SISTEMA</button>
         </div>
+
         <div id="dashboard-screen" class="screen">
             <h2 id="welcome">HOLA</h2>
-            <div id="btn-ventas" onclick="window.location.href='cotizador.html'" class="menu-card"><h3>🛒 MI COTIZADOR</h3></div>
-            <div id="btn-solicitudes" onclick="window.location.href='solicitudes.html'" class="menu-card" style="border-left-color: #10b981;"><h3>📥 SOLICITUDES CLIENTES</h3></div>
-            <div id="btn-planta" onclick="window.location.href='planta.html'" class="menu-card" style="border-left-color: #f59e0b;"><h3>🏭 PRODUCCIÓN (PLANTA)</h3></div>
-            <div id="btn-gerencia" onclick="window.location.href='gerencia.html'" class="menu-card" style="border-left-color: #3b82f6;"><h3>📊 FINANZAS (GERENCIA)</h3></div>
-            <div id="btn-admin" onclick="abrirAdmin()" class="menu-card" style="border-left-color: #b0b0b0; display:none; background:#3a3a3a;"><h3 style="color:#ffffff;">🔑 GESTIÓN DE USUARIOS</h3></div>
+            <div id="btn-ventas" onclick="window.location.href='cotizador.html'" class="menu-card" style="border-left-color: #b0b0b0;">
+                <h3>🛒 MI COTIZADOR</h3>
+            </div>
+            <div id="btn-solicitudes" onclick="window.location.href='solicitudes.html'" class="menu-card" style="border-left-color: #10b981;">
+                <h3>📥 SOLICITUDES CLIENTES</h3>
+            </div>
+            <div id="btn-planta" onclick="window.location.href='planta.html'" class="menu-card" style="border-left-color: #6b7280;">
+                <h3>🏭 PRODUCCIÓN (PLANTA)</h3>
+            </div>
+            <div id="btn-gerencia" onclick="window.location.href='gerencia.html'" class="menu-card" style="border-left-color: #3b82f6;">
+                <h3>📊 FINANZAS (GERENCIA)</h3>
+            </div>
+            <div id="btn-admin" onclick="abrirAdmin()" class="menu-card" style="border-left-color: #b0b0b0; display:none; background:#3a3a3a;">
+                <h3 style="color:#ffffff;">🔑 GESTIÓN DE USUARIOS</h3>
+            </div>
             <button onclick="logout()" style="color:#e0e0e0; background:none; border:none; cursor:pointer; font-weight:bold; margin-top:10px;">Cerrar Sesión</button>
         </div>
+
         <div id="admin-screen" class="screen">
             <h2 style="color:#ffffff;">Gestión de Roles</h2>
             <div class="user-list" id="lista-usuarios-ui"></div>
@@ -67,18 +82,37 @@
                 <h3 style="font-size:14px; text-align:left; margin-bottom:10px; color:#fff;">Nuevo / Editar Usuario</h3>
                 <input type="text" id="new-user" placeholder="NOMBRE DE USUARIO" style="text-transform:uppercase;">
                 <input type="text" id="new-pin" placeholder="PIN DE ACCESO">
-                <div class="module-group"><label class="module-header"><input type="checkbox" id="m_ventas"> Módulo Cotizador</label><div class="sub-perms"><label class="sub-perm-label" style="color:#b0b0b0;"><input type="checkbox" id="v_crear"> Botón "Agregar a la Lista"</label></div></div>
-                <div class="module-group"><label class="module-header"><input type="checkbox" id="m_soli"> Módulo Solicitudes</label><div class="sub-perms"><label class="sub-perm-label" style="color:#b0b0b0;"><input type="checkbox" id="s_aprobar"> Botón "Aprobar y Enviar"</label></div></div>
-                <div class="module-group"><label class="module-header"><input type="checkbox" id="m_gerencia"> Módulo Gerencia</label><div class="sub-perms"><label class="sub-perm-label" style="color:#b0b0b0;"><input type="checkbox" id="g_editar"> Botones de Editar Datos</label></div></div>
-                <div class="module-group"><label class="module-header"><input type="checkbox" id="m_planta"> Módulo Producción</label><div class="sub-perms"><label class="sub-perm-label"><input type="checkbox" id="p_pla_precio"> Ver Panel de Dinero ($)</label><label class="sub-perm-label"><input type="checkbox" id="p_pla_receta"> Ver Receta Química</label><label class="sub-perm-label"><input type="checkbox" id="p_pla_accion"> Botones Iniciar/Entregar</label><label class="sub-perm-label"><input type="checkbox" id="p_pla_pdf"> Botones de PDF</label></div></div>
+                <div class="module-group">
+                    <label class="module-header"><input type="checkbox" id="m_ventas"> Módulo Cotizador</label>
+                    <div class="sub-perms"><label class="sub-perm-label" style="color:#b0b0b0;"><input type="checkbox" id="v_crear"> Botón "Agregar a la Lista"</label></div>
+                </div>
+                <div class="module-group">
+                    <label class="module-header"><input type="checkbox" id="m_soli"> Módulo Solicitudes</label>
+                    <div class="sub-perms"><label class="sub-perm-label" style="color:#b0b0b0;"><input type="checkbox" id="s_aprobar"> Botón "Aprobar y Enviar"</label></div>
+                </div>
+                <div class="module-group">
+                    <label class="module-header"><input type="checkbox" id="m_gerencia"> Módulo Gerencia</label>
+                    <div class="sub-perms"><label class="sub-perm-label" style="color:#b0b0b0;"><input type="checkbox" id="g_editar"> Botones de Editar Datos</label></div>
+                </div>
+                <div class="module-group">
+                    <label class="module-header"><input type="checkbox" id="m_planta"> Módulo Producción</label>
+                    <div class="sub-perms">
+                        <label class="sub-perm-label"><input type="checkbox" id="p_pla_precio"> Ver Panel de Dinero ($)</label>
+                        <label class="sub-perm-label"><input type="checkbox" id="p_pla_receta"> Ver Receta Química</label>
+                        <label class="sub-perm-label"><input type="checkbox" id="p_pla_accion"> Botones Iniciar/Entregar</label>
+                        <label class="sub-perm-label"><input type="checkbox" id="p_pla_pdf"> Botones de PDF</label>
+                    </div>
+                </div>
                 <button class="btn-main" style="background:#555555; color:#fff;" onclick="guardarUsuario()">💾 GUARDAR USUARIO</button>
             </div>
             <button onclick="cerrarAdmin()" style="background:none; border:none; font-weight:bold; color:var(--text-muted); margin-top:15px; cursor:pointer;">Volver al Menú</button>
         </div>
     </div>
+
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
         let dbUsuarios = [];
+        
         window.onload = () => {
             document.getElementById('loader').style.display = 'flex';
             fetch(API_URL + "?action=get_usuarios").then(r => r.json()).then(data => {
@@ -87,37 +121,101 @@
                 if(userRegistrado) aplicarInterfaz(userRegistrado);
             }).catch(e => { document.getElementById('loader').style.display = 'none'; });
         };
+
         function validar() {
-            const u = document.getElementById('username').value.toUpperCase().trim(); const p = document.getElementById('pin').value.trim();
+            const u = document.getElementById('username').value.toUpperCase().trim(); 
+            const p = document.getElementById('pin').value.trim();
+            
             if(u === "EDUARDO" && p === "1234") {
                 let masterPerms = { m_ventas:true, v_crear:true, m_soli:true, s_aprobar:true, m_gerencia:true, g_editar:true, m_planta:true, p_precios:true, p_receta:true, p_acciones:true, p_pdf:true };
-                localStorage.setItem('usuarioCoralsintec', u); localStorage.setItem('permisosCoralsintec', JSON.stringify(masterPerms));
+                localStorage.setItem('usuarioCoralsintec', u); 
+                localStorage.setItem('permisosCoralsintec', JSON.stringify(masterPerms));
                 aplicarInterfaz(u); return;
             }
+            
             const userRow = dbUsuarios.find(x => String(x.USUARIO).trim().toUpperCase() === u && String(x.PIN).trim() === p);
-            if(userRow) { localStorage.setItem('usuarioCoralsintec', u); localStorage.setItem('permisosCoralsintec', userRow.PERMISOS_JSON || "{}"); aplicarInterfaz(u); } else { alert("Usuario o PIN incorrecto."); }
+            if(userRow) { 
+                localStorage.setItem('usuarioCoralsintec', u); 
+                localStorage.setItem('permisosCoralsintec', userRow.PERMISOS_JSON || "{}"); 
+                aplicarInterfaz(u); 
+            } else { 
+                alert("Usuario o PIN incorrecto."); 
+            }
         }
+
         function aplicarInterfaz(u) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('dashboard-screen').classList.add('active'); document.getElementById('welcome').innerText = "HOLA " + u;
-            let perms = {}; try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
+            document.getElementById('dashboard-screen').classList.add('active'); 
+            document.getElementById('welcome').innerText = "HOLA " + u;
+            
+            let perms = {}; 
+            try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
+            
             const isMaster = (String(u).trim().toUpperCase() === "EDUARDO");
+            
             document.getElementById('btn-ventas').style.display = (isMaster || perms.m_ventas) ? 'block' : 'none';
             document.getElementById('btn-solicitudes').style.display = (isMaster || perms.m_soli) ? 'block' : 'none';
             document.getElementById('btn-gerencia').style.display = (isMaster || perms.m_gerencia) ? 'block' : 'none';
             document.getElementById('btn-planta').style.display = (isMaster || perms.m_planta) ? 'block' : 'none';
             document.getElementById('btn-admin').style.display = isMaster ? 'block' : 'none';
         }
-        function abrirAdmin() { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('admin-screen').classList.add('active'); const listaUI = document.getElementById('lista-usuarios-ui'); listaUI.innerHTML = ""; dbUsuarios.forEach(user => { if(user.USUARIO && String(user.USUARIO).trim().toUpperCase() !== "EDUARDO") { listaUI.innerHTML += `<div class="user-item"><span>👤 ${user.USUARIO}</span><button class="btn-sm" onclick="eliminarUser('${user.USUARIO}')">Borrar</button></div>`; } }); }
-        function cerrarAdmin() { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('dashboard-screen').classList.add('active'); }
-        function guardarUsuario() {
-            const u = document.getElementById('new-user').value.trim().toUpperCase(); const p = document.getElementById('new-pin').value.trim();
-            if(u === "" || p === "") { alert("Escribe un Nombre de Usuario y un PIN."); return; }
-            const permisos = { m_ventas: document.getElementById('m_ventas').checked, v_crear: document.getElementById('v_crear').checked, m_soli: document.getElementById('m_soli').checked, s_aprobar: document.getElementById('s_aprobar').checked, m_gerencia: document.getElementById('m_gerencia').checked, g_editar: document.getElementById('g_editar').checked, m_planta: document.getElementById('m_planta').checked, p_precios: document.getElementById('p_pla_precio').checked, p_receta: document.getElementById('p_pla_receta').checked, p_acciones: document.getElementById('p_pla_accion').checked, p_pdf: document.getElementById('p_pla_pdf').checked };
-            document.getElementById('loader').innerText = `⏳ Guardando...`; document.getElementById('loader').style.display = 'flex';
-            fetch(API_URL + "?action=guardar_usuario", { method: "POST", mode: "no-cors", body: JSON.stringify({ usuario: u, pin: p, permisos: permisos }) }).then(() => { alert(`✅ ¡Guardado!`); location.reload(); }).catch(e => { alert("Error de red"); document.getElementById('loader').style.display = 'none'; });
+
+        function abrirAdmin() { 
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
+            document.getElementById('admin-screen').classList.add('active'); 
+            const listaUI = document.getElementById('lista-usuarios-ui'); 
+            listaUI.innerHTML = ""; 
+            dbUsuarios.forEach(user => { 
+                if(user.USUARIO && String(user.USUARIO).trim().toUpperCase() !== "EDUARDO") { 
+                    listaUI.innerHTML += `<div class="user-item"><span>👤 ${user.USUARIO}</span><button class="btn-sm" onclick="eliminarUser('${user.USUARIO}')">Borrar</button></div>`; 
+                } 
+            }); 
         }
-        function eliminarUser(u) { if(!confirm("¿Borrar acceso?")) return; document.getElementById('loader').innerText = "🗑️ Borrando..."; document.getElementById('loader').style.display = 'flex'; fetch(API_URL + "?action=eliminar_usuario", { method: "POST", mode: "no-cors", body: JSON.stringify({ usuario: u }) }).then(() => { location.reload(); }); }
-        function logout() { localStorage.clear(); location.reload(); }
+
+        function cerrarAdmin() { 
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
+            document.getElementById('dashboard-screen').classList.add('active'); 
+        }
+
+        function guardarUsuario() {
+            const u = document.getElementById('new-user').value.trim().toUpperCase(); 
+            const p = document.getElementById('new-pin').value.trim();
+            if(u === "" || p === "") { alert("Escribe un Nombre de Usuario y un PIN."); return; }
+            
+            const permisos = { 
+                m_ventas: document.getElementById('m_ventas').checked, 
+                v_crear: document.getElementById('v_crear').checked, 
+                m_soli: document.getElementById('m_soli').checked, 
+                s_aprobar: document.getElementById('s_aprobar').checked, 
+                m_gerencia: document.getElementById('m_gerencia').checked, 
+                g_editar: document.getElementById('g_editar').checked, 
+                m_planta: document.getElementById('m_planta').checked, 
+                p_precios: document.getElementById('p_pla_precio').checked, 
+                p_receta: document.getElementById('p_pla_receta').checked, 
+                p_acciones: document.getElementById('p_pla_accion').checked, 
+                p_pdf: document.getElementById('p_pla_pdf').checked 
+            };
+            
+            document.getElementById('loader').innerText = `⏳ Guardando...`; 
+            document.getElementById('loader').style.display = 'flex';
+            
+            fetch(API_URL + "?action=guardar_usuario", { method: "POST", mode: "no-cors", body: JSON.stringify({ usuario: u, pin: p, permisos: permisos }) })
+            .then(() => { alert(`✅ ¡Guardado!`); location.reload(); })
+            .catch(e => { alert("Error de red"); document.getElementById('loader').style.display = 'none'; });
+        }
+
+        function eliminarUser(u) { 
+            if(!confirm("¿Borrar acceso?")) return; 
+            document.getElementById('loader').innerText = "🗑️ Borrando..."; 
+            document.getElementById('loader').style.display = 'flex'; 
+            fetch(API_URL + "?action=eliminar_usuario", { method: "POST", mode: "no-cors", body: JSON.stringify({ usuario: u }) })
+            .then(() => { location.reload(); }); 
+        }
+
+        function logout() { 
+            localStorage.clear(); 
+            location.reload(); 
+        }
     </script>
 </body>
 </html>
