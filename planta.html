@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Producción Coralsintec</title>
     <style>
         body { font-family: -apple-system, sans-serif; background: #f0f2f5; margin: 0; padding: 15px; color: #333; }
@@ -42,7 +45,6 @@
         .qty-badge { background: #eff6ff; color: #1d4ed8; padding: 4px 8px; border-radius: 4px; font-weight: 800; display: inline-block;}
         .pcs-badge { color: #16a34a; font-weight: 900; font-size: 15px;}
         
-        .btn-group { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 15px;}
         .jefe-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 15px;}
         .btn-action { border: none; padding: 14px; border-radius: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; font-size: 12px; transition: transform 0.1s; text-align:center;}
         .btn-action:active { transform: scale(0.98); }
@@ -54,7 +56,6 @@
         
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: #3b82f6; font-size: 18px;}
         
-        /* CSS DE MODALES CORREGIDO */
         .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
         .modal-card { background: #fff; padding: 25px; border-radius: 15px; width: 90%; max-width: 420px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
         .modal-card h3 { margin: 0 0 15px 0; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;}
@@ -133,9 +134,9 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
 
-    // IDENTIFICADOR DE JEFE
-    const uActual = (localStorage.getItem('usuarioCoralsintec') || '').trim().toUpperCase();
-    const soyElJefe = (uActual === 'EDUARDO' || uActual.includes('EDUARDO'));
+    // IDENTIFICADOR DE JEFE EXTREMADAMENTE BLINDADO
+    const uActual = String(localStorage.getItem('usuarioCoralsintec') || '').trim().toUpperCase();
+    const soyElJefe = (uActual === 'EDUARDO' || uActual.indexOf('EDUARDO') !== -1);
 
     // CARGAMOS PERMISOS
     let sysPerms = { p_precios: false, p_receta: false, p_acciones: false, p_pdf: false };
@@ -161,7 +162,7 @@
     window.onload = () => {
         const badge = document.getElementById('badge-usuario'); 
         const headerSub = document.getElementById('header-user');
-        badge.innerText = "👤 " + uActual;
+        badge.innerText = "👤 " + (uActual || "DESCONOCIDO");
         
         if(soyElJefe) { 
             headerSub.innerText = "⭐ VISTA GERENCIAL"; 
@@ -227,6 +228,7 @@
             let estado = p.ESTADO || "NUEVO / POR ACEPTAR"; 
             let stClass = estado === "ACEPTADO / EN PROCESO" ? "st-proceso" : estado === "PROCESANDO / COORDINAR ENTREGA" ? "st-coordinar" : estado === "ENTREGADO" ? "st-listo" : "st-nuevo";
             let safeId = String(p.FECHA_ORDEN).replace(/[^a-zA-Z0-9]/g, '');
+            let safeCliente = String(p.CLIENTE || 'Cliente').replace(/'/g, "\\'"); // PREVIENE ERRORES SI EL NOMBRE LLEVA COMILLAS
             let pctMini = obtenerProgreso(p.FECHA_ORDEN, p.FECHA_LIMITE_HABIL); 
             let clipMini = 100 - pctMini;
             
@@ -258,7 +260,7 @@
                                 <span style="font-size:9px; color:#64748b; text-transform:uppercase;">+ Nuevo Avance</span>
                                 <div style="display:flex; align-items:center; gap:4px;">
                                     <input type="number" id="avance-${safeId}" placeholder="0" class="input-avance">
-                                    <button onclick="guardarNuevoAbono('${p.CLIENTE}', '${p.FECHA_ORDEN}', '${safeId}', ${total})" class="btn-guardar-abono">💾 Guardar</button>
+                                    <button onclick="guardarNuevoAbono('${safeCliente}', '${p.FECHA_ORDEN}', '${safeId}', ${total})" class="btn-guardar-abono">💾 Guardar</button>
                                 </div>
                             </div>
                         </div>
@@ -327,7 +329,7 @@
                                 <div style="font-size:18px; font-weight:900; color:#1e293b; text-transform:uppercase;">${p.CLIENTE}</div>
                                 <div style="font-size:12px; color:#64748b; margin-top:3px;"><b>RIF:</b> ${p.RIF_CI || '-'}</div>
                             </div>
-                            <div class="calendar-btn" onclick="abrirTimeline('${p.FECHA_ORDEN}', '${p.FECHA_LIMITE_HABIL}', '${p.CLIENTE}')">
+                            <div class="calendar-btn" onclick="abrirTimeline('${p.FECHA_ORDEN}', '${p.FECHA_LIMITE_HABIL}', '${safeCliente}')">
                                 <span style="font-size: 26px;">📅</span>
                                 <div style="width: 100px;">
                                     <div style="font-size:9px; font-weight:900; color:#64748b; text-transform:uppercase; text-align:left;">FECHA LÍMITE</div>
@@ -351,16 +353,16 @@
             html += `<div id="detalles-${safeId}" class="order-tab-content active" style="overflow-x: auto;">${tablaDetallesHtml}</div>`;
             if(sysPerms.p_receta || soyElJefe) { html += `<div id="receta-${safeId}" class="order-tab-content">${recetaHtml}</div>`; }
             
-            // 5. BOTONES DE ACCIÓN PARA EL JEFE
+            // 5. BOTONES DE ACCIÓN PARA EL JEFE (AHORA SÍ FUNCIONALES Y EN SU SITIO)
             if(sysPerms.p_acciones || soyElJefe) { 
                 html += `<div class="jefe-actions-grid">`; 
-                html += `<button class="btn-action btn-aceptar" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN PROCESO')">✅ 1. INICIAR PROD.</button>`;
-                html += `<button class="btn-action btn-aviso" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'PROCESANDO / COORDINAR ENTREGA')">📢 2. AVISO (Coord.)</button>`; 
-                html += `<button class="btn-action btn-listo" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'LISTO PARA ENTREGA / COORDINAR')">✔️ 3. ORDEN LISTA</button>`; 
-                html += `<button class="btn-action btn-entregado" onclick="accion('${p.CLIENTE}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 4. ENTREGADA</button>`; 
+                html += `<button class="btn-action btn-aceptar" onclick="accion('${safeCliente}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN PROCESO')">✅ 1. INICIAR PROD.</button>`;
+                html += `<button class="btn-action btn-aviso" onclick="accion('${safeCliente}', '${p.FECHA_ORDEN}', 'PROCESANDO / COORDINAR ENTREGA')">📢 2. AVISO (Coord.)</button>`; 
+                html += `<button class="btn-action btn-listo" onclick="accion('${safeCliente}', '${p.FECHA_ORDEN}', 'LISTO PARA ENTREGA / COORDINAR')">✔️ 3. ORDEN LISTA</button>`; 
+                html += `<button class="btn-action btn-entregado" onclick="accion('${safeCliente}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 4. ENTREGADA</button>`; 
                 
                 if(soyElJefe) { 
-                    html += `<button class="btn-action btn-eliminar" onclick="eliminar('${p.CLIENTE}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN PERMANENTEMENTE</button>`; 
+                    html += `<button class="btn-action btn-eliminar" onclick="eliminar('${safeCliente}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN PERMANENTEMENTE</button>`; 
                 } 
                 html += `</div>`; 
             }
