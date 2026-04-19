@@ -9,7 +9,7 @@
             --c-bg: #1c1c1c; 
             --c-card: #2d2d2d; 
             --c-input: #3a3a3a; 
-            --c-accent: #b0b0b0; 
+            --c-accent: #b0b0b0; /* Gris Cemento */
             --c-text: #e0e0e0; 
             --c-border: #555555; 
             --c-muted: #9ca3af; 
@@ -132,8 +132,8 @@
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
+    
     let db = [];
-
     const usuarioActual = localStorage.getItem('usuarioCoralsintec') || 'DESCONOCIDO';
     let p_master = (String(usuarioActual).trim().toUpperCase() === 'EDUARDO');
     let perms = {}; try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
