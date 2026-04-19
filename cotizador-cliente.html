@@ -9,7 +9,7 @@
             --c-bg: #1c1c1c; 
             --c-card: #2d2d2d; 
             --c-input: #3a3a3a; 
-            --c-accent: #b0b0b0; /* Gris Cemento Elegante */
+            --c-accent: #b0b0b0; /* Gris Cemento */
             --c-text: #e0e0e0; 
             --c-border: #555555; 
             --c-muted: #9ca3af; 
@@ -49,6 +49,7 @@
         .total-price { font-size: 32px; font-weight: 900; color: var(--c-accent); margin: 5px 0 0 0; }
         .btn-add-outline { width: 100%; background-color: transparent; color: var(--c-accent); border: 2px solid var(--c-accent); padding: 16px; border-radius: 10px; font-size: 14px; font-weight: 900; text-transform: uppercase; margin-top: 20px; cursor: pointer; transition: 0.2s; }
         .btn-add-outline:hover { background: var(--c-accent); color: #1c1c1c; }
+        .btn-add-outline:active { transform: scale(0.97); }
         .btn-submit { width: 100%; border: none; padding: 16px; border-radius: 10px; font-size: 15px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.1s; background-color: #3b82f6; color: white; margin-top: 15px;}
         .btn-submit:active { transform: scale(0.97); }
         .cart-section { width: 100%; max-width: 400px; background: rgba(45, 45, 45, 0.95); backdrop-filter: blur(8px); padding: 20px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); margin-top: 20px; box-sizing: border-box; border-top: 6px solid var(--c-accent); }
@@ -106,7 +107,7 @@
             <div class="form-row"><label>Metros (m²):</label><input type="number" id="metros" placeholder="10" min="0.1" step="0.1" oninput="calcularPresupuesto()"></div>
 
             <div class="options-group">
-                <label class="option-item" style="color:#b0b0b0;"><span>+10% Desperdicio (Sugerido)</span><input type="checkbox" id="desperdicio" onchange="calcularPresupuesto()" checked></label>
+                <label class="option-item" style="color:var(--c-accent);"><span>+10% Desperdicio (Sugerido)</span><input type="checkbox" id="desperdicio" onchange="calcularPresupuesto()" checked></label>
                 <div class="divider"></div>
                 <label class="option-item"><span>Incluir Carateo (Sacos)</span><input type="checkbox" id="carateo" onchange="calcularPresupuesto()"></label>
                 <label class="option-item"><span>Incluir Sellador (Galones)</span><input type="checkbox" id="sellador" onchange="calcularPresupuesto()"></label>
@@ -141,7 +142,7 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
     let db = [];
 
-    // EN ESTE ARCHIVO NO HAY SEGURIDAD DE LOGIN - ES PÚBLICO
+    // SIN LOGIN. ACCESO LIBRE PARA CLIENTES.
     window.onload = () => {
         document.getElementById('loader-overlay').style.display = 'flex';
         fetch(API_URL + "?action=get_productos").then(r => r.json()).then(data => { 
@@ -203,9 +204,8 @@
             <div class="cart-row"><span>Subtotal Material:</span> <b>$${item.totalRev.toFixed(2)}</b></div>
             <div class="cart-row"><span>Área:</span> <b>${item.m2Final.toFixed(2)} m²</b></div>`;
             
-            // SIN COLORES AMARILLOS/DORADOS AQUÍ TAMPOCO
-            if(item.carCheck) htmlHTML += `<div class="cart-row" style="color:#b0b0b0;"><span>Carateo (${item.cantSacos} sacos):</span> <b>$${item.totalCar.toFixed(2)}</b></div>`;
-            if(item.selCheck) htmlHTML += `<div class="cart-row" style="color:#b0b0b0;"><span>Sellador (${item.cantGalones} gal):</span> <b>$${item.totalSel.toFixed(2)}</b></div>`;
+            if(item.carCheck) htmlHTML += `<div class="cart-row" style="color:var(--c-accent);"><span>Carateo (${item.cantSacos} sacos):</span> <b>$${item.totalCar.toFixed(2)}</b></div>`;
+            if(item.selCheck) htmlHTML += `<div class="cart-row" style="color:var(--c-accent);"><span>Sellador (${item.cantGalones} gal):</span> <b>$${item.totalSel.toFixed(2)}</b></div>`;
             
             htmlHTML += `<div class="cart-total-row"><span>Subtotal:</span> <b>$${item.total.toFixed(2)}</b></div>`; li.innerHTML = htmlHTML; listaUI.appendChild(li);
         });
@@ -222,7 +222,7 @@
         let carritoLimpio = carrito.map(item => ({ formato: item.formato, uso: item.uso, color: item.color, textura: item.textura, m2: item.m2Final, carateo: item.cantSacos, sellador: item.cantGalones, total: item.total }));
         const paquete = { cliente: nom.toUpperCase(), rif: rif.toUpperCase(), telefono: tlf, ubicacion: obr, total: document.getElementById('grand-total').innerText, detalles: carritoLimpio };
         
-        // ESTO ASEGURA QUE VAYA A LA BANDEJA DE SOLICITUDES Y NO A PLANTA DIRECTO
+        // ENVÍA DIRECTO A BANDEJA DE SOLICITUDES
         try { 
             await fetch(API_URL + "?action=nueva_solicitud", { method: "POST", mode: "no-cors", body: JSON.stringify(paquete) }); 
             document.getElementById('loader-overlay').style.display = 'none'; 
