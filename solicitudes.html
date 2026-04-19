@@ -12,8 +12,15 @@
         .btn-volver { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--text-main); }
         .header { background: #374151; color: #fff; border: 1px solid var(--border); padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
         .header h2 { margin: 0; letter-spacing: 1px; text-transform: uppercase; font-size: 18px;}
-        .solicitud-card { background: var(--card-bg); padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-left: 5px solid var(--green); }
-        .cliente-nombre { font-size: 18px; font-weight: 900; color: #fff; text-transform: uppercase; margin-bottom: 5px; }
+        
+        .solicitud-card { background: var(--card-bg); padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-left: 5px solid var(--a); position: relative;}
+        
+        /* BOTON PDF NUEVO */
+        .btn-pdf { position: absolute; top: 15px; right: 15px; background: #1e3a8a; border: 1px solid #3b82f6; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase;}
+        .btn-pdf:hover { background: #3b82f6; }
+        .btn-pdf:active { transform: scale(0.95); }
+
+        .cliente-nombre { font-size: 18px; font-weight: 900; color: #fff; text-transform: uppercase; margin-bottom: 5px; width: 70%;}
         .info-txt { font-size: 12px; color: var(--text-muted); margin: 3px 0; }
         .info-txt b { color: #ccc; }
         .monto-box { background: rgba(55, 65, 81, 0.4); padding: 10px; border-radius: 8px; border: 1px solid #555555; display: inline-block; margin-top: 10px; }
@@ -21,11 +28,14 @@
         .monto-box b { color: #ffffff; font-size: 18px; }
         .items-box { margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); }
         .item-row { background: #1c1c1c; padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; border: 1px solid var(--border); color: #ddd;}
-        .item-row b { color: #60a5fa; }
-        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-marcar { flex: 1; background: #166534; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;}
+        .item-row b { color: #b0b0b0; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;}
+        .btn-marcar { flex: 2; min-width: 200px; background: #166534; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px;}
         .btn-marcar:active { transform: scale(0.98); }
-        .btn-eliminar { background: #450a0a; color: #e0e0e0; border: 1px solid #7f1d1d; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-eliminar { flex: 1; min-width: 100px; background: #450a0a; color: #e0e0e0; border: 1px solid #7f1d1d; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px;}
+        .btn-eliminar:active { transform: scale(0.98); }
+        
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28,28,28,0.95); display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--a); z-index: 100; font-size: 18px; }
     </style>
 </head>
@@ -36,12 +46,13 @@
             <button class="btn-volver" onclick="window.location.href='index.html'">⬅ MENÚ</button>
             <div id="badge-usuario" style="background: #374151; color: #fff; border: 1px solid var(--border); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;"></div>
         </div>
-        <div class="header"><h2>📥 Bandeja de Cotizaciones</h2><p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;">Enviadas por los clientes</p></div>
+        <div class="header"><h2>📥 Bandeja de Cotizaciones</h2><p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;">Enviadas por los clientes o equipo</p></div>
         <div id="lista-solicitudes"></div>
     </main>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
+    let solicitudesGlobal = []; // Necesitamos esto global para generar el PDF
 
     window.onload = () => {
         const u = localStorage.getItem('usuarioCoralsintec') || 'DESCONOCIDO';
@@ -51,7 +62,13 @@
 
     function cargarSolicitudes() {
         document.getElementById('loader').style.display = 'flex';
-        fetch(API_URL + "?action=get_solicitudes").then(r => r.json()).then(data => { render(data); document.getElementById('loader').style.display = 'none'; }).catch(e => { document.getElementById('loader').style.display = 'none'; });
+        fetch(API_URL + "?action=get_solicitudes").then(r => r.json()).then(data => { 
+            solicitudesGlobal = data; // Guardamos en memoria
+            render(data); 
+            document.getElementById('loader').style.display = 'none'; 
+        }).catch(e => { 
+            document.getElementById('loader').style.display = 'none'; 
+        });
     }
 
     function render(solicitudes) {
@@ -64,17 +81,103 @@
             items.forEach(i => { let m2Final = i.m2Final || i.m2; htmlItems += `<div class="item-row"><b>${m2Final} m² de ${i.formato || 'Material'}</b> - ${i.color || ''} (${i.textura || ''})</div>`; });
 
             let totalVal = parseFloat(s.TOTAL_USD || s.TOTAL || 0).toFixed(2);
-            let cardHtml = `<div class="solicitud-card"><div style="font-size: 10px; color: #9ca3af; margin-bottom: 5px; font-weight:bold;">FECHA: ${s.FECHA}</div><div class="cliente-nombre">${s.CLIENTE}</div><p class="info-txt"><b>RIF:</b> ${s.RIF || s.RIF_CI || '-'}</p><p class="info-txt"><b>Tlf:</b> ${s.TELEFONO}</p><p class="info-txt"><b>Obra:</b> ${s.UBICACION}</p><div class="monto-box"><span>VALOR COTIZADO:</span><b>$${totalVal}</b></div><div class="items-box"><p style="font-size:11px; font-weight:bold; color:#fff; margin: 0 0 10px 0;">MATERIAL SOLICITADO:</p>${htmlItems}</div>`;
+            let safeId = String(s.FECHA).replace(/[^a-zA-Z0-9]/g, '');
 
-            // SE ELIMINÓ EL CANDADO DE PERMISOS. LOS BOTONES SALEN PARA TODOS SIEMPRE.
-            cardHtml += `<div class="btn-group"><button class="btn-marcar" onclick="aprobarAPlanta('${s.CLIENTE}', '${s.FECHA}')">✅ PAGADO / ENVIAR A PLANTA</button><button class="btn-eliminar" onclick="eliminar('${s.CLIENTE}', '${s.FECHA}')">🗑️ ELIMINAR</button></div>`; 
-            
-            cardHtml += `</div>`; container.innerHTML += cardHtml;
+            let cardHtml = `
+            <div class="solicitud-card">
+                <button class="btn-pdf" onclick="generarPDFPresupuesto('${s.FECHA}')">📄 PRESUPUESTO</button>
+                <div style="font-size: 10px; color: #9ca3af; margin-bottom: 5px; font-weight:bold;">FECHA: ${s.FECHA}</div>
+                <div class="cliente-nombre">${s.CLIENTE}</div>
+                <p class="info-txt"><b>RIF:</b> ${s.RIF || s.RIF_CI || '-'}</p>
+                <p class="info-txt"><b>Tlf:</b> ${s.TELEFONO}</p>
+                <p class="info-txt"><b>Obra:</b> ${s.UBICACION}</p>
+                <div class="monto-box"><span>VALOR COTIZADO:</span><b>$${totalVal}</b></div>
+                <div class="items-box">
+                    <p style="font-size:11px; font-weight:bold; color:#fff; margin: 0 0 10px 0;">MATERIAL SOLICITADO:</p>
+                    ${htmlItems}
+                </div>
+                <div class="btn-group">
+                    <button class="btn-marcar" onclick="aprobarAPlanta('${s.CLIENTE}', '${s.FECHA}')">✅ APROBAR Y ENVIAR A PLANTA</button>
+                    <button class="btn-eliminar" onclick="eliminar('${s.CLIENTE}', '${s.FECHA}')">🗑️ ELIMINAR</button>
+                </div>
+            </div>`;
+            container.innerHTML += cardHtml;
         });
     }
 
-    function aprobarAPlanta(cliente, fecha) { if(!confirm("¿Confirmas el pago? Se enviará a Planta.")) return; document.getElementById('loader').style.display = 'flex'; fetch(API_URL + "?action=marcar_pagado_solicitud", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: cliente, fecha: fecha }) }).finally(() => { setTimeout(() => { cargarSolicitudes(); }, 1500); }); }
-    function eliminar(cliente, fecha) { if(!confirm("¿Eliminar solicitud?")) return; document.getElementById('loader').style.display = 'flex'; fetch(API_URL + "?action=eliminar_solicitud", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: cliente, fecha: fecha }) }).finally(() => { setTimeout(() => { cargarSolicitudes(); }, 1500); }); }
+    // FUNCION NUEVA PARA GENERAR EL PDF DEL PRESUPUESTO DESDE SOLICITUDES
+    function generarPDFPresupuesto(fechaOrden) {
+        let p = solicitudesGlobal.find(x => x.FECHA === fechaOrden); 
+        if(!p) return; 
+        
+        let items = JSON.parse(p.DETALLES_JSON); 
+        let total = parseFloat(p.TOTAL_USD || p.TOTAL || 0); 
+        
+        let htmlPDF = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Presupuesto Formal - ${p.CLIENTE}</title><style>body { font-family: Arial, sans-serif; color: #333; margin: 40px; font-size: 13px; line-height: 1.4; } .header { border-bottom: 3px solid #1e2328; padding-bottom: 15px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:flex-end;} .empresa h1 { margin: 0 0 5px 0; color: #1e2328; font-size:20px; text-transform:uppercase; letter-spacing: 1px;} .empresa p { margin: 2px 0; color: #475569; font-size:11px; font-weight: bold;} .empresa .slogan { font-style: italic; color: #475569; margin-top: 4px; font-weight: normal;} .titulo-doc { text-align: right;} .titulo-doc h2 { margin: 0 0 5px 0; color: #1e2328; font-size:18px;} .info-grid { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;} .info-box p { margin: 5px 0; } table { width: 100%; border-collapse: collapse; margin-bottom: 20px; } th { background: #475569; color: white; padding: 10px; text-align: left; font-size:11px; text-transform: uppercase;} td { border-bottom: 1px solid #e2e8f0; padding: 10px; font-size:12px;} .total-box { text-align: right; font-size: 16px; font-weight: 900; margin-top: 15px; padding: 10px; background: #e2e8f0; display: inline-block; float: right; border-radius: 6px; border-left: 4px solid #b0b0b0;} .firmas { margin-top: 60px; display: flex; justify-content: space-around; text-align: center; } .firma-linea { border-top: 1px solid #000; width: 200px; padding-top: 5px; font-weight: bold; font-size: 11px; } @media print { body { margin: 0; } .no-print { display: none; } }</style></head><body><div class="header"><div class="empresa"><h1>REVESTIMIENTOS CORALROCK C.A.</h1><p>RIF: J-50317540-0</p><p>by Coralsintec</p><p class="slogan">Playing with concrete since 1986</p><p>Caracas - Venezuela</p></div><div class="titulo-doc"><h2>PRESUPUESTO FORMAL</h2><p><b>Fecha:</b> ${p.FECHA}</p></div></div><div class="info-grid"><div class="info-box"><p><b>Cliente:</b> ${p.CLIENTE}</p><p><b>RIF/CI:</b> ${p.RIF || p.RIF_CI || 'No registrado'}</p><p><b>Teléfono:</b> ${p.TELEFONO || 'No registrado'}</p><p><b>Obra / Ubicación:</b> ${p.UBICACION}</p></div></div>`; 
+        
+        htmlPDF += `<table><thead><tr><th>FORMATO</th><th>USO</th><th>TEXTURA</th><th>COLOR</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`; 
+        
+        items.forEach(i => { 
+            let m = parseFloat(i.m2Final || i.m2 || 0); 
+            let pcs = i.piezas || i.pieces || Math.ceil(m / (((i.formato.split('x')[0] || 1)*(i.formato.split('x')[1] || 1))/10000)); 
+            htmlPDF += `<tr><td>${i.formato}</td><td>${i.uso}</td><td>${i.textura}</td><td>${i.color}</td><td><b>${m} m²</b></td><td>${pcs}</td></tr>`; 
+        }); 
+        
+        htmlPDF += `</tbody></table>`; 
+        htmlPDF += `<div class="total-box">TOTAL PRESUPUESTO: $${total.toFixed(2)}</div><br><br><br>`; 
+        htmlPDF += `<div class="firmas"><div class="firma-linea">Emitido por la Empresa</div><div class="firma-linea">Firma de Aceptación (Cliente)</div></div><script>window.onload = function() { setTimeout(() => { window.print(); }, 500); }<\/script></body></html>`; 
+        
+        let printWindow = window.open('', '_blank'); 
+        printWindow.document.write(htmlPDF); 
+        printWindow.document.close(); 
+    }
+
+    function aprobarAPlanta(cliente, fecha) { 
+        // 2. PREGUNTA POR EL ABONO ANTES DE ENVIAR
+        let abono = prompt("Ingresa el monto abonado inicialmente por el cliente (USD):", "0");
+        if(abono === null || isNaN(abono) || abono === "") {
+            alert("Operación cancelada o monto inválido.");
+            return;
+        }
+
+        if(!confirm("¿Confirmas la aprobación? La orden pasará a Producción (Planta).")) return; 
+        
+        document.getElementById('loader').innerText = "⏳ Aprobando y enviando a Planta...";
+        document.getElementById('loader').style.display = 'flex'; 
+        
+        // MODIFICAMOS EL BODY PARA INCLUIR EL MONTO ABONADO
+        fetch(API_URL + "?action=marcar_pagado_solicitud", { 
+            method: "POST", 
+            mode: "no-cors", 
+            body: JSON.stringify({ 
+                cliente: cliente, 
+                fecha: fecha,
+                monto_pagado: abono // Nuevo parámetro que viaja a la base de datos
+            }) 
+        }).finally(() => { 
+            setTimeout(() => { 
+                document.getElementById('loader').innerText = "⏳ Buscando solicitudes...";
+                cargarSolicitudes(); 
+            }, 2000); 
+        }); 
+    }
+
+    function eliminar(cliente, fecha) { 
+        if(!confirm("⚠️ ¿Eliminar esta solicitud permanentemente?")) return; 
+        document.getElementById('loader').innerText = "🗑️ Eliminando...";
+        document.getElementById('loader').style.display = 'flex'; 
+        
+        fetch(API_URL + "?action=eliminar_solicitud", { 
+            method: "POST", 
+            mode: "no-cors", 
+            body: JSON.stringify({ cliente: cliente, fecha: fecha }) 
+        }).finally(() => { 
+            setTimeout(() => { 
+                document.getElementById('loader').innerText = "⏳ Buscando solicitudes...";
+                cargarSolicitudes(); 
+            }, 1500); 
+        }); 
+    }
 </script>
 </body>
 </html>
