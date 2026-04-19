@@ -145,14 +145,14 @@
         <div class="cart-header"><h2>Resumen de Compra</h2><button onclick="vaciarCarrito()">Limpiar</button></div>
         <ul class="cart-list" id="cart-list"></ul>
         <div class="grand-total"><span class="gt-title">TOTAL GENERAL</span><div class="grand-total-val">$ <span id="grand-total">0.00</span></div></div>
-        <button class="btn-submit" onclick="enviarPedido()">🚀 CARGAR PEDIDO A PLANTA</button>
+        <button class="btn-submit" onclick="enviarPedido()">🚀 ENVIAR SOLICITUD A BANDEJA</button>
     </section>
 
     <div id="success-screen" class="success-msg">
         <div style="font-size: 60px; margin-bottom: 10px;">✅</div>
-        <h2>¡PEDIDO REGISTRADO!</h2>
-        <p>El pedido ha sido enviado a Producción.</p>
-        <button class="btn-submit" style="margin-top:20px;" onclick="location.reload()">Nuevo Pedido</button>
+        <h2>¡SOLICITUD REGISTRADA!</h2>
+        <p>Ha sido enviada a la bandeja para su aprobación.</p>
+        <button class="btn-submit" style="margin-top:20px;" onclick="location.reload()">Nueva Cotización</button>
     </div>
 
 <script>
@@ -239,10 +239,21 @@
     async function enviarPedido() {
         const nom = document.getElementById('c-nombre').value; const rif = document.getElementById('c-rif').value; const tlf = document.getElementById('c-telefono').value; const obr = document.getElementById('c-ubicacion').value;
         if(!nom || !rif || !tlf || !obr) { alert("Por favor complete los datos del cliente."); return; } if(carrito.length === 0) return;
-        document.getElementById('loader-overlay').style.display = 'flex'; document.getElementById('loader-overlay').innerHTML = "⏳ CARGANDO PEDIDO...";
+        document.getElementById('loader-overlay').style.display = 'flex'; document.getElementById('loader-overlay').innerHTML = "⏳ ENVIANDO SOLICITUD...";
         let carritoLimpio = carrito.map(item => ({ formato: item.formato, uso: item.uso, color: item.color, textura: item.textura, m2: item.m2Final, carateo: item.cantSacos, sellador: item.cantGalones, total: item.total }));
         const paquete = { cliente: nom.toUpperCase(), rif: rif.toUpperCase(), telefono: tlf, ubicacion: obr, total: document.getElementById('grand-total').innerText, detalles: carritoLimpio };
-        try { await fetch(API_URL + "?action=nuevo_pedido", { method: "POST", mode: "no-cors", body: JSON.stringify(paquete) }); document.getElementById('loader-overlay').style.display = 'none'; document.getElementById('main-content').style.display = 'none'; document.getElementById('cart-section').style.display = 'none'; document.getElementById('success-screen').style.display = 'block'; } catch(e) { alert("Error de conexión. Intente de nuevo."); document.getElementById('loader-overlay').style.display = 'none'; }
+        
+        // AHORA ESTA ACCIÓN ES "nueva_solicitud" PARA QUE PASE A TU BANDEJA PRIMERO
+        try { 
+            await fetch(API_URL + "?action=nueva_solicitud", { method: "POST", mode: "no-cors", body: JSON.stringify(paquete) }); 
+            document.getElementById('loader-overlay').style.display = 'none'; 
+            document.getElementById('main-content').style.display = 'none'; 
+            document.getElementById('cart-section').style.display = 'none'; 
+            document.getElementById('success-screen').style.display = 'block'; 
+        } catch(e) { 
+            alert("Error de conexión. Intente de nuevo."); 
+            document.getElementById('loader-overlay').style.display = 'none'; 
+        }
     }
 </script>
 </body>
