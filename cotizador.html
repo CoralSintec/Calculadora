@@ -9,13 +9,24 @@
             --c-bg: #1c1c1c; 
             --c-card: #2d2d2d; 
             --c-input: #3a3a3a; 
-            --c-accent: #b0b0b0; /* Gris Cemento */
+            --c-accent: #b0b0b0; /* Gris Cemento Mate */
             --c-text: #e0e0e0; 
             --c-border: #555555; 
             --c-muted: #9ca3af; 
         }
         html, body { min-height: 100vh; margin: 0; }
-        body { font-family: -apple-system, sans-serif; background-image: linear-gradient(rgba(28,28,28,0.9), rgba(28,28,28,0.9)), url('cabecera.jpg'); background-size: cover; background-position: center; background-attachment: fixed; color: var(--c-text); padding: 40px 15px 50px 15px; display: flex; flex-direction: column; align-items: center; }
+        body { 
+            font-family: -apple-system, sans-serif; 
+            background-image: linear-gradient(rgba(28,28,28,0.9), rgba(28,28,28,0.9)), url('cabecera.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed; 
+            color: var(--c-text); 
+            padding: 40px 15px 50px 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
         .app-main { background: rgba(45, 45, 45, 0.95); backdrop-filter: blur(8px); padding: 25px 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); width: 100%; max-width: 400px; box-sizing: border-box; border-top: 6px solid var(--c-accent); }
         .section-title { font-size: 20px; color: #fff; margin: 0 0 5px 0; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
         .section-subtitle { text-align: center; color: var(--c-muted); font-size: 13px; margin-bottom: 20px; font-weight: 500; }
@@ -25,9 +36,11 @@
         label { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 800; color: var(--c-muted); text-transform: uppercase; }
         select, input[type="number"], input[type="text"], input[type="tel"] { width: 100%; padding: 14px; border: 1px solid var(--c-border); border-radius: 10px; font-size: 15px; background-color: var(--c-input); color: #fff; appearance: none; box-sizing: border-box; font-weight: 700; }
         select:focus, input:focus { outline: none; border-color: var(--c-accent); }
+        
         .options-group { background: var(--c-bg); border-radius: 10px; padding: 15px; margin-top: 20px; border: 1px solid var(--c-border); }
         .option-item { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 800; padding: 8px 0; color: #fff; }
         .option-item input[type="checkbox"] { width: 24px; height: 24px; accent-color: var(--c-accent); }
+        
         .results-card { margin-top: 25px; padding: 20px; background-color: var(--c-bg); border-radius: 12px; color: white; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); border-left: 4px solid var(--c-accent); border: 1px solid var(--c-border);}
         .breakdown-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: var(--c-muted); align-items: center; }
         .breakdown-val { font-weight: 800; color: #fff; font-size: 14px; }
@@ -35,32 +48,44 @@
         .total-price-container { text-align: center; margin-top: 15px; }
         .total-label { font-size: 11px; text-transform: uppercase; color: var(--c-muted); letter-spacing: 1px; font-weight: 600; }
         .total-price { font-size: 32px; font-weight: 900; color: var(--c-accent); margin: 5px 0 0 0; }
+        
         .btn-add-outline { width: 100%; background-color: transparent; color: var(--c-accent); border: 2px solid var(--c-accent); padding: 16px; border-radius: 10px; font-size: 14px; font-weight: 900; text-transform: uppercase; margin-top: 20px; cursor: pointer; transition: 0.2s; }
         .btn-add-outline:hover { background: var(--c-accent); color: #1c1c1c; }
+        .btn-add-outline:active { transform: scale(0.97); }
+        
         .btn-submit { width: 100%; border: none; padding: 16px; border-radius: 10px; font-size: 15px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.1s; background-color: #374151; color: white; margin-top: 15px;}
+        .btn-submit:active { transform: scale(0.97); }
+        
         .cart-section { width: 100%; max-width: 400px; background: rgba(45, 45, 45, 0.95); backdrop-filter: blur(8px); padding: 20px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); margin-top: 20px; box-sizing: border-box; border-top: 6px solid var(--c-accent); }
         .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--c-border); padding-bottom: 10px; }
         .cart-header h2 { font-size: 16px; margin: 0; color: #fff; font-weight: 900;}
         .cart-header button { background: #3a3a3a; border: 1px solid #555555; color: #e0e0e0; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer;}
+        
         .cart-list { margin: 0; padding: 0; list-style: none; }
         .cart-item { background: var(--c-bg); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--c-border); }
         .cart-item-title { display: flex; justify-content: space-between; align-items: center; font-weight: 900; color: #fff; font-size: 15px; margin-bottom: 8px; border-bottom: 1px solid var(--c-border); padding-bottom: 8px; }
         .btn-del-item { background: transparent; color: #b0b0b0; border: none; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase;}
+        
         .cart-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--c-muted); margin-bottom: 4px; }
         .cart-row b { color: #fff; }
         .cart-total-row { display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; color: #fff; border-top: 1px solid var(--c-border); margin-top: 8px; padding-top: 8px; }
         .cart-total-row b { color: var(--c-accent); font-size: 18px; }
+        
         .grand-total { text-align: center; background: rgba(55, 65, 81, 0.4); padding: 20px; border-radius: 12px; border: 1px solid #555555; margin-top: 15px;}
         .grand-total span.gt-title { font-size: 12px; color: #b0b0b0; font-weight: 800; display: block; text-transform: uppercase; margin-bottom: 5px;}
         .grand-total-val { font-size: 26px; font-weight: 900; color: #fff; display:flex; justify-content:center; align-items:center; gap:6px;}
+        
         .btn-volver { background: var(--c-input); border: 1px solid var(--c-border); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; align-self: flex-start; }
+        
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28,28,28,0.95); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; color: var(--c-accent); font-size:18px; display:none;}
+        
         .success-msg { display: none; text-align: center; padding: 50px 20px; background: rgba(45, 45, 45, 0.95); border-radius: 16px; border-top: 8px solid #b0b0b0; max-width:400px; width:100%; box-sizing:border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.6);}
         .success-msg h2 { color: #fff; margin:0;}
         .success-msg p { color: var(--c-muted); font-weight:bold;}
     </style>
 </head>
 <body>
+
     <div id="loader-overlay">⏳ PROCESANDO...</div>
 
     <main class="app-main" id="main-content">
@@ -134,8 +159,11 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
     
     let db = [];
+    
+    // SEGURIDAD BLINDADA CONTRA ESPACIOS
     const usuarioActual = localStorage.getItem('usuarioCoralsintec') || 'DESCONOCIDO';
     let p_master = (String(usuarioActual).trim().toUpperCase() === 'EDUARDO');
+    
     let perms = {}; try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
     const canCreate = p_master || perms.v_crear === true;
 
@@ -196,6 +224,7 @@
             <div class="cart-row"><span>Revestimiento (${item.espesor}):</span> <b>$${item.totalRev.toFixed(2)}</b></div>
             <div class="cart-row"><span>Piezas a fabricar:</span> <b>${item.piezas}</b></div><div class="cart-row"><span>Área Final:</span> <b>${item.m2Final.toFixed(2)} m²</b></div>`;
             
+            // ELIMINADOS LOS COLORES AMARILLOS DE AQUÍ
             if(item.carCheck) htmlHTML += `<div class="cart-row" style="color:#b0b0b0;"><span>Carateo (${item.cantSacos} sacos):</span> <b>$${item.totalCar.toFixed(2)}</b></div>`;
             if(item.selCheck) htmlHTML += `<div class="cart-row" style="color:#b0b0b0;"><span>Sellador (${item.cantGalones} gal):</span> <b>$${item.totalSel.toFixed(2)}</b></div>`;
             
