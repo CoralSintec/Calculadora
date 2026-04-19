@@ -15,7 +15,7 @@
             --blue: #3b82f6; 
             --red: #ef4444; 
             --green: #10b981; 
-            --accent: #b0b0b0; 
+            --accent: #b0b0b0; /* Gris Cemento */
         }
         body { 
             font-family: -apple-system, sans-serif; 
@@ -74,9 +74,12 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
     
+    // SEGURIDAD BLINDADA DE JEFE
+    const uActual = (localStorage.getItem('usuarioCoralsintec') || '').trim().toUpperCase();
+    const soyElJefe = (uActual === 'EDUARDO' || uActual.includes('EDUARDO'));
+
     window.onload = () => {
-        const u = localStorage.getItem('usuarioCoralsintec') || 'DESCONOCIDO';
-        document.getElementById('badge-usuario').innerText = "👤 " + String(u).trim();
+        document.getElementById('badge-usuario').innerText = soyElJefe ? "👑 MODO GERENTE" : "👤 " + uActual;
         cargarTodo();
     };
 
@@ -85,10 +88,8 @@
     async function cargarTodo() {
         document.getElementById('loader').style.display = 'flex';
         
-        const usuarioActual = localStorage.getItem('usuarioCoralsintec') || '';
-        let p_master = (String(usuarioActual).trim().toUpperCase() === 'EDUARDO');
         let perms = {}; try { perms = JSON.parse(localStorage.getItem('permisosCoralsintec')) || {}; } catch(e){}
-        const canEdit = p_master || perms.g_editar === true;
+        const canEdit = soyElJefe || perms.g_editar === true;
 
         try {
             const [rP, rN, rI] = await Promise.all([fetch(API_URL + "?action=get_pedidos&t=" + Date.now()).then(r => r.json()), fetch(API_URL + "?action=get_nomina&t=" + Date.now()).then(r => r.json()), fetch(API_URL + "?action=get_inventario&t=" + Date.now()).then(r => r.json())]);
