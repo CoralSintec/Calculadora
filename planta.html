@@ -15,16 +15,17 @@
             --border: #555555; 
             --text-main: #e0e0e0; 
             --text-muted: #9ca3af; 
-            --accent: #b0b0b0; /* Gris Cemento */
+            --accent: #b0b0b0; 
             --blue: #3b82f6; 
             --green: #10b981; 
             --red: #ef4444; 
         }
         body { font-family: -apple-system, sans-serif; background-image: linear-gradient(rgba(28,28,28,0.95), rgba(28,28,28,0.95)), url('cabecera.jpg'); background-size: cover; background-attachment: fixed; margin: 0; padding: 15px; color: var(--text-main); }
         .app-main { width: 100%; max-width: 600px; margin: 0 auto; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .btn-volver { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--text-main); }
-        .user-badge { background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 5px; }
+        .btn-volver { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--text-main); font-size: 11px; }
+        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 11px; }
+        .user-badge { background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border); padding: 6px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center;}
         .user-eduardo { background: #3a3a3a; color: #ffffff; border-color: #b0b0b0; }
         
         .header { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
@@ -134,6 +135,7 @@
     <main class="app-main">
         <div class="top-bar">
             <button class="btn-volver" onclick="window.location.href='index.html'">⬅ MENÚ</button>
+            <button class="btn-logout" onclick="localStorage.clear(); window.location.href='index.html';">🚪 CERRAR SESIÓN</button>
             <div id="badge-usuario" class="user-badge">👤 PLANTA</div>
         </div>
         <div class="header">
@@ -149,7 +151,6 @@
     const uActual = String(localStorage.getItem('usuarioCoralsintec') || '').trim().toUpperCase();
     const soyElJefe = (uActual === 'EDUARDO' || uActual.indexOf('EDUARDO') !== -1);
 
-    // NUEVOS PERMISOS GRANULARES
     let sysPerms = { p_precios: false, p_receta: false, p_acciones: false, p_pdf_cotiz: false, p_pdf_prod: false, p_pdf_envio: false };
     try { 
         let saved = JSON.parse(localStorage.getItem('permisosCoralsintec')); 
@@ -279,11 +280,14 @@
                         <div class="payment-divider"></div>
                         <div class="payment-box">
                             <span class="payment-label">Abonado (<span id="pct-abono-${safeId}">${porcentaje}</span>%)</span>
-                            <div style="display:flex; align-items:center; gap:2px;">
-                                <span style="color:#16a34a; font-weight:900; font-size:16px;">$</span>
+                            <div style="display:flex; flex-direction:column; align-items:center; gap:3px;">
                                 <input type="number" id="abono-${safeId}" value="${pagado.toFixed(2)}" class="input-abono" oninput="recalcularAbono('${safeId}', ${total})">
+                                <span style="font-size:9px; color:var(--text-muted); text-transform:uppercase;">+ Nuevo Avance</span>
+                                <div style="display:flex; align-items:center; gap:4px;">
+                                    <input type="number" id="avance-${safeId}" placeholder="0" class="input-avance">
+                                    <button onclick="guardarNuevoAbono('${safeCliente}', '${p.FECHA_ORDEN}', '${safeId}', ${total})" class="btn-guardar-abono">💾 Guardar</button>
+                                </div>
                             </div>
-                            <button onclick="guardarAbonoDirecto('${safeCliente}', '${p.FECHA_ORDEN}', '${safeId}')" class="btn-guardar-abono" style="margin-top:5px; width:100%;">💾 Guardar Abono</button>
                         </div>
                         <div class="payment-divider"></div>
                         <div class="payment-box" style="align-items:flex-end;">
@@ -390,18 +394,33 @@
         });
     }
 
-    function guardarAbonoDirecto(cliente, fecha, idInput) {
-        let val = document.getElementById('abono-' + idInput).value;
-        let nuevoAbono = parseFloat(val);
-        if(isNaN(nuevoAbono)) return;
-
-        document.getElementById('loader-overlay').innerText = "⏳ Guardando pago...";
+    function guardarNuevoAbono(cliente, fecha, idInput, total) {
+        let rawAbonoActual = String(document.getElementById('abono-' + idInput).value).replace(/[^0-9.]/g, '');
+        let abonoAcumulado = parseFloat(rawAbonoActual) || 0;
+        
+        let abonoInput = document.getElementById('avance-' + idInput).value;
+        let nuevoAvance = parseFloat(abonoInput) || 0;
+        
+        let nuevoTotalPagado = abonoAcumulado + nuevoAvance;
+        let nuevaResta = total - nuevoTotalPagado;
+        
+        let nuevoPctAbono = total > 0 ? Math.round((nuevoTotalPagado / total) * 100) : 0;
+        let nuevoPctResta = total > 0 ? Math.round((nuevaResta / total) * 100) : 0;
+        
+        document.getElementById('abono-' + idInput).value = nuevoTotalPagado.toFixed(2);
+        document.getElementById('pct-abono-' + idInput).innerText = nuevoPctAbono;
+        document.getElementById('pct-resta-' + idInput).innerText = nuevoPctResta;
+        document.getElementById('val-resta-' + idInput).innerText = '$' + nuevaResta.toFixed(2);
+        
+        document.getElementById('avance-' + idInput).value = "";
+        
+        document.getElementById('loader-overlay').innerText = "⏳ Guardando abono...";
         document.getElementById('loader-overlay').style.display = 'flex';
         
         fetch(API_URL + "?action=registrar_pago", { 
             method: "POST", 
             mode: "no-cors", 
-            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, monto_pagado: nuevoAbono }) 
+            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, monto_pagado: nuevoTotalPagado }) 
         }).finally(() => { 
             setTimeout(() => { 
                 document.getElementById('loader-overlay').innerText = "⏳ Sincronizando Planta...";
