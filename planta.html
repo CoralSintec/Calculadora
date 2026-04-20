@@ -146,11 +146,9 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
 
-    // IDENTIFICADOR DE JEFE EXTREMADAMENTE BLINDADO
     const uActual = String(localStorage.getItem('usuarioCoralsintec') || '').trim().toUpperCase();
     const soyElJefe = (uActual === 'EDUARDO' || uActual.indexOf('EDUARDO') !== -1);
 
-    // CARGAMOS PERMISOS
     let sysPerms = { p_precios: false, p_receta: false, p_acciones: false, p_pdf: false };
     try { 
         let saved = JSON.parse(localStorage.getItem('permisosCoralsintec')); 
@@ -223,6 +221,17 @@
     function switchTab(btn, targetId) { let card = btn.closest('.order-card'); card.querySelectorAll('.order-tab-content').forEach(c => c.classList.remove('active')); card.querySelectorAll('.order-tab').forEach(b => b.classList.remove('active')); card.querySelector('#' + targetId).classList.add('active'); btn.classList.add('active'); }
     function ultraClean(str) { if(!str) return ""; return String(str).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase(); }
 
+    function recalcularAbono(id, total) {
+        let val = parseFloat(document.getElementById('abono-' + id).value) || 0;
+        let resta = total - val;
+        let pctAbono = total > 0 ? Math.round((val / total) * 100) : 0;
+        let pctResta = total > 0 ? Math.round((resta / total) * 100) : 0;
+        
+        document.getElementById('pct-abono-' + id).innerText = pctAbono;
+        document.getElementById('pct-resta-' + id).innerText = pctResta;
+        document.getElementById('val-resta-' + id).innerText = '$' + resta.toFixed(2);
+    }
+
     function render(pedidos, formulas) {
         const container = document.getElementById('lista-pedidos'); 
         container.innerHTML = '';
@@ -244,7 +253,6 @@
             let pctMini = obtenerProgreso(p.FECHA_ORDEN, p.FECHA_LIMITE_HABIL); 
             let clipMini = 100 - pctMini;
             
-            // CÁLCULO FINANCIERO SEGURO
             let rawTotal = String(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || "0").replace(/[^0-9.]/g, '');
             let rawPagado = String(p.PAGADO_USD || p.PAGADO || (Object.values(p).length > 11 ? Object.values(p)[11] : "0")).replace(/[^0-9.]/g, '');
             let total = parseFloat(rawTotal) || 0; 
@@ -254,7 +262,6 @@
             let porcentaje = total > 0 ? Math.round((pagado / total) * 100) : 0; 
             let porcentajeResta = total > 0 ? Math.round((falta / total) * 100) : 0;
 
-            // 1. PANEL INTERACTIVO DE ABONOS (GRIS CEMENTO)
             let etiquetaPrecio = "";
             if(sysPerms.p_precios || soyElJefe) { 
                 etiquetaPrecio = `
@@ -267,17 +274,14 @@
                         <div class="payment-divider"></div>
                         <div class="payment-box">
                             <span class="payment-label">Abonado (<span id="pct-abono-${safeId}">${porcentaje}</span>%)</span>
-                            <div style="display:flex; flex-direction:column; align-items:center; gap:3px;">
-                                <input type="number" id="abono-${safeId}" value="${pagado.toFixed(2)}" class="input-abono">
-                                <span style="font-size:9px; color:var(--text-muted); text-transform:uppercase;">+ Nuevo Avance</span>
-                                <div style="display:flex; align-items:center; gap:4px;">
-                                    <input type="number" id="avance-${safeId}" placeholder="0" class="input-avance">
-                                    <button onclick="guardarNuevoAbono('${safeCliente}', '${p.FECHA_ORDEN}', '${safeId}', ${total})" class="btn-guardar-abono">💾 Guardar</button>
-                                </div>
+                            <div style="display:flex; align-items:center; gap:2px;">
+                                <span style="color:#16a34a; font-weight:900; font-size:16px;">$</span>
+                                <input type="number" id="abono-${safeId}" value="${pagado.toFixed(2)}" class="input-abono" oninput="recalcularAbono('${safeId}', ${total})">
                             </div>
+                            <button onclick="guardarAbonoDirecto('${safeCliente}', '${p.FECHA_ORDEN}', '${safeId}')" class="btn-guardar-abono" style="margin-top:5px; width:100%;">💾 Guardar Abono</button>
                         </div>
                         <div class="payment-divider"></div>
-                        <div class="payment-box">
+                        <div class="payment-box" style="align-items:flex-end;">
                             <span class="payment-label">Resta (<span id="pct-resta-${safeId}">${porcentajeResta}</span>%)</span>
                             <span class="payment-val val-red" id="val-resta-${safeId}">$${falta.toFixed(2)}</span>
                         </div>
@@ -285,18 +289,25 @@
                 </div>`; 
             }
 
-            // 2. BOTONES PDF
             let botonesPDF = "";
-            if(sysPerms.p_pdf || soyElJefe) { 
-                botonesPDF = `
-                <div class="doc-buttons">
-                    <button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'cotizacion')">📄 COTIZ.</button>
+            // LOS BOTONES DE PDF ESTÁN CONTROLADOS
+            if(sysPerms.p_pdf || sysPerms.p_precios || soyElJefe) { 
+                botonesPDF = `<div class="doc-buttons">`;
+                
+                // Solo quienes tengan permiso de PRECIOS verán la COTIZACIÓN
+                if(sysPerms.p_precios || soyElJefe) {
+                    botonesPDF += `<button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'cotizacion')">📄 COTIZ.</button>`;
+                }
+                
+                // Quienes tengan permiso de PDF verán PROD y ENVÍO
+                if(sysPerms.p_pdf || soyElJefe) {
+                    botonesPDF += `
                     <button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'produccion')">🏭 PROD.</button>
-                    <button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'entrega')">🚚 ENVÍO</button>
-                </div>`; 
+                    <button class="btn-doc" onclick="prepararPDF('${p.FECHA_ORDEN}', 'entrega')">🚚 ENVÍO</button>`;
+                }
+                botonesPDF += `</div>`; 
             }
 
-            // 3. TABLA DETALLES Y RECETAS
             let tablaDetallesHtml = `<table><thead><tr><th>FORMATO</th><th>USO</th><th>COLOR</th><th>TEXTURA</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`; 
             let recetaHtml = `<div>`;
             
@@ -328,7 +339,6 @@
             tablaDetallesHtml += `</tbody></table>`;
             recetaHtml += `</div>`;
 
-            // 4. CONSTRUCCIÓN DE LA TARJETA
             let html = `
             <div class="order-card">
                 ${botonesPDF}
@@ -347,8 +357,8 @@
                                 <div style="width: 100px;">
                                     <div style="font-size:9px; font-weight:900; color:var(--text-muted); text-transform:uppercase; text-align:left;">FECHA LÍMITE</div>
                                     <div style="color:#fff; font-size:14px; font-weight:900; margin-top:1px; text-align:left;">${p.FECHA_LIMITE_HABIL}</div>
-                                    <div style="width: 100%; height: 5px; background: #404040; border-radius: 3px; margin-top: 4px; position: relative;">
-                                        <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(to right, #3b82f6, #b0b0b0, #10b981); border-radius: 3px; clip-path: inset(0 ${clipMini}% 0 0);"></div>
+                                    <div style="width: 100%; height: 5px; background: #e2e8f0; border-radius: 3px; margin-top: 4px; position: relative;">
+                                        <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(to right, #3b82f6, #f59e0b, #10b981); border-radius: 3px; clip-path: inset(0 ${clipMini}% 0 0);"></div>
                                     </div>
                                 </div>
                             </div>
@@ -366,7 +376,6 @@
             html += `<div id="detalles-${safeId}" class="order-tab-content active" style="overflow-x: auto;">${tablaDetallesHtml}</div>`;
             if(sysPerms.p_receta || soyElJefe) { html += `<div id="receta-${safeId}" class="order-tab-content">${recetaHtml}</div>`; }
             
-            // 5. BOTONES DE ACCIÓN PARA EL JEFE
             if(sysPerms.p_acciones || soyElJefe) { 
                 html += `<div class="jefe-actions-grid">`; 
                 html += `<button class="btn-action btn-aceptar" onclick="accion('${safeCliente}', '${p.FECHA_ORDEN}', 'ACEPTADO / EN PROCESO')">✅ 1. INICIAR PROD.</button>`;
@@ -375,7 +384,7 @@
                 html += `<button class="btn-action btn-entregado" onclick="accion('${safeCliente}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 4. ENTREGADA</button>`; 
                 
                 if(soyElJefe) { 
-                    html += `<button class="btn-action btn-eliminar" onclick="eliminar('${safeCliente}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN PERMANENTEMENTE</button>`; 
+                    html += `<button class="btn-action btn-eliminar" onclick="eliminar('${safeCliente}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN</button>`; 
                 } 
                 html += `</div>`; 
             }
@@ -385,34 +394,18 @@
         });
     }
 
-    // FUNCION DE GUARDAR EL ABONO DEL CUADRITO INTERACTIVO
-    function guardarNuevoAbono(cliente, fecha, idInput, total) {
-        let rawAbonoActual = String(document.getElementById('abono-' + idInput).value).replace(/[^0-9.]/g, '');
-        let abonoAcumulado = parseFloat(rawAbonoActual) || 0;
-        
-        let abonoInput = document.getElementById('avance-' + idInput).value;
-        let nuevoAvance = parseFloat(abonoInput) || 0;
-        
-        let nuevoTotalPagado = abonoAcumulado + nuevoAvance;
-        let nuevaResta = total - nuevoTotalPagado;
-        
-        let nuevoPctAbono = total > 0 ? Math.round((nuevoTotalPagado / total) * 100) : 0;
-        let nuevoPctResta = total > 0 ? Math.round((nuevaResta / total) * 100) : 0;
-        
-        document.getElementById('abono-' + idInput).value = nuevoTotalPagado.toFixed(2);
-        document.getElementById('pct-abono-' + idInput).innerText = nuevoPctAbono;
-        document.getElementById('pct-resta-' + idInput).innerText = nuevoPctResta;
-        document.getElementById('val-resta-' + idInput).innerText = '$' + nuevaResta.toFixed(2);
-        
-        document.getElementById('avance-' + idInput).value = "";
-        
-        document.getElementById('loader-overlay').innerText = "⏳ Guardando abono...";
+    function guardarAbonoDirecto(cliente, fecha, idInput) {
+        let val = document.getElementById('abono-' + idInput).value;
+        let nuevoAbono = parseFloat(val);
+        if(isNaN(nuevoAbono)) return;
+
+        document.getElementById('loader-overlay').innerText = "⏳ Guardando pago...";
         document.getElementById('loader-overlay').style.display = 'flex';
         
         fetch(API_URL + "?action=registrar_pago", { 
             method: "POST", 
             mode: "no-cors", 
-            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, monto_pagado: nuevoTotalPagado }) 
+            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, monto_pagado: nuevoAbono }) 
         }).finally(() => { 
             setTimeout(() => { 
                 document.getElementById('loader-overlay').innerText = "⏳ Sincronizando Planta...";
@@ -423,7 +416,76 @@
 
     function prepararPDF(fechaOrden, tipo) { if(tipo === 'entrega') { document.getElementById('ch-id-pedido').value = fechaOrden; document.getElementById('modal-chofer').style.display = 'flex'; } else { generarPDF(fechaOrden, tipo, null); } }
     function ejecutarNotaEntrega() { let fechaOrden = document.getElementById('ch-id-pedido').value; let datosChofer = { destino: document.getElementById('ch-destino').value || 'No especificado', nombre: document.getElementById('ch-nombre').value || 'No especificado', modelo: document.getElementById('ch-modelo').value || 'N/A', anio: document.getElementById('ch-anio').value || 'N/A', color: document.getElementById('ch-color').value || 'N/A', placa: document.getElementById('ch-placa').value || 'N/A' }; document.getElementById('modal-chofer').style.display = 'none'; generarPDF(fechaOrden, 'entrega', datosChofer); }
-    function generarPDF(fechaOrden, tipo, datosChofer) { let p = pedidosGlobal.find(x => x.FECHA_ORDEN === fechaOrden); if(!p) return; let items = JSON.parse(p.DETALLES_JSON); let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0); let tituloDoc = tipo === 'cotizacion' ? "COTIZACIÓN FORMAL" : tipo === 'produccion' ? "ORDEN DE PRODUCCIÓN" : "NOTA DE ENTREGA / GUÍA DE DESPACHO"; let htmlPDF = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${tituloDoc} - ${p.CLIENTE}</title><style>body { font-family: Arial, sans-serif; color: #333; margin: 40px; font-size: 13px; line-height: 1.4; } .header { border-bottom: 3px solid #1e2328; padding-bottom: 15px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:flex-end;} .empresa h1 { margin: 0 0 5px 0; color: #1e2328; font-size:20px; text-transform:uppercase; letter-spacing: 1px;} .empresa p { margin: 2px 0; color: #475569; font-size:11px; font-weight: bold;} .empresa .slogan { font-style: italic; color: #475569; margin-top: 4px; font-weight: normal;} .titulo-doc { text-align: right;} .titulo-doc h2 { margin: 0 0 5px 0; color: #1e2328; font-size:18px;} .info-grid { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;} .info-box p { margin: 5px 0; } table { width: 100%; border-collapse: collapse; margin-bottom: 20px; } th { background: #475569; color: white; padding: 10px; text-align: left; font-size:11px; text-transform: uppercase;} td { border-bottom: 1px solid #e2e8f0; padding: 10px; font-size:12px;} .total-box { text-align: right; font-size: 16px; font-weight: 900; margin-top: 15px; padding: 10px; background: #ecfccb; display: inline-block; float: right; border-radius: 6px;} .firmas { margin-top: 60px; display: flex; justify-content: space-around; text-align: center; } .firma-linea { border-top: 1px solid #000; width: 200px; padding-top: 5px; font-weight: bold; font-size: 11px; } @media print { body { margin: 0; } .no-print { display: none; } }</style></head><body><div class="header"><div class="empresa"><h1>REVESTIMIENTOS CORALROCK C.A.</h1><p>RIF: J-50317540-0</p><p>by Coralsintec</p><p class="slogan">Playing with concrete since 1986</p><p>Caracas - Venezuela</p></div><div class="titulo-doc"><h2>${tituloDoc}</h2><p><b>Fecha:</b> ${p.FECHA_ORDEN}</p></div></div><div class="info-grid"><div class="info-box"><p><b>Cliente:</b> ${p.CLIENTE}</p><p><b>RIF/CI:</b> ${p.RIF_CI || 'No registrado'}</p><p><b>Teléfono:</b> ${p.TELEFONO || 'No registrado'}</p><p><b>Obra / Ubicación:</b> ${p.UBICACION}</p></div></div>`; if(tipo === 'entrega' && datosChofer) { htmlPDF += `<div style="border: 2px dashed #cbd5e1; padding: 15px; margin-bottom: 20px; border-radius: 8px;"><h4 style="margin: 0 0 10px 0; color: #3b82f6;">📦 Datos de Transporte</h4><p style="margin: 3px 0;"><b>Destino:</b> ${datosChofer.destino}</p><p style="margin: 3px 0;"><b>Chofer:</b> ${datosChofer.nombre}</p><p style="margin: 3px 0;"><b>Vehículo:</b> ${datosChofer.modelo} (${datosChofer.anio}) | ${datosChofer.color} | Placa: ${datosChofer.placa}</p></div>`; } htmlPDF += `<table><thead><tr><th>FORMATO</th><th>USO</th><th>TEXTURA</th><th>COLOR</th><th>ÁREA</th><th>PIEZAS</th></tr></thead><tbody>`; items.forEach(i => { let m = parseFloat(i.m2Final || i.m2 || 0); let pcs = i.piezas || i.pieces || Math.ceil(m / (((i.formato.split('x')[0] || 1)*(i.formato.split('x')[1] || 1))/10000)); htmlPDF += `<tr><td>${i.formato}</td><td>${i.uso}</td><td>${i.textura}</td><td>${i.color}</td><td><b>${m} m²</b></td><td>${pcs}</td></tr>`; }); htmlPDF += `</tbody></table>`; if(tipo === 'cotizacion') { htmlPDF += `<div class="total-box">TOTAL PRESUPUESTO: $${total.toFixed(2)}</div><br><br><br>`; } let textoFirma1 = tipo === 'entrega' ? 'Despachado por (Planta)' : 'Emitido por la Empresa'; let textoFirma2 = tipo === 'cotizacion' ? 'Firma de Aceptación (Cliente)' : tipo === 'produccion' ? 'Firma del Gerente de Producción' : 'Recibido Conforme (Chofer/Cliente)'; htmlPDF += `<div class="firmas"><div class="firma-linea">${textoFirma1}</div><div class="firma-linea">${textoFirma2}</div></div><script>window.onload = function() { setTimeout(() => { window.print(); }, 500); }<\/script></body></html>`; let printWindow = window.open('', '_blank'); printWindow.document.write(htmlPDF); printWindow.document.close(); }
+    
+    // FUNCION DE PDF SIN PEGO (IGUAL QUE EN SOLICITUDES)
+    function generarPDF(fechaOrden, tipo, datosChofer) { 
+        let p = pedidosGlobal.find(x => x.FECHA_ORDEN === fechaOrden); 
+        if(!p) return; 
+        
+        let items = JSON.parse(p.DETALLES_JSON); 
+        let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0); 
+        let tituloDoc = tipo === 'cotizacion' ? "COTIZACIÓN FORMAL" : tipo === 'produccion' ? "ORDEN DE PRODUCCIÓN" : "NOTA DE ENTREGA / GUÍA DE DESPACHO"; 
+        
+        let htmlPDF = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${tituloDoc} - ${p.CLIENTE}</title><style>body { font-family: Arial, sans-serif; color: #333; margin: 40px; font-size: 13px; line-height: 1.4; } .header { border-bottom: 3px solid #1e2328; padding-bottom: 15px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:flex-end;} .empresa h1 { margin: 0 0 5px 0; color: #1e2328; font-size:20px; text-transform:uppercase; letter-spacing: 1px;} .empresa p { margin: 2px 0; color: #475569; font-size:11px; font-weight: bold;} .empresa .slogan { font-style: italic; color: #475569; margin-top: 4px; font-weight: normal;} .titulo-doc { text-align: right;} .titulo-doc h2 { margin: 0 0 5px 0; color: #1e2328; font-size:18px;} .info-grid { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;} .info-box p { margin: 5px 0; } table { width: 100%; border-collapse: collapse; margin-bottom: 20px; } th { background: #475569; color: white; padding: 10px; text-align: left; font-size:11px; text-transform: uppercase;} td { border-bottom: 1px solid #e2e8f0; padding: 10px; font-size:12px;} .total-box { text-align: right; font-size: 16px; font-weight: 900; margin-top: 15px; padding: 10px; background: #e2e8f0; display: inline-block; float: right; border-radius: 6px; border-left: 4px solid #b0b0b0;} .firmas { margin-top: 60px; display: flex; justify-content: space-around; text-align: center; } .firma-linea { border-top: 1px solid #000; width: 200px; padding-top: 5px; font-weight: bold; font-size: 11px; } @media print { body { margin: 0; } .no-print { display: none; } }</style></head><body><div class="header"><div class="empresa"><h1>REVESTIMIENTOS CORALROCK C.A.</h1><p>RIF: J-50317540-0</p><p>by Coralsintec</p><p class="slogan">Playing with concrete since 1986</p><p>Caracas - Venezuela</p></div><div class="titulo-doc"><h2>${tituloDoc}</h2><p><b>Fecha:</b> ${p.FECHA_ORDEN}</p></div></div><div class="info-grid"><div class="info-box"><p><b>Cliente:</b> ${p.CLIENTE}</p><p><b>RIF/CI:</b> ${p.RIF_CI || 'No registrado'}</p><p><b>Teléfono:</b> ${p.TELEFONO || 'No registrado'}</p><p><b>Obra / Ubicación:</b> ${p.UBICACION}</p></div></div>`; 
+        
+        if(tipo === 'entrega' && datosChofer) { 
+            htmlPDF += `<div style="border: 2px dashed #cbd5e1; padding: 15px; margin-bottom: 20px; border-radius: 8px;"><h4 style="margin: 0 0 10px 0; color: #3b82f6;">📦 Datos de Transporte</h4><p style="margin: 3px 0;"><b>Destino:</b> ${datosChofer.destino}</p><p style="margin: 3px 0;"><b>Chofer:</b> ${datosChofer.nombre}</p><p style="margin: 3px 0;"><b>Vehículo:</b> ${datosChofer.modelo} (${datosChofer.anio}) | ${datosChofer.color} | Placa: ${datosChofer.placa}</p></div>`; 
+        } 
+        
+        let hasPrices = (tipo === 'cotizacion');
+        let tableHeaders = hasPrices ? `<th>FORMATO</th><th>DESCRIPCIÓN</th><th>CANTIDAD</th><th>PRECIO UNIT.</th><th>TOTAL</th>` : `<th>FORMATO</th><th>DESCRIPCIÓN</th><th>CANTIDAD</th>`;
+        
+        htmlPDF += `<table><thead><tr>${tableHeaders}</tr></thead><tbody>`; 
+        
+        let granTotalPDF = 0;
+
+        items.forEach(i => { 
+            let m = parseFloat(i.m2Final || i.m2 || 0); 
+            let pcs = i.piezas || i.pieces || Math.ceil(m / (((i.formato.split('x')[0] || 1)*(i.formato.split('x')[1] || 1))/10000)); 
+            
+            let cantCarateo = i.carateo || i.cantSacos || 0;
+            let precioCarateo = (i.color === "Beige" || String(i.color).includes("Gris")) ? 60 : 50;
+            let totalCarateo = cantCarateo * precioCarateo;
+
+            let cantSellador = i.sellador || i.cantGalones || 0;
+            let precioSellador = 100;
+            let totalSellador = cantSellador * precioSellador;
+
+            let totalRev = parseFloat(i.total) - totalCarateo - totalSellador;
+            let precioM2Rev = m > 0 ? (totalRev / m) : 0;
+
+            granTotalPDF += totalRev + totalCarateo + totalSellador;
+
+            htmlPDF += `<tr><td><b>${i.formato}</b></td><td>Revestimiento ${i.uso} - ${i.color} (${i.textura})</td><td>${m.toFixed(2)} m² <br><span style="font-size:10px; color:#666;">(${pcs} piezas)</span></td>`;
+            if(hasPrices) htmlPDF += `<td>$${precioM2Rev.toFixed(2)}</td><td><b>$${totalRev.toFixed(2)}</b></td>`;
+            htmlPDF += `</tr>`; 
+            
+            if(cantCarateo > 0) {
+                htmlPDF += `<tr><td>-</td><td>Sellador de juntas (Carateo)</td><td>${cantCarateo} sacos</td>`;
+                if(hasPrices) htmlPDF += `<td>$${precioCarateo.toFixed(2)}</td><td>$${totalCarateo.toFixed(2)}</td>`;
+                htmlPDF += `</tr>`; 
+            }
+            if(cantSellador > 0) {
+                htmlPDF += `<tr><td>-</td><td>Sellador Hidrorepelente</td><td>${cantSellador} galones</td>`;
+                if(hasPrices) htmlPDF += `<td>$${precioSellador.toFixed(2)}</td><td>$${totalSellador.toFixed(2)}</td>`;
+                htmlPDF += `</tr>`; 
+            }
+        }); 
+        
+        htmlPDF += `</tbody></table>`; 
+        
+        if(hasPrices) { 
+            htmlPDF += `<div class="total-box">TOTAL PRESUPUESTO: $${granTotalPDF.toFixed(2)}</div><br><br><br>`; 
+        } 
+        
+        let textoFirma1 = tipo === 'entrega' ? 'Despachado por (Planta)' : 'Emitido por la Empresa'; 
+        let textoFirma2 = tipo === 'cotizacion' ? 'Firma de Aceptación (Cliente)' : tipo === 'produccion' ? 'Firma del Gerente de Producción' : 'Recibido Conforme (Chofer/Cliente)'; 
+        htmlPDF += `<div class="firmas"><div class="firma-linea">${textoFirma1}</div><div class="firma-linea">${textoFirma2}</div></div><script>window.onload = function() { setTimeout(() => { window.print(); }, 500); }<\/script></body></html>`; 
+        
+        let printWindow = window.open('', '_blank'); 
+        printWindow.document.write(htmlPDF); 
+        printWindow.document.close(); 
+    }
     
     function accion(c, f, e) { if(!confirm("¿Confirmar cambio a: " + e + "?")) return; document.getElementById('loader-overlay').style.display = 'flex'; fetch(API_URL + "?action=actualizar_estado", { method: "POST", mode: "no-cors", body: JSON.stringify({ cliente: c, fecha_orden: f, nuevo_estado: e }) }).finally(() => { setTimeout(() => { loadData(); }, 2000); }); }
     
