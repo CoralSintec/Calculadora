@@ -227,6 +227,20 @@
     function switchTab(btn, targetId) { let card = btn.closest('.order-card'); card.querySelectorAll('.order-tab-content').forEach(c => c.classList.remove('active')); card.querySelectorAll('.order-tab').forEach(b => b.classList.remove('active')); card.querySelector('#' + targetId).classList.add('active'); btn.classList.add('active'); }
     function ultraClean(str) { if(!str) return ""; return String(str).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase(); }
 
+    function parseDineroSeguro(val) {
+        if (!val) return 0;
+        let v = String(val).replace(/[^\d.,]/g, '');
+        if (v.includes(',') && v.includes('.')) {
+            let lastComma = v.lastIndexOf(',');
+            let lastDot = v.lastIndexOf('.');
+            if (lastComma > lastDot) { v = v.replace(/\./g, '').replace(',', '.'); } 
+            else { v = v.replace(/,/g, ''); }
+        } else if (v.includes(',')) {
+            v = v.replace(',', '.');
+        }
+        return parseFloat(v) || 0;
+    }
+
     function recalcularAbono(id, total) {
         let val = parseFloat(document.getElementById('abono-' + id).value) || 0;
         let resta = total - val;
@@ -259,10 +273,8 @@
             let pctMini = obtenerProgreso(p.FECHA_ORDEN, p.FECHA_LIMITE_HABIL); 
             let clipMini = 100 - pctMini;
             
-            let rawTotal = String(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || "0").replace(/[^0-9.]/g, '');
-            let rawPagado = String(p.PAGADO_USD || p.PAGADO || (Object.values(p).length > 11 ? Object.values(p)[11] : "0")).replace(/[^0-9.]/g, '');
-            let total = parseFloat(rawTotal) || 0; 
-            let pagado = parseFloat(rawPagado) || 0; 
+            let total = parseDineroSeguro(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL); 
+            let pagado = parseDineroSeguro(p.PAGADO_USD || p.PAGADO || (Object.values(p).length > 11 ? Object.values(p)[11] : "0")); 
             let falta = total - pagado;
             
             let porcentaje = total > 0 ? Math.round((pagado / total) * 100) : 0; 
@@ -280,14 +292,11 @@
                         <div class="payment-divider"></div>
                         <div class="payment-box">
                             <span class="payment-label">Abonado (<span id="pct-abono-${safeId}">${porcentaje}</span>%)</span>
-                            <div style="display:flex; flex-direction:column; align-items:center; gap:3px;">
+                            <div style="display:flex; align-items:center; gap:2px;">
+                                <span style="color:#16a34a; font-weight:900; font-size:16px;">$</span>
                                 <input type="number" id="abono-${safeId}" value="${pagado.toFixed(2)}" class="input-abono" oninput="recalcularAbono('${safeId}', ${total})">
-                                <span style="font-size:9px; color:var(--text-muted); text-transform:uppercase;">+ Nuevo Avance</span>
-                                <div style="display:flex; align-items:center; gap:4px;">
-                                    <input type="number" id="avance-${safeId}" placeholder="0" class="input-avance">
-                                    <button onclick="guardarNuevoAbono('${safeCliente}', '${p.FECHA_ORDEN}', '${safeId}', ${total})" class="btn-guardar-abono">💾 Guardar</button>
-                                </div>
                             </div>
+                            <button onclick="guardarAbonoDirecto('${safeCliente}', '${p.FECHA_ORDEN}', '${safeId}')" class="btn-guardar-abono" style="margin-top:5px; width:100%;">💾 Guardar Abono</button>
                         </div>
                         <div class="payment-divider"></div>
                         <div class="payment-box" style="align-items:flex-end;">
@@ -312,21 +321,30 @@
             let recetaHtml = `<div>`;
             
             items.forEach(i => {
-                let m = parseFloat(i.m2Final || i.m2 || 0); let formatoReal = i.formato || 'N/A'; let colorReal = i.color || 'N/A'; let usoReal = i.uso || 'N/A'; let texturaReal = i.textura || 'N/A';
-                let pcs = i.piezas || i.pieces || Math.ceil(m / (((formatoReal.split('x')[0] || 1)*(formatoReal.split('x')[1] || 1))/10000));
-                tablaDetallesHtml += `<tr><td>${formatoReal}</td><td><b>${usoReal}</b></td><td>${colorReal}</td><td>${texturaReal}</td><td><span class="qty-badge">${m}m²</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
+                let mCliente = parseFloat(i.m2Final || i.m2 || 0); 
+                let mFabrica = parseFloat(i.m2Receta !== undefined ? i.m2Receta : mCliente); 
+                
+                let formatoReal = i.formato || 'N/A'; let colorReal = i.color || 'N/A'; let usoReal = i.uso || 'N/A'; let texturaReal = i.textura || 'N/A';
+                
+                let fLow = String(formatoReal).toLowerCase();
+                let esLineal = (fLow.includes('borde') || fLow.includes('gotero') || fLow.includes('rodapie') || fLow.includes('huella') || fLow.includes('escalon'));
+                let unidadStr = esLineal ? ' MTL/Und' : ' m²';
+                
+                let pcs = (i.piezas !== undefined) ? i.piezas : ((i.pieces !== undefined) ? i.pieces : mCliente); 
+                
+                tablaDetallesHtml += `<tr><td>${formatoReal}</td><td><b>${usoReal}</b></td><td>${colorReal}</td><td>${texturaReal}</td><td><span class="qty-badge">${mCliente}${unidadStr}</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
                 
                 if(sysPerms.p_receta || soyElJefe) {
                     let formulasArray = Array.isArray(formulas) ? formulas : [];
                     let colorClean = ultraClean(colorReal); let textClean = ultraClean(texturaReal).substring(0, 4); let usoClean = ultraClean(usoReal);
                     let formulaEncontrada = formulasArray.find(f => { return f && ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(colorClean) && ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(textClean) && ultraClean(f['PRODUCTO_BASE'] || f[0]).includes(usoClean); });
                     
-                    recetaHtml += `<div class="receta-item"><div class="receta-title">▶ Para fabricar: ${m}m² de ${colorReal} (${texturaReal}) - ${usoReal}</div>`;
+                    recetaHtml += `<div class="receta-item"><div class="receta-title">▶ Trompo para: ${mFabrica} m² de volumen real (${colorReal} - ${texturaReal})</div>`;
                     if(formulaEncontrada) { 
                         let keys = Object.keys(formulaEncontrada); let vals = Object.values(formulaEncontrada); 
-                        recetaHtml += `<div style="font-size:10px; color:#10b981; margin-bottom:5px; font-weight:bold;">✅ Fórmula: ${vals[0]}</div><ul class="receta-lista"><li><b>CEMENTO ${String(vals[1]).toUpperCase()}:</b> ${(parseFloat(vals[2] || 0) * m).toFixed(2)} kg</li>`; 
+                        recetaHtml += `<div style="font-size:10px; color:#10b981; margin-bottom:5px; font-weight:bold;">✅ Fórmula: ${vals[0]}</div><ul class="receta-lista"><li><b>CEMENTO ${String(vals[1]).toUpperCase()}:</b> ${(parseFloat(vals[2] || 0) * mFabrica).toFixed(2)} kg</li>`; 
                         for(let c = 3; c < keys.length; c++) { 
-                            let qty = (parseFloat(vals[c] || 0) * m).toFixed(2); 
+                            let qty = (parseFloat(vals[c] || 0) * mFabrica).toFixed(2); 
                             if(qty > 0) recetaHtml += `<li><b>${keys[c]}:</b> ${qty}</li>`; 
                         } 
                         recetaHtml += `</ul>`; 
@@ -384,7 +402,7 @@
                 html += `<button class="btn-action btn-entregado" onclick="accion('${safeCliente}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 4. ENTREGADA</button>`; 
                 
                 if(soyElJefe) { 
-                    html += `<button class="btn-action btn-eliminar" onclick="eliminar('${safeCliente}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN PERMANENTEMENTE</button>`; 
+                    html += `<button class="btn-action btn-eliminar" onclick="eliminar('${safeCliente}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN</button>`; 
                 } 
                 html += `</div>`; 
             }
@@ -394,33 +412,18 @@
         });
     }
 
-    function guardarNuevoAbono(cliente, fecha, idInput, total) {
-        let rawAbonoActual = String(document.getElementById('abono-' + idInput).value).replace(/[^0-9.]/g, '');
-        let abonoAcumulado = parseFloat(rawAbonoActual) || 0;
-        
-        let abonoInput = document.getElementById('avance-' + idInput).value;
-        let nuevoAvance = parseFloat(abonoInput) || 0;
-        
-        let nuevoTotalPagado = abonoAcumulado + nuevoAvance;
-        let nuevaResta = total - nuevoTotalPagado;
-        
-        let nuevoPctAbono = total > 0 ? Math.round((nuevoTotalPagado / total) * 100) : 0;
-        let nuevoPctResta = total > 0 ? Math.round((nuevaResta / total) * 100) : 0;
-        
-        document.getElementById('abono-' + idInput).value = nuevoTotalPagado.toFixed(2);
-        document.getElementById('pct-abono-' + idInput).innerText = nuevoPctAbono;
-        document.getElementById('pct-resta-' + idInput).innerText = nuevoPctResta;
-        document.getElementById('val-resta-' + idInput).innerText = '$' + nuevaResta.toFixed(2);
-        
-        document.getElementById('avance-' + idInput).value = "";
-        
-        document.getElementById('loader-overlay').innerText = "⏳ Guardando abono...";
+    function guardarAbonoDirecto(cliente, fecha, idInput) {
+        let val = document.getElementById('abono-' + idInput).value;
+        let nuevoAbono = parseFloat(val);
+        if(isNaN(nuevoAbono)) return;
+
+        document.getElementById('loader-overlay').innerText = "⏳ Guardando pago...";
         document.getElementById('loader-overlay').style.display = 'flex';
         
         fetch(API_URL + "?action=registrar_pago", { 
             method: "POST", 
             mode: "no-cors", 
-            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, monto_pagado: nuevoTotalPagado }) 
+            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, monto_pagado: nuevoAbono }) 
         }).finally(() => { 
             setTimeout(() => { 
                 document.getElementById('loader-overlay').innerText = "⏳ Sincronizando Planta...";
@@ -437,7 +440,7 @@
         if(!p) return; 
         
         let items = JSON.parse(p.DETALLES_JSON); 
-        let total = parseFloat(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL || 0); 
+        let total = parseDineroSeguro(p.TOTAL_USD || p['TOTAL USD'] || p.TOTAL); 
         let tituloDoc = tipo === 'cotizacion' ? "COTIZACIÓN FORMAL" : tipo === 'produccion' ? "ORDEN DE PRODUCCIÓN" : "NOTA DE ENTREGA / GUÍA DE DESPACHO"; 
         
         let htmlPDF = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${tituloDoc} - ${p.CLIENTE}</title><style>body { font-family: Arial, sans-serif; color: #333; margin: 40px; font-size: 13px; line-height: 1.4; } .header { border-bottom: 3px solid #1e2328; padding-bottom: 15px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:flex-end;} .empresa h1 { margin: 0 0 5px 0; color: #1e2328; font-size:20px; text-transform:uppercase; letter-spacing: 1px;} .empresa p { margin: 2px 0; color: #475569; font-size:11px; font-weight: bold;} .empresa .slogan { font-style: italic; color: #475569; margin-top: 4px; font-weight: normal;} .titulo-doc { text-align: right;} .titulo-doc h2 { margin: 0 0 5px 0; color: #1e2328; font-size:18px;} .info-grid { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;} .info-box p { margin: 5px 0; } table { width: 100%; border-collapse: collapse; margin-bottom: 20px; } th { background: #475569; color: white; padding: 10px; text-align: left; font-size:11px; text-transform: uppercase;} td { border-bottom: 1px solid #e2e8f0; padding: 10px; font-size:12px;} .total-box { text-align: right; font-size: 16px; font-weight: 900; margin-top: 15px; padding: 10px; background: #e2e8f0; display: inline-block; float: right; border-radius: 6px; border-left: 4px solid #b0b0b0;} .firmas { margin-top: 60px; display: flex; justify-content: space-around; text-align: center; } .firma-linea { border-top: 1px solid #000; width: 200px; padding-top: 5px; font-weight: bold; font-size: 11px; } @media print { body { margin: 0; } .no-print { display: none; } }</style></head><body><div class="header"><div class="empresa"><h1>REVESTIMIENTOS CORALROCK C.A.</h1><p>RIF: J-50317540-0</p><p>by Coralsintec</p><p class="slogan">Playing with concrete since 1986</p><p>Caracas - Venezuela</p></div><div class="titulo-doc"><h2>${tituloDoc}</h2><p><b>Fecha:</b> ${p.FECHA_ORDEN}</p></div></div><div class="info-grid"><div class="info-box"><p><b>Cliente:</b> ${p.CLIENTE}</p><p><b>RIF/CI:</b> ${p.RIF_CI || 'No registrado'}</p><p><b>Teléfono:</b> ${p.TELEFONO || 'No registrado'}</p><p><b>Obra / Ubicación:</b> ${p.UBICACION}</p></div></div>`; 
@@ -454,11 +457,15 @@
         let granTotalPDF = 0;
 
         items.forEach(i => { 
-            let m = parseFloat(i.m2Final || i.m2 || 0); 
-            let pcs = i.piezas || i.pieces || Math.ceil(m / (((i.formato.split('x')[0] || 1)*(i.formato.split('x')[1] || 1))/10000)); 
+            let mCliente = parseFloat(i.m2Final || i.m2 || 0); 
+            let pcs = (i.piezas !== undefined) ? i.piezas : ((i.pieces !== undefined) ? i.pieces : mCliente); 
+            
+            let fLow = String(i.formato || '').toLowerCase();
+            let esLineal = (fLow.includes('borde') || fLow.includes('gotero') || fLow.includes('rodapie') || fLow.includes('huella') || fLow.includes('escalon'));
+            let unidadStr = esLineal ? ' MTL/Und' : ' m²';
             
             let cantCarateo = i.carateo || i.cantSacos || 0;
-            let precioCarateo = (i.color === "Beige" || String(i.color).includes("Gris")) ? 60 : 50;
+            let precioCarateo = (String(i.color).toLowerCase().includes("beige") || String(i.color).toLowerCase().includes("gris claro")) ? 60 : 50;
             let totalCarateo = cantCarateo * precioCarateo;
 
             let cantSellador = i.sellador || i.cantGalones || 0;
@@ -466,11 +473,11 @@
             let totalSellador = cantSellador * precioSellador;
 
             let totalRev = parseFloat(i.total) - totalCarateo - totalSellador;
-            let precioM2Rev = m > 0 ? (totalRev / m) : 0;
+            let precioM2Rev = mCliente > 0 ? (totalRev / mCliente) : 0;
 
             granTotalPDF += totalRev + totalCarateo + totalSellador;
 
-            htmlPDF += `<tr><td><b>${i.formato}</b></td><td>Revestimiento ${i.uso} - ${i.color} (${i.textura})</td><td>${m.toFixed(2)} m² <br><span style="font-size:10px; color:#666;">(${pcs} piezas)</span></td>`;
+            htmlPDF += `<tr><td><b>${i.formato}</b></td><td>Revestimiento ${i.uso} - ${i.color} (${i.textura})</td><td>${mCliente.toFixed(2)}${unidadStr} <br><span style="font-size:10px; color:#666;">(${pcs} piezas)</span></td>`;
             if(hasPrices) htmlPDF += `<td>$${precioM2Rev.toFixed(2)}</td><td><b>$${totalRev.toFixed(2)}</b></td>`;
             htmlPDF += `</tr>`; 
             
