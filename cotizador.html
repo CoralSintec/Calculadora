@@ -318,7 +318,8 @@
                 let esLineal = (fLow.includes('borde') || fLow.includes('gotero') || fLow.includes('rodapie') || fLow.includes('huella') || fLow.includes('escalon'));
                 let unidadStr = esLineal ? ' MTL/Und' : ' m²';
                 
-                let pcs = i.piezas || i.pieces || mCliente; 
+                // Extrae las piezas tal cual como las calculó de forma segura el Cotizador
+                let pcs = i.piezas || i.pieces || mCliente;
                 
                 tablaDetallesHtml += `<tr><td>${formatoReal}</td><td><b>${usoReal}</b></td><td>${colorReal}</td><td>${texturaReal}</td><td><span class="qty-badge">${mCliente}${unidadStr}</span></td><td><span class="pcs-badge">${pcs} pcs</span></td></tr>`;
                 
@@ -390,7 +391,7 @@
                 html += `<button class="btn-action btn-entregado" onclick="accion('${safeCliente}', '${p.FECHA_ORDEN}', 'ENTREGADO')">📦 4. ENTREGADA</button>`; 
                 
                 if(soyElJefe) { 
-                    html += `<button class="btn-action btn-eliminar" onclick="eliminar('${safeCliente}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN</button>`; 
+                    html += `<button class="btn-action btn-eliminar" onclick="eliminar('${safeCliente}', '${p.FECHA_ORDEN}')">🗑️ ELIMINAR ORDEN PERMANENTEMENTE</button>`; 
                 } 
                 html += `</div>`; 
             }
@@ -412,6 +413,41 @@
             method: "POST", 
             mode: "no-cors", 
             body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, monto_pagado: nuevoAbono }) 
+        }).finally(() => { 
+            setTimeout(() => { 
+                document.getElementById('loader-overlay').innerText = "⏳ Sincronizando Planta...";
+                loadData(); 
+            }, 1500); 
+        });
+    }
+
+    function guardarNuevoAbono(cliente, fecha, idInput, total) {
+        let rawAbonoActual = String(document.getElementById('abono-' + idInput).value).replace(/[^0-9.]/g, '');
+        let abonoAcumulado = parseFloat(rawAbonoActual) || 0;
+        
+        let abonoInput = document.getElementById('avance-' + idInput).value;
+        let nuevoAvance = parseFloat(abonoInput) || 0;
+        
+        let nuevoTotalPagado = abonoAcumulado + nuevoAvance;
+        let nuevaResta = total - nuevoTotalPagado;
+        
+        let nuevoPctAbono = total > 0 ? Math.round((nuevoTotalPagado / total) * 100) : 0;
+        let nuevoPctResta = total > 0 ? Math.round((nuevaResta / total) * 100) : 0;
+        
+        document.getElementById('abono-' + idInput).value = nuevoTotalPagado.toFixed(2);
+        document.getElementById('pct-abono-' + idInput).innerText = nuevoPctAbono;
+        document.getElementById('pct-resta-' + idInput).innerText = nuevoPctResta;
+        document.getElementById('val-resta-' + idInput).innerText = '$' + nuevaResta.toFixed(2);
+        
+        document.getElementById('avance-' + idInput).value = "";
+        
+        document.getElementById('loader-overlay').innerText = "⏳ Guardando abono...";
+        document.getElementById('loader-overlay').style.display = 'flex';
+        
+        fetch(API_URL + "?action=registrar_pago", { 
+            method: "POST", 
+            mode: "no-cors", 
+            body: JSON.stringify({ cliente: cliente, fecha_orden: fecha, monto_pagado: nuevoTotalPagado }) 
         }).finally(() => { 
             setTimeout(() => { 
                 document.getElementById('loader-overlay').innerText = "⏳ Sincronizando Planta...";
@@ -450,7 +486,7 @@
             
             let fLow = String(i.formato || '').toLowerCase();
             let esLineal = (fLow.includes('borde') || fLow.includes('gotero') || fLow.includes('rodapie') || fLow.includes('huella') || fLow.includes('escalon'));
-            let unidadStr = esLineal ? ' MTL/Und' : ' m²';
+            let unidadStr = esLineal ? ' MTL' : ' m²';
             
             let cantCarateo = i.carateo || i.cantSacos || 0;
             let precioCarateo = (String(i.color).toLowerCase().includes("beige") || String(i.color).toLowerCase().includes("gris claro")) ? 60 : 50;
