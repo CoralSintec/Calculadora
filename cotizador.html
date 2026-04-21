@@ -252,7 +252,6 @@
         
         if(p && p.PRECIO_USD) {
             display.innerText = `$${parseFloat(p.PRECIO_USD).toFixed(2)}`;
-            // Precio del carateo
             let colorLower = String(p.COLOR).toLowerCase();
             let precioSaco = (colorLower.includes('beige') || colorLower.includes('gris claro')) ? 60 : 50;
             badgeCarateo.innerText = `$${precioSaco} / Saco`;
@@ -274,22 +273,38 @@
         let fLow = String(prod.FORMATO).toLowerCase();
         let esLineal = (fLow.includes('borde') || fLow.includes('gotero') || fLow.includes('rodapie') || fLow.includes('huella') || fLow.includes('escalon'));
         
-        let pcs = esLineal ? cant : Math.ceil(cant / (((prod.FORMATO.split('x')[0] || 1)*(prod.FORMATO.split('x')[1] || 1))/10000));
+        let pcs = esLineal ? cant : Math.ceil(cant / (((parseFloat(prod.FORMATO.split('x')[0]) || 1)*(parseFloat(prod.FORMATO.split('x')[1]) || 1))/10000));
         
-        // Calcular complementos
+        // --- MAGIA PARA LA FÁBRICA (Cálculo exacto del trompo) ---
+        let ancho = parseFloat(prod.FORMATO.split('x')[0]) || 1;
+        let largo = parseFloat(prod.FORMATO.split('x')[1]) || 1;
+        let areaUnaPieza = (ancho * largo) / 10000; 
+        
+        if (fLow.includes('borde') || fLow.includes('escalon') || fLow.includes('gotero')) {
+            areaUnaPieza = areaUnaPieza * 1.15; // +15% de material por el labio en L que chupa más concreto
+        }
+        if (String(prod.ESPESOR).includes('5.0')) {
+            areaUnaPieza = areaUnaPieza * 2.27; // Es el doble de grueso, lleva el doble de material
+        }
+        
+        let m2ParaFabrica = esLineal ? (cant * areaUnaPieza) : cant;
+        if (!esLineal && String(prod.ESPESOR).includes('5.0')) {
+             m2ParaFabrica = cant * 2.27;
+        }
+
+        // Calcular complementos reales
         let quiereCarateo = document.getElementById('chk-carateo').checked;
         let quiereSellador = document.getElementById('chk-sellador').checked;
+        let areaFisicaReal = esLineal ? (cant * ((ancho * largo) / 10000)) : cant;
         
-        let sacosCarateo = quiereCarateo ? Math.ceil(cant / 15) : 0; 
-        let galonesSellador = quiereSellador ? Math.ceil(cant / 20) : 0;
-        
+        let sacosCarateo = quiereCarateo ? Math.ceil(areaFisicaReal / 15) : 0; 
+        let galonesSellador = quiereSellador ? Math.ceil(areaFisicaReal / 20) : 0;
         let colorLower = String(prod.COLOR).toLowerCase();
         let precioSacoCarateo = (colorLower.includes('beige') || colorLower.includes('gris claro')) ? 60 : 50;
         
         let totalRev = cant * precioBase;
         let totalCarateo = sacosCarateo * precioSacoCarateo;
         let totalSellador = galonesSellador * 100;
-        
         let subtotal = totalRev + totalCarateo + totalSellador;
 
         let item = {
@@ -299,8 +314,9 @@
             color: prod.COLOR,
             textura: prod.TEXTURA,
             espesor: prod.ESPESOR,
-            m2: cant, // Para compatibilidad
-            m2Final: cant, // Para compatibilidad
+            m2: cant, // Lo que ve el cliente (MTL o Unidades)
+            m2Final: cant, 
+            m2Receta: parseFloat(m2ParaFabrica.toFixed(2)), // EL VOLUMEN SECRETO PARA LA PLANTA
             piezas: pcs,
             carateo: sacosCarateo,
             sellador: galonesSellador,
@@ -309,11 +325,9 @@
 
         carrito.push(item);
         
-        // Reset inputs
         document.getElementById('inp-cantidad').value = "";
         document.getElementById('chk-carateo').checked = false;
         document.getElementById('chk-sellador').checked = false;
-        
         renderCarrito();
     }
 
@@ -339,10 +353,14 @@
             if(i.carateo > 0) extras += ` | +${i.carateo} sacos de carateo`;
             if(i.sellador > 0) extras += ` | +${i.sellador} gal. sellador`;
             
+            let fLow = String(i.formato).toLowerCase();
+            let esLineal = (fLow.includes('borde') || fLow.includes('gotero') || fLow.includes('rodapie') || fLow.includes('huella') || fLow.includes('escalon'));
+            let unidadTexto = esLineal ? ' MTL/Und' : ' m²';
+
             cont.innerHTML += `
             <div class="cart-item">
                 <button class="btn-del" onclick="eliminarItem(${i.id})">X</button>
-                <div class="cart-item-title">${i.m2Final} ${i.formato.toLowerCase().includes('borde') ? 'MTL' : 'm²'} - ${i.formato}</div>
+                <div class="cart-item-title">${i.m2Final}${unidadTexto} - ${i.formato}</div>
                 <div class="cart-item-desc">${i.color} (${i.textura}) - Uso: ${i.uso}</div>
                 <div class="cart-item-desc" style="color:#b0b0b0;">${i.piezas} piezas aprox. ${extras}</div>
                 <div class="cart-item-price">$${i.total.toFixed(2)}</div>
