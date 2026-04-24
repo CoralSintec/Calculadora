@@ -11,7 +11,6 @@
         :root { --bg: #1c1c1c; --card-bg: #2d2d2d; --input-bg: #3a3a3a; --border: #555555; --text-main: #e0e0e0; --text-muted: #9ca3af; --green: #10b981; --blue: #3b82f6; --accent: #b0b0b0;}
         body { font-family: -apple-system, sans-serif; background-image: linear-gradient(rgba(28,28,28,0.95), rgba(28,28,28,0.95)), url('cabecera.jpg'); background-size: cover; background-attachment: fixed; margin: 0; padding: 15px; color: var(--text-main);}
         
-        /* DISEÑO ESTRECHO Y COMPACTO */
         .app-main { width: 100%; max-width: 420px; margin: 0 auto; }
         
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 5px;}
@@ -30,7 +29,6 @@
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
         
-        /* GRID COMPACTO */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         select, input[type="number"], input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border); background: var(--input-bg); color: #fff; border-radius: 8px; font-size: 13px; font-weight: bold; box-sizing: border-box; }
@@ -141,12 +139,10 @@
         <div class="section-title">3. DATOS DEL CLIENTE</div>
         <div class="form-card">
             <div class="form-group"><input type="text" id="cli-nombre" placeholder="Nombre completo / Empresa" style="text-transform: uppercase;"></div>
-            
             <div class="grid-2">
                 <div class="form-group"><input type="text" id="cli-rif" placeholder="RIF / Cédula" style="text-transform: uppercase;"></div>
                 <div class="form-group"><input type="text" id="cli-telefono" placeholder="WhatsApp / Teléfono"></div>
             </div>
-            
             <div class="form-group"><input type="text" id="cli-obra" placeholder="Dirección de la obra" style="text-transform: uppercase; margin-bottom: 0;"></div>
             
             <button class="btn-send" onclick="enviarCotizacion()">ENVIAR A BANDEJA DE PLANTA</button>
@@ -189,7 +185,6 @@
         formatos.forEach(f => sel.innerHTML += `<option value="${f}">${f}</option>`);
     }
 
-    // --- FILTROS SIN ESPESOR ---
     function filtrarUsos() {
         let f = document.getElementById('sel-formato').value;
         let filtrado = dbProductos.filter(x => x.FORMATO === f);
@@ -244,26 +239,20 @@
         let u = document.getElementById('sel-uso').value;
         let t = document.getElementById('sel-textura').value;
         let c = document.getElementById('sel-color').value;
-        // Encuentra el producto y extrae el ESPESOR automáticamente de la base de datos
         return dbProductos.find(x => x.FORMATO === f && x.USO === u && x.TEXTURA === t && x.COLOR === c);
     }
 
-    // --- CEREBRO FINANCIERO DEL CARATEO ---
     function calcularPrecioCarateo(color) {
         if(!color) return 0;
         let c = String(color).toLowerCase();
-        let precioSaco = 50; // Base de cemento gris por defecto
-        let costoColorante = 0;
-
-        if(c.includes('beige') || c.includes('gris claro')) {
-            precioSaco = 60; // Base de cemento blanco
-        }
+        if(c.includes('beige')) return 60.00;
         
-        // INCIDENCIA DEL COLORANTE (Ajusta estos dólares si la vida real es diferente)
-        if(c.includes('gris 1%')) costoColorante = 2.50; 
-        if(c.includes('gris 2%')) costoColorante = 5.00;
-        if(c.includes('gris 3%')) costoColorante = 7.50;
-        if(c.includes('beige')) costoColorante = 3.00; // Ocre o amarillo
+        let precioSaco = 55.00; 
+        let costoColorante = 0;
+        
+        if(c.includes('gris 1%')) costoColorante = 2.34; 
+        if(c.includes('gris 2%')) costoColorante = 4.68;
+        if(c.includes('gris 3%')) costoColorante = 7.02;
 
         return precioSaco + costoColorante;
     }
@@ -310,23 +299,27 @@
             else { ancho = 50; largo = 50; } 
         }
 
+        // --- REGLA DE 75CM: Fuerza espesor a 2.2 ---
+        let espesorFinal = prod.ESPESOR;
+        if ((largo > 75 || ancho > 75) && !String(prod.ESPESOR).includes('5.0')) {
+            espesorFinal = "2.2 cm";
+        }
+
         let areaPuraUnaPieza = (ancho * largo) / 10000;
         let areaConModificadores = areaPuraUnaPieza;
 
         if (fLow.includes('borde') && !fLow.includes('ventana')) areaConModificadores *= 1.15; 
         if (fLow.includes('escalon') || fLow.includes('gotero')) areaConModificadores *= 1.15; 
-        if (String(prod.ESPESOR).includes('5.0')) areaConModificadores *= 2.27; 
+        if (String(espesorFinal).includes('5.0')) areaConModificadores *= 2.27; 
 
         let pcs = esLineal ? cant : Math.ceil(cant / areaPuraUnaPieza);
-        
         let m2ParaFabrica = esLineal ? (cant * areaConModificadores) : (cant * (areaConModificadores / areaPuraUnaPieza));
 
-        // --- CÁLCULO REAL DE COMPLEMENTOS Y RENDIMIENTO ---
         let areaFisicaReal = esLineal ? (cant * areaPuraUnaPieza) : cant;
         let quiereCarateo = document.getElementById('chk-carateo').checked;
         let quiereSellador = document.getElementById('chk-sellador').checked;
         
-        // AHORA EL SACO RINDE 40 M2 EXACTOS
+        // CÁLCULO RENDIMIENTO CARATEO (40m2)
         let sacosCarateo = quiereCarateo ? Math.ceil(areaFisicaReal / 40) : 0; 
         let galonesSellador = quiereSellador ? Math.ceil(areaFisicaReal / 20) : 0;
         
@@ -343,7 +336,7 @@
             uso: prod.USO,
             color: prod.COLOR,
             textura: prod.TEXTURA,
-            espesor: prod.ESPESOR, 
+            espesor: espesorFinal, 
             m2: cant, 
             m2Final: cant, 
             m2Receta: parseFloat(m2ParaFabrica.toFixed(2)), 
@@ -391,7 +384,7 @@
             <div class="cart-item">
                 <button class="btn-del" onclick="eliminarItem(${i.id})">X</button>
                 <div class="cart-item-title">${i.m2Final}${unidadTexto} - ${i.formato}</div>
-                <div class="cart-item-desc">${i.color} (${i.textura}) - Uso: ${i.uso}</div>
+                <div class="cart-item-desc">${i.color} (${i.textura}) - ${i.uso} (${i.espesor})</div>
                 <div class="cart-item-desc" style="color:#b0b0b0;">${i.piezas} piezas aprox. ${extras}</div>
                 <div class="cart-item-price">$${i.total.toFixed(2)}</div>
             </div>`;
