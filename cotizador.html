@@ -40,15 +40,24 @@
         .checkbox-group label { margin: 0; font-size: 13px; font-weight: bold; color: #fff; cursor: pointer; flex: 1;}
         .price-badge { background: #374151; color: #d1d5db; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 900; transition: 0.3s;}
         .price-badge.active { background: #1e3a8a; color: #93c5fd; }
+        
+        /* BOTONES MÁGICOS Y ESTILOS DE DESCUENTO */
+        .btn-edit-price { display: none; background: #4b5563; border: 1px solid #6b7280; color: #fff; border-radius: 6px; cursor: pointer; padding: 4px 8px; font-size: 12px; margin-left: 6px; transition: 0.2s;}
+        .btn-edit-price:hover { background: #f59e0b; border-color: #d97706; color: #fff; }
+        .btn-edit-price:active { transform: scale(0.9); }
+        .strikethrough { text-decoration: line-through; color: #ef4444; font-size: 0.85em; margin-right: 6px; opacity: 0.9; }
+        .discount-badge { background: #f59e0b; color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 3px; vertical-align: middle; margin-left: 5px; font-weight: 900; letter-spacing: 0.5px;}
 
         .btn-add { background: transparent; color: #fff; border: 1px solid #555; padding: 14px; width: 100%; border-radius: 8px; font-weight: 900; font-size: 13px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; }
         .btn-add:hover { background: #3a3a3a; }
         .btn-add:active { transform: scale(0.98); }
         
-        .cart-item { background: var(--input-bg); padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--blue); position: relative;}
-        .cart-item-title { font-weight: 900; font-size: 13px; color: #fff; margin-bottom: 4px; }
-        .cart-item-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 4px;}
-        .cart-item-price { font-weight: 900; color: #10b981; font-size: 14px;}
+        .cart-item { background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid var(--blue); position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3);}
+        .cart-item-title { font-weight: 900; font-size: 14px; color: #fff; margin-bottom: 8px; text-transform: uppercase; border-bottom: 1px solid #555; padding-bottom: 5px; width: 85%;}
+        .cart-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-bottom: 4px; color: #ccc;}
+        .cart-row b { color: #fff; }
+        .cart-row.highlight { background: rgba(59, 130, 246, 0.1); padding: 4px; border-radius: 4px; color: #93c5fd; margin-top: 5px;}
+        .cart-item-price { font-weight: 900; color: #10b981; font-size: 16px; text-align: right; margin-top: 10px;}
         .btn-del { position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 10px; font-weight: bold; cursor: pointer;}
         
         .total-box { text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);}
@@ -100,8 +109,11 @@
             </div>
             
             <div class="form-group" style="background:#1c1c1c; padding:12px; border-radius:8px; border:1px solid #404040; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:11px; font-weight:800; color:#9ca3af; text-transform:uppercase;">Precio Base Unitario:</span>
-                <span id="precio-unitario-ui" style="font-size:18px; font-weight:900; color:#10b981;">$0.00</span>
+                <span style="font-size:11px; font-weight:800; color:#9ca3af; text-transform:uppercase;">Precio Unitario:</span>
+                <div style="display:flex; align-items:center;">
+                    <span id="precio-unitario-ui" style="font-size:18px; font-weight:900; color:#10b981; transition: 0.3s;">$0.00</span>
+                    <button class="btn-edit-price" onclick="editarPrecioBase()" title="Modificar Precio">✏️</button>
+                </div>
             </div>
 
             <div class="form-group">
@@ -110,22 +122,28 @@
             </div>
 
             <div style="margin-top: 15px;">
-                <label class="checkbox-group">
+                <div class="checkbox-group">
                     <input type="checkbox" id="chk-carateo">
                     <label for="chk-carateo">Incluir Carateo (Sacos)</label>
-                    <span class="price-badge" id="badge-carateo">Automático</span>
-                </label>
-                <label class="checkbox-group">
+                    <div style="display:flex; align-items:center;">
+                        <span class="price-badge" id="badge-carateo">Automático</span>
+                        <button class="btn-edit-price" onclick="editarPrecioCarateo()" title="Modificar Carateo">✏️</button>
+                    </div>
+                </div>
+                <div class="checkbox-group" style="border-bottom:none;">
                     <input type="checkbox" id="chk-sellador">
                     <label for="chk-sellador">Incluir Sellador (Galones)</label>
-                    <span class="price-badge active">$100 / Gal</span>
-                </label>
+                    <div style="display:flex; align-items:center;">
+                        <span class="price-badge active" id="badge-sellador">$100 / Gal</span>
+                        <button class="btn-edit-price" onclick="editarPrecioSellador()" title="Modificar Sellador">✏️</button>
+                    </div>
+                </div>
             </div>
 
             <button class="btn-add" onclick="agregarAlCarrito()">AGREGAR A LA LISTA</button>
         </div>
 
-        <div class="section-title">2. LISTA DE COMPRA</div>
+        <div class="section-title">2. LISTA DE COMPRA DESGLOSADA</div>
         <div class="form-card">
             <div id="carrito-container">
                 <p style="text-align:center; color:var(--text-muted); font-size:12px; font-weight:bold; margin: 10px 0;">La lista está vacía.</p>
@@ -154,26 +172,45 @@
     let dbProductos = [];
     let carrito = [];
 
+    // MEMORIA DE DESCUENTOS Y MODIFICACIONES
+    let overridePrecioBase = null;
+    let overridePrecioCarateo = null;
+    let overridePrecioSellador = null;
+
     const uActual = String(localStorage.getItem('usuarioCoralsintec') || '').trim().toUpperCase();
     const soyElJefe = (uActual === 'EDUARDO' || uActual.indexOf('EDUARDO') !== -1);
 
+    let sysPerms = { p_descuento: false };
+    try { 
+        let saved = JSON.parse(localStorage.getItem('permisosCoralsintec')); 
+        if(saved && saved.p_descuento) sysPerms.p_descuento = true; 
+    } catch(e){}
+
     window.onload = () => {
         document.getElementById('badge-usuario').innerText = "👤 " + (uActual || "ASESOR");
-        if(soyElJefe) { document.getElementById('badge-usuario').innerText = "👑 GERENTE"; document.getElementById('badge-usuario').classList.add('user-eduardo'); }
+        if(soyElJefe) { 
+            document.getElementById('badge-usuario').innerText = "👑 GERENTE"; 
+            document.getElementById('badge-usuario').classList.add('user-eduardo'); 
+        }
+        
+        if (soyElJefe || sysPerms.p_descuento) {
+            document.querySelectorAll('.btn-edit-price').forEach(b => b.style.display = 'inline-block');
+        }
         cargarInventario();
     };
 
+    function resetOverrides() {
+        overridePrecioBase = null;
+        overridePrecioCarateo = null;
+        overridePrecioSellador = null;
+    }
+
     function cargarInventario() {
-        fetch(API_URL + "?action=get_productos")
-        .then(r => r.json())
-        .then(data => {
+        fetch(API_URL + "?action=get_productos").then(r => r.json()).then(data => {
             dbProductos = data;
             iniciarFiltros();
             document.getElementById('loader').style.display = 'none';
-        })
-        .catch(e => {
-            document.getElementById('loader').innerHTML = "<span>⚠️ Error de conexión.<br>Recarga la página.</span>";
-        });
+        }).catch(e => { document.getElementById('loader').innerHTML = "<span>⚠️ Error de conexión.</span>"; });
     }
 
     function getUnique(arr, key) { return [...new Set(arr.map(item => item[key]))].filter(Boolean); }
@@ -186,48 +223,41 @@
     }
 
     function filtrarUsos() {
+        resetOverrides();
         let f = document.getElementById('sel-formato').value;
         let filtrado = dbProductos.filter(x => x.FORMATO === f);
         let usos = getUnique(filtrado, 'USO');
-        
         let sel = document.getElementById('sel-uso');
         sel.innerHTML = '<option value="">-- Seleccione --</option>';
         usos.forEach(u => sel.innerHTML += `<option value="${u}">${u}</option>`);
-        
         document.getElementById('sel-textura').innerHTML = '<option value="">-</option>';
         document.getElementById('sel-color').innerHTML = '<option value="">-</option>';
-        
         let lbl = document.getElementById('lbl-cantidad');
-        let fLow = f.toLowerCase();
-        if(fLow.includes('borde') || fLow.includes('gotero') || fLow.includes('rodapie') || fLow.includes('huella') || fLow.includes('escalon')) {
-            lbl.innerText = "CANTIDAD (MTL / Unidades):";
-        } else {
-            lbl.innerText = "CANTIDAD (m²):";
-        }
+        if(f.toLowerCase().match(/borde|gotero|rodapie|huella|escalon/)) lbl.innerText = "CANTIDAD (MTL / Unidades):";
+        else lbl.innerText = "CANTIDAD (m²):";
         actualizarPrecioUI();
     }
 
     function filtrarTexturas() {
+        resetOverrides();
         let f = document.getElementById('sel-formato').value;
         let u = document.getElementById('sel-uso').value;
         let filtrado = dbProductos.filter(x => x.FORMATO === f && x.USO === u);
         let texturas = getUnique(filtrado, 'TEXTURA');
-        
         let sel = document.getElementById('sel-textura');
         sel.innerHTML = '<option value="">-- Seleccione --</option>';
         texturas.forEach(t => sel.innerHTML += `<option value="${t}">${t}</option>`);
-        
         document.getElementById('sel-color').innerHTML = '<option value="">-</option>';
         actualizarPrecioUI();
     }
 
     function filtrarColores() {
+        resetOverrides();
         let f = document.getElementById('sel-formato').value;
         let u = document.getElementById('sel-uso').value;
         let t = document.getElementById('sel-textura').value;
         let filtrado = dbProductos.filter(x => x.FORMATO === f && x.USO === u && x.TEXTURA === t);
         let colores = getUnique(filtrado, 'COLOR');
-        
         let sel = document.getElementById('sel-color');
         sel.innerHTML = '<option value="">-- Seleccione --</option>';
         colores.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
@@ -246,14 +276,11 @@
         if(!color) return 0;
         let c = String(color).toLowerCase();
         if(c.includes('beige')) return 60.00;
-        
         let precioSaco = 55.00; 
         let costoColorante = 0;
-        
         if(c.includes('gris 1%')) costoColorante = 2.34; 
         if(c.includes('gris 2%')) costoColorante = 4.68;
         if(c.includes('gris 3%')) costoColorante = 7.02;
-
         return precioSaco + costoColorante;
     }
 
@@ -261,172 +288,162 @@
         let p = getProductoSeleccionado();
         let display = document.getElementById('precio-unitario-ui');
         let badgeCarateo = document.getElementById('badge-carateo');
+        let badgeSellador = document.getElementById('badge-sellador');
         
         if(p && p.PRECIO_USD) {
-            display.innerText = `$${parseFloat(p.PRECIO_USD).toFixed(2)}`;
-            let precioRealCarateo = calcularPrecioCarateo(p.COLOR);
-            badgeCarateo.innerText = `$${precioRealCarateo.toFixed(2)} / Saco`;
+            let precioOriginal = parseFloat(p.PRECIO_USD);
+            if(overridePrecioBase !== null) {
+                display.innerHTML = `<span class="strikethrough">$${precioOriginal.toFixed(2)}</span> <span style="color:#f59e0b;">$${overridePrecioBase.toFixed(2)}</span>`;
+            } else {
+                display.innerText = `$${precioOriginal.toFixed(2)}`;
+                display.style.color = '#10b981';
+            }
+
+            let precioRealCarateoOrig = calcularPrecioCarateo(p.COLOR);
+            if(overridePrecioCarateo !== null) {
+                badgeCarateo.innerHTML = `<span class="strikethrough">$${precioRealCarateoOrig.toFixed(2)}</span> $${overridePrecioCarateo.toFixed(2)} / Saco`;
+                badgeCarateo.style.color = '#f59e0b';
+            } else {
+                badgeCarateo.innerText = `$${precioRealCarateoOrig.toFixed(2)} / Saco`;
+                badgeCarateo.style.color = '#93c5fd';
+            }
             badgeCarateo.classList.add('active');
         } else {
             display.innerText = `$0.00`;
+            display.style.color = '#10b981';
             badgeCarateo.innerText = `Automático`;
+            badgeCarateo.style.color = '#d1d5db';
             badgeCarateo.classList.remove('active');
         }
+
+        if(overridePrecioSellador !== null) {
+            badgeSellador.innerHTML = `<span class="strikethrough">$100.00</span> $${overridePrecioSellador.toFixed(2)} / Gal`;
+            badgeSellador.style.color = '#f59e0b';
+        } else {
+            badgeSellador.innerText = `$100.00 / Gal`;
+            badgeSellador.style.color = '#93c5fd';
+        }
+    }
+
+    function editarPrecioBase() {
+        let p = getProductoSeleccionado();
+        if(!p) return alert("Selecciona primero un material para modificar su precio.");
+        let precioActual = overridePrecioBase !== null ? overridePrecioBase : parseFloat(p.PRECIO_USD);
+        let nuevoPrecio = prompt("MODIFICAR PRECIO UNITARIO (USD):\nIngrese el nuevo precio:", precioActual.toFixed(2));
+        if(nuevoPrecio !== null && nuevoPrecio.trim() !== "" && !isNaN(nuevoPrecio)) { overridePrecioBase = parseFloat(nuevoPrecio); actualizarPrecioUI(); }
+    }
+
+    function editarPrecioCarateo() {
+        let p = getProductoSeleccionado();
+        if(!p) return alert("Selecciona primero un material.");
+        let precioActual = overridePrecioCarateo !== null ? overridePrecioCarateo : calcularPrecioCarateo(p.COLOR);
+        let nuevoPrecio = prompt("MODIFICAR PRECIO DEL CARATEO (USD):", precioActual.toFixed(2));
+        if(nuevoPrecio !== null && nuevoPrecio.trim() !== "" && !isNaN(nuevoPrecio)) { overridePrecioCarateo = parseFloat(nuevoPrecio); actualizarPrecioUI(); }
+    }
+
+    function editarPrecioSellador() {
+        let precioActual = overridePrecioSellador !== null ? overridePrecioSellador : 100.00;
+        let nuevoPrecio = prompt("MODIFICAR PRECIO DEL SELLADOR (USD):", precioActual.toFixed(2));
+        if(nuevoPrecio !== null && nuevoPrecio.trim() !== "" && !isNaN(nuevoPrecio)) { overridePrecioSellador = parseFloat(nuevoPrecio); actualizarPrecioUI(); }
     }
 
     function agregarAlCarrito() {
         let prod = getProductoSeleccionado();
-        let cantStr = document.getElementById('inp-cantidad').value;
-        let cant = parseFloat(cantStr);
+        let cant = parseFloat(document.getElementById('inp-cantidad').value);
+        if(!prod || isNaN(cant) || cant <= 0) { alert("Completa los datos correctamente."); return; }
         
-        if(!prod) { alert("Por favor selecciona todas las características del producto."); return; }
-        if(isNaN(cant) || cant <= 0) { alert("Ingresa una cantidad válida."); return; }
+        let precioOriginalProd = parseFloat(prod.PRECIO_USD);
+        let precioBase = overridePrecioBase !== null ? overridePrecioBase : precioOriginalProd;
         
-        let precioBase = parseFloat(prod.PRECIO_USD) || 0;
-        let fLow = String(prod.FORMATO).toLowerCase();
-        let esLineal = (fLow.includes('borde') || fLow.includes('gotero') || fLow.includes('rodapie') || fLow.includes('huella') || fLow.includes('escalon'));
-        
-        let ancho = 100;
-        let largo = 100;
+        let fLow = prod.FORMATO.toLowerCase();
+        let esLineal = fLow.match(/borde|gotero|rodapie|huella|escalon/);
         let matchDim = prod.FORMATO.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)/i);
+        let ancho = matchDim ? parseFloat(matchDim[1]) : (fLow.includes('ventana') ? 30 : 50);
+        let largo = matchDim ? parseFloat(matchDim[2]) : 100;
         
-        if (matchDim) {
-            ancho = parseFloat(matchDim[1]);
-            largo = parseFloat(matchDim[2]);
-        } else {
-            if (fLow.includes('ventana')) { ancho = 30; largo = 100; }
-            else if (fLow.includes('rodapie')) { ancho = 15; largo = 75; }
-            else { ancho = 50; largo = 50; } 
-        }
-
-        // --- REGLA DE 75CM: Fuerza espesor a 2.2 ---
-        let espesorFinal = prod.ESPESOR;
-        if ((largo > 75 || ancho > 75) && !String(prod.ESPESOR).includes('5.0')) {
-            espesorFinal = "2.2 cm";
-        }
-
+        let espesorFinal = (largo > 75 || ancho > 75) && !prod.ESPESOR.includes('5.0') ? "2.2 cm" : prod.ESPESOR;
         let areaPuraUnaPieza = (ancho * largo) / 10000;
         let areaConModificadores = areaPuraUnaPieza;
 
-        if (fLow.includes('borde') && !fLow.includes('ventana')) areaConModificadores *= 1.15; 
-        if (fLow.includes('escalon') || fLow.includes('gotero')) areaConModificadores *= 1.15; 
-        if (String(espesorFinal).includes('5.0')) areaConModificadores *= 2.27; 
+        if (fLow.match(/borde|escalon|gotero/) && !fLow.includes('ventana')) areaConModificadores *= 1.15;
+        if (espesorFinal.includes('5.0')) areaConModificadores *= 2.27;
 
         let pcs = esLineal ? cant : Math.ceil(cant / areaPuraUnaPieza);
-        let m2ParaFabrica = esLineal ? (cant * areaConModificadores) : (cant * (areaConModificadores / areaPuraUnaPieza));
-
+        let m2Receta = esLineal ? (cant * areaConModificadores) : (cant * (areaConModificadores / areaPuraUnaPieza));
         let areaFisicaReal = esLineal ? (cant * areaPuraUnaPieza) : cant;
-        let quiereCarateo = document.getElementById('chk-carateo').checked;
-        let quiereSellador = document.getElementById('chk-sellador').checked;
+        let cantCon10 = areaFisicaReal * 1.10; 
         
-        // CÁLCULO RENDIMIENTO CARATEO (40m2)
-        let sacosCarateo = quiereCarateo ? Math.ceil(areaFisicaReal / 40) : 0; 
-        let galonesSellador = quiereSellador ? Math.ceil(areaFisicaReal / 20) : 0;
+        let sacosCarateo = document.getElementById('chk-carateo').checked ? Math.ceil(areaFisicaReal / 40) : 0; 
+        let galonesSellador = document.getElementById('chk-sellador').checked ? Math.ceil(areaFisicaReal / 20) : 0;
         
-        let precioSacoCarateo = calcularPrecioCarateo(prod.COLOR);
+        let precioCarateoOriginal = calcularPrecioCarateo(prod.COLOR);
+        let pSaco = overridePrecioCarateo !== null ? overridePrecioCarateo : precioCarateoOriginal;
+        let pSellador = overridePrecioSellador !== null ? overridePrecioSellador : 100.00;
         
-        let totalRev = cant * precioBase;
-        let totalCarateo = sacosCarateo * precioSacoCarateo;
-        let totalSellador = galonesSellador * 100;
-        let subtotal = totalRev + totalCarateo + totalSellador;
-
         let item = {
-            id: Date.now(),
-            formato: prod.FORMATO,
-            uso: prod.USO,
-            color: prod.COLOR,
-            textura: prod.TEXTURA,
-            espesor: espesorFinal, 
-            m2: cant, 
-            m2Final: cant, 
-            m2Receta: parseFloat(m2ParaFabrica.toFixed(2)), 
-            piezas: pcs,
-            carateo: sacosCarateo,
-            sellador: galonesSellador,
-            total: subtotal
+            id: Date.now(), formato: prod.FORMATO, uso: prod.USO, color: prod.COLOR, textura: prod.TEXTURA, espesor: espesorFinal,
+            m2: cant, m2Precio: precioBase, m2PrecioOriginal: precioOriginalProd,
+            pcs: pcs, m2Receta: m2Receta.toFixed(2), m2Final10: cantCon10.toFixed(2),
+            carateoCant: sacosCarateo, carateoPrecio: pSaco, carateoPrecioOriginal: precioCarateoOriginal,
+            selladorCant: galonesSellador, selladorPrecio: pSellador, selladorPrecioOriginal: 100.00,
+            total: (cant * precioBase) + (sacosCarateo * pSaco) + (galonesSellador * pSellador)
         };
 
         carrito.push(item);
-        
         document.getElementById('inp-cantidad').value = "";
         document.getElementById('chk-carateo').checked = false;
         document.getElementById('chk-sellador').checked = false;
+        resetOverrides(); 
+        actualizarPrecioUI();
         renderCarrito();
     }
 
-    function eliminarItem(id) {
-        carrito = carrito.filter(x => x.id !== id);
-        renderCarrito();
-    }
+    function eliminarItem(id) { carrito = carrito.filter(x => x.id !== id); renderCarrito(); }
 
     function renderCarrito() {
         let cont = document.getElementById('carrito-container');
-        let granTotal = 0;
-        cont.innerHTML = "";
-        
+        let granTotal = 0; cont.innerHTML = "";
         if(carrito.length === 0) {
             cont.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size:12px; font-weight:bold; margin: 10px 0;">La lista está vacía.</p>';
-            document.getElementById('gran-total').innerText = "$0.00";
-            return;
+            document.getElementById('gran-total').innerText = "$0.00"; return;
         }
-
         carrito.forEach(i => {
             granTotal += i.total;
-            let extras = "";
-            if(i.carateo > 0) extras += ` | +${i.carateo} sac. carateo`;
-            if(i.sellador > 0) extras += ` | +${i.sellador} gal. sellador`;
+            let esLineal = i.formato.toLowerCase().match(/borde|gotero|rodapie|huella|escalon/);
+            let unit = esLineal ? 'MTL' : 'm²';
             
-            let fLow = String(i.formato).toLowerCase();
-            let esLineal = (fLow.includes('borde') || fLow.includes('gotero') || fLow.includes('rodapie') || fLow.includes('huella') || fLow.includes('escalon'));
-            let unidadTexto = esLineal ? ' MTL/Und' : ' m²';
+            // HTML CONDICIONAL PARA TACHADO SI HAY DESCUENTO
+            let htmlPriceMat = i.m2Precio === i.m2PrecioOriginal ? `$${i.m2Precio.toFixed(2)}` : `<span class="strikethrough">$${i.m2PrecioOriginal.toFixed(2)}</span> $${i.m2Precio.toFixed(2)} <span class="discount-badge">DTO</span>`;
+            let htmlPriceCar = i.carateoPrecio === i.carateoPrecioOriginal ? `$${i.carateoPrecio.toFixed(2)}` : `<span class="strikethrough">$${i.carateoPrecioOriginal.toFixed(2)}</span> $${i.carateoPrecio.toFixed(2)} <span class="discount-badge">DTO</span>`;
+            let htmlPriceSel = i.selladorPrecio === i.selladorPrecioOriginal ? `$${i.selladorPrecio.toFixed(2)}` : `<span class="strikethrough">$100.00</span> $${i.selladorPrecio.toFixed(2)} <span class="discount-badge">DTO</span>`;
 
-            cont.innerHTML += `
-            <div class="cart-item">
+            let html = `<div class="cart-item">
                 <button class="btn-del" onclick="eliminarItem(${i.id})">X</button>
-                <div class="cart-item-title">${i.m2Final}${unidadTexto} - ${i.formato}</div>
-                <div class="cart-item-desc">${i.color} (${i.textura}) - ${i.uso} (${i.espesor})</div>
-                <div class="cart-item-desc" style="color:#b0b0b0;">${i.piezas} piezas aprox. ${extras}</div>
-                <div class="cart-item-price">$${i.total.toFixed(2)}</div>
-            </div>`;
+                <div class="cart-item-title">${i.m2Final} ${unit} - ${i.formato}</div>
+                <div class="cart-row"><b>${i.color} (${i.textura})</b> <span>Uso: ${i.uso} (${i.espesor})</span></div>
+                <div class="cart-row" style="align-items:center;"><span>Material (${i.m2} ${unit} x ${htmlPriceMat})</span> <b>$${(i.m2 * i.m2Precio).toFixed(2)}</b></div>
+                <div class="cart-row"><span>Piezas aproximadas:</span> <b>${i.pcs} pcs</b></div>
+                <div class="cart-row highlight"><span>Sugerido c/ 10% Desperdicio:</span> <b>${i.m2Final10} ${unit}</b></div>`;
+            
+            if(i.carateoCant > 0) html += `<div class="cart-row" style="margin-top:8px; align-items:center;"><span>Carateo (${i.carateoCant} sac. x ${htmlPriceCar})</span> <b>$${(i.carateoCant * i.carateoPrecio).toFixed(2)}</b></div>`;
+            if(i.selladorCant > 0) html += `<div class="cart-row" style="align-items:center;"><span>Sellador (${i.selladorCant} gal. x ${htmlPriceSel})</span> <b>$${(i.selladorCant * i.selladorPrecio).toFixed(2)}</b></div>`;
+            
+            html += `<div class="cart-item-price">$${i.total.toFixed(2)}</div></div>`;
+            cont.innerHTML += html;
         });
-        
         document.getElementById('gran-total').innerText = "$" + granTotal.toFixed(2);
     }
 
     function enviarCotizacion() {
-        if(carrito.length === 0) { alert("Agrega al menos un producto a la lista."); return; }
-        
+        if(carrito.length === 0) { alert("Agrega un producto."); return; }
         let cli = document.getElementById('cli-nombre').value.trim().toUpperCase();
-        let rif = document.getElementById('cli-rif').value.trim().toUpperCase();
-        let tlf = document.getElementById('cli-telefono').value.trim();
-        let obra = document.getElementById('cli-obra').value.trim().toUpperCase();
-        
-        if(cli === "") { alert("El nombre del cliente es obligatorio."); return; }
-        
-        let totalVenta = carrito.reduce((sum, i) => sum + i.total, 0);
-
-        let payload = {
-            cliente: cli,
-            rif_ci: rif,
-            telefono: tlf,
-            ubicacion: obra,
-            total_usd: totalVenta,
-            detalles_json: JSON.stringify(carrito)
-        };
-
-        document.getElementById('loader').innerHTML = "<span>🚀 Enviando Solicitud...</span>";
+        if(cli === "") { alert("Nombre del cliente obligatorio."); return; }
+        document.getElementById('loader').innerHTML = "<span>🚀 Enviando a Planta...</span>";
         document.getElementById('loader').style.display = 'flex';
-
         fetch(API_URL + "?action=guardar_solicitud", {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify(payload)
-        }).finally(() => {
-            setTimeout(() => {
-                alert("¡Cotización enviada a la bandeja exitosamente!");
-                window.location.reload();
-            }, 1500);
-        });
+            method: "POST", mode: "no-cors",
+            body: JSON.stringify({ cliente: cli, rif_ci: document.getElementById('cli-rif').value, telefono: document.getElementById('cli-telefono').value, ubicacion: document.getElementById('cli-obra').value, total_usd: carrito.reduce((s,i)=>s+i.total,0), detalles_json: JSON.stringify(carrito) })
+        }).finally(() => { setTimeout(() => { alert("¡Enviado a Planta!"); window.location.reload(); }, 1500); });
     }
 </script>
 </body>
