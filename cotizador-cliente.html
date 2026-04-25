@@ -13,8 +13,12 @@
         
         .app-main { width: 100%; max-width: 420px; margin: 0 auto; }
         
-        .top-bar { margin-bottom: 20px;}
-        .user-badge { background: var(--input-bg); color: #fff; border: 1px solid var(--blue); padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 900; text-transform: uppercase; text-align: center; width: 100%; box-sizing: border-box; box-shadow: 0 2px 5px rgba(0,0,0,0.3);}
+        /* BARRA SUPERIOR AJUSTADA PARA EL BOTON DEL CATÁLOGO GRIS CLARO */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px;}
+        .user-badge { background: var(--input-bg); color: #fff; border: 1px solid var(--blue); padding: 10px; border-radius: 8px; font-size: 11px; font-weight: 900; text-transform: uppercase; text-align: center; flex: 1; box-sizing: border-box; box-shadow: 0 2px 5px rgba(0,0,0,0.3);}
+        .btn-catalogo { background: #d1d5db; color: #1c1c1c; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 900; font-size: 11px; cursor: pointer; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: 0.2s; white-space: nowrap;}
+        .btn-catalogo:hover { background: #9ca3af; }
+        .btn-catalogo:active { transform: scale(0.95); }
         
         .header { text-align: center; margin-bottom: 20px; padding-top: 10px;}
         .header h2 { margin: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; color: #fff;}
@@ -66,6 +70,7 @@
     <main class="app-main">
         <div class="top-bar">
             <div class="user-badge">🌐 COTIZADOR WEB OFICIAL</div>
+            <button class="btn-catalogo" onclick="window.open('catalogo.pdf', '_blank')">📖 CATÁLOGO</button>
         </div>
         
         <div class="header">
@@ -312,7 +317,7 @@
         carrito.forEach(i => {
             granTotal += i.total;
             let esLineal = i.formato.toLowerCase().match(/borde|gotero|rodapie|huella|escalon/);
-            let unit = esLineal ? 'MTL/Und' : 'm²';
+            let unit = esLineal ? 'MTL' : 'm²';
 
             let html = `<div class="cart-item">
                 <button class="btn-del" onclick="eliminarItem(${i.id})">X</button>
