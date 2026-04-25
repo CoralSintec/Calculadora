@@ -160,6 +160,50 @@
         }
         function eliminarUser(u) { if(!confirm("¿Borrar acceso?")) return; document.getElementById('loader').innerText = "🗑️ Borrando..."; document.getElementById('loader').style.display = 'flex'; fetch(API_URL + "?action=eliminar_usuario", { method: "POST", mode: "no-cors", body: JSON.stringify({ usuario: u }) }).then(() => { location.reload(); }); }
         function logout() { localStorage.clear(); location.reload(); }
+
+        // ================================================================
+    // --- SISTEMA DE SEGURIDAD: AUTO-CIERRE Y CONTROL DE PESTAÑA ---
+    // ================================================================
+    (function() {
+        // 1. Control de cierre de pestaña/navegador (Usa sessionStorage que muere al cerrar)
+        let urlActual = window.location.href.toLowerCase();
+        let esIndex = urlActual.endsWith('index.html') || urlActual.endsWith('/') || urlActual.includes('github.io');
+        
+        if (!esIndex) {
+            // Si el usuario intentó entrar a Planta o Cotizador con una pestaña nueva o el navegador recién abierto
+            if (!sessionStorage.getItem('sesion_activa_coral')) {
+                localStorage.removeItem('usuarioCoralsintec');
+                localStorage.removeItem('permisosCoralsintec');
+                window.location.href = 'index.html'; // Lo bota al login
+                return;
+            }
+        } else {
+            // Si está en el Menú Principal (Index), marcamos esta pestaña como autorizada
+            sessionStorage.setItem('sesion_activa_coral', 'true');
+        }
+
+        // 2. Control de 5 minutos de Inactividad (300,000 milisegundos)
+        let relojInactividad;
+        function reiniciarReloj() {
+            clearTimeout(relojInactividad);
+            relojInactividad = setTimeout(() => {
+                if (localStorage.getItem('usuarioCoralsintec')) {
+                    localStorage.removeItem('usuarioCoralsintec');
+                    localStorage.removeItem('permisosCoralsintec');
+                    sessionStorage.removeItem('sesion_activa_coral');
+                    alert("⏳ Por seguridad, tu sesión se ha cerrado tras 5 minutos de inactividad.");
+                    window.location.href = 'index.html';
+                }
+            }, 300000); // 300000 ms = 5 minutos
+        }
+
+        // Escucha cualquier movimiento del ratón, toque en pantalla, teclado o scroll para saber que el usuario sigue ahí
+        ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evento => 
+            document.addEventListener(evento, reiniciarReloj, true)
+        );
+        reiniciarReloj(); // Arranca el reloj apenas carga la página
+    })();
+        
     </script>
 </body>
 </html>
