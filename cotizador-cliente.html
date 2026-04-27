@@ -3,126 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitud de Presupuesto | Coralsintec</title>
+    <title>Cotizador Oficial | Coralsintec</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
-        :root { --primary: #2c3e50; --accent: #e67e22; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); padding: 20px; color: var(--primary); }
-        .container { max-width: 600px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: auto; }
-        h2 { text-align: center; color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
-        .form-group { margin-bottom: 15px; }
-        label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 0.9em; }
-        select, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        .checkbox-group { display: flex; align-items: center; margin-top: 10px; background: #ecf0f1; padding: 10px; border-radius: 6px;}
-        .checkbox-group input { width: auto; margin-right: 10px; transform: scale(1.2); cursor: pointer;}
-        .resumen { background: #ecf0f1; padding: 15px; border-left: 4px solid var(--accent); border-radius: 6px; margin-top: 20px; }
-        .total-box { font-size: 1.5em; font-weight: bold; color: var(--accent); text-align: right; margin-top: 10px; }
-        .item-resumen { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9em;}
-        .btn-submit { background: var(--accent); color: white; border: none; padding: 15px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 1.1em; font-weight: bold; margin-top: 20px; transition: background 0.3s;}
+        :root { 
+            --primary: #2c3e50; 
+            --accent: #e67e22; 
+            --bg: #f4f7f6; 
+            --success: #27ae60;
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--bg); 
+            padding: 20px; 
+            color: var(--primary); 
+            margin: 0;
+        }
+        .container { 
+            max-width: 600px; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            margin: auto; 
+        }
+        h2 { 
+            text-align: center; 
+            color: var(--primary); 
+            border-bottom: 2px solid var(--accent); 
+            padding-bottom: 10px; 
+            margin-top: 0;
+        }
+        .form-group { 
+            margin-bottom: 15px; 
+        }
+        label { 
+            font-weight: bold; 
+            display: block; 
+            margin-bottom: 5px; 
+            font-size: 0.9em; 
+            color: #34495e;
+        }
+        select, input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #bdc3c7; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        select:focus, input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+        select:disabled {
+            background-color: #ecf0f1;
+            cursor: not-allowed;
+        }
+        .checkbox-group { 
+            display: flex; 
+            align-items: center; 
+            margin-top: 15px; 
+            background: #ecf0f1; 
+            padding: 12px; 
+            border-radius: 6px;
+            border-left: 4px solid #bdc3c7;
+        }
+        .checkbox-group input { 
+            width: auto; 
+            margin-right: 12px; 
+            transform: scale(1.3); 
+            cursor: pointer;
+        }
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+        .resumen { 
+            background: #ecf0f1; 
+            padding: 20px; 
+            border-left: 4px solid var(--accent); 
+            border-radius: 6px; 
+            margin-top: 25px; 
+        }
+        .item-resumen { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 8px; 
+            font-size: 0.95em;
+            color: #34495e;
+        }
+        .total-box { 
+            font-size: 1.6em; 
+            font-weight: bold; 
+            color: var(--accent); 
+            text-align: right; 
+            margin-top: 15px; 
+            padding-top: 15px;
+            border-top: 1px solid #bdc3c7;
+        }
+        .btn-submit { 
+            background: var(--accent); 
+            color: white; 
+            border: none; 
+            padding: 15px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-size: 1.1em; 
+            font-weight: bold; 
+            margin-top: 25px; 
+            transition: background 0.3s, transform 0.1s;
+        }
         .btn-submit:hover { background: #d35400; }
-        #mensajeExito { display: none; background: #2ecc71; color: white; padding: 15px; text-align: center; border-radius: 6px; margin-top: 20px; font-weight: bold;}
+        .btn-submit:active { transform: scale(0.98); }
+        .btn-submit:disabled { background: #95a5a6; cursor: not-allowed; }
+        
+        #mensajeExito { 
+            display: none; 
+            background: var(--success); 
+            color: white; 
+            padding: 15px; 
+            text-align: center; 
+            border-radius: 6px; 
+            margin-top: 20px; 
+            font-weight: bold;
+        }
+        .loading-db {
+            text-align: center;
+            font-size: 0.9em;
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Cotizador Coralsintec</h2>
+    <h2>Cotizador Online</h2>
     
+    <div id="statusCarga" class="loading-db">Conectando con la fábrica...</div>
+
     <form id="cotizadorForm">
         <div class="form-group">
-            <label>Nombre y Apellido</label>
+            <label for="clienteNombre">Nombre y Apellido</label>
             <input type="text" id="clienteNombre" required placeholder="Ej. Juan Pérez">
         </div>
         <div class="form-group">
-            <label>Teléfono (WhatsApp)</label>
+            <label for="clienteTelefono">Teléfono (WhatsApp)</label>
             <input type="tel" id="clienteTelefono" required placeholder="Ej. 04141234567">
         </div>
 
+        <hr style="border: 0; border-top: 1px solid #ecf0f1; margin: 25px 0;">
+
         <div class="form-group">
-            <label>Formato</label>
-            <select id="formato" onchange="filtrarTexturas()"><option value="">Cargando formatos...</option></select>
+            <label for="formato">1. Formato de Pieza</label>
+            <select id="formato" onchange="filtrarTexturas()" disabled>
+                <option value="">Cargando formatos...</option>
+            </select>
         </div>
         <div class="form-group">
-            <label>Textura</label>
-            <select id="textura" onchange="filtrarColores()" disabled><option value="">Seleccione un Formato primero</option></select>
+            <label for="textura">2. Textura</label>
+            <select id="textura" onchange="filtrarColores()" disabled>
+                <option value="">Seleccione un Formato primero</option>
+            </select>
         </div>
         <div class="form-group">
-            <label>Color</label>
-            <select id="color" onchange="calcularPresupuesto()" disabled><option value="">Seleccione una Textura primero</option></select>
+            <label for="color">3. Color</label>
+            <select id="color" onchange="calcularPresupuesto()" disabled>
+                <option value="">Seleccione una Textura primero</option>
+            </select>
         </div>
         <div class="form-group">
-            <label>Metros Cuadrados (m²)</label>
+            <label for="cantidad">Metros Cuadrados (m²)</label>
             <input type="number" id="cantidad" value="1" min="1" oninput="calcularPresupuesto()">
         </div>
 
         <div class="checkbox-group">
             <input type="checkbox" id="incluirCarateo" onchange="calcularPresupuesto()">
-            <label for="incluirCarateo" style="margin:0;">Incluir Carateo (Junta del mismo color)</label>
+            <label for="incluirCarateo">Incluir Carateo (Junta del mismo color de la losa)</label>
         </div>
 
         <div class="resumen">
-            <div class="item-resumen"><span>Subtotal Losa:</span> <span id="subLosa">$ 0.00</span></div>
-            <div class="item-resumen" id="rowCarateo" style="display:none;"><span>Subtotal Carateo:</span> <span id="subCarateo">$ 0.00</span></div>
-            <div class="total-box" id="totalFinal">$ 0.00</div>
+            <div class="item-resumen">
+                <span>Precio Unitario Losa:</span> 
+                <span id="precioUnitarioLosa">$ 0.00</span>
+            </div>
+            <div class="item-resumen">
+                <span>Subtotal Losa (<span id="txtMetros">1</span> m²):</span> 
+                <span id="subLosa" style="font-weight:bold;">$ 0.00</span>
+            </div>
+            <div class="item-resumen" id="rowCarateo" style="display:none; color: var(--accent);">
+                <span>Subtotal Carateo (Aprox <span id="txtKgCarateo">1</span> Kg):</span> 
+                <span id="subCarateo">$ 0.00</span>
+            </div>
+            
+            <div class="total-box">
+                Total Estimado: <span id="totalFinal">$ 0.00</span>
+            </div>
         </div>
 
-        <button type="button" class="btn-submit" id="btnEnviar" onclick="enviarSolicitud()">Enviar Solicitud a Fábrica</button>
-        <div id="mensajeExito">¡Solicitud enviada con éxito! Te contactaremos pronto.</div>
+        <button type="button" class="btn-submit" id="btnEnviar" onclick="enviarSolicitud()" disabled>Enviar Solicitud a Fábrica</button>
+        <div id="mensajeExito">¡Solicitud enviada con éxito! Nuestro equipo te contactará vía WhatsApp.</div>
     </form>
 </div>
 
 <script>
-    // URLs proporcionadas por Eduardo
+    // ==========================================
+    // CONFIGURACIÓN DE ENLACES (No modificar)
+    // ==========================================
+    // URL del Google Sheets publicado como CSV
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQS2jTGOpkjdFZM116nP9MLIoOgMNKB9Yl48duVoOUUrdmliZF9ji_rdsX7nK8dN5rvjxQx0H-OF7k7/pub?gid=0&single=true&output=csv";
+    
+    // URL de tu AppScript (Web App) para recibir datos
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
     
-    let db = [];
-    let precioLosaActual = 0;
+    let db = []; // Aquí se guarda la base de datos descargada
 
-    // Cargar CSV al iniciar
+    // ==========================================
+    // 1. CARGA DINÁMICA DE LA BASE DE DATOS
+    // ==========================================
     Papa.parse(CSV_URL, {
         download: true,
         header: true,
         complete: function(results) {
-            db = results.data.filter(row => row.FORMATO); // Filtra filas vacías
-            poblarFormatos();
+            // Filtrar filas vacías de seguridad
+            db = results.data.filter(row => row.FORMATO && row.FORMATO.trim() !== ""); 
+            
+            if(db.length > 0) {
+                document.getElementById('statusCarga').style.display = 'none';
+                document.getElementById('btnEnviar').disabled = false;
+                poblarFormatos();
+            } else {
+                document.getElementById('statusCarga').innerText = "Error: Base de datos vacía.";
+            }
+        },
+        error: function() {
+            document.getElementById('statusCarga').innerText = "Error al conectar con la base de datos.";
+            document.getElementById('statusCarga').style.color = "red";
         }
     });
 
+    // ==========================================
+    // 2. LÓGICA DE MENÚS EN CASCADA
+    // ==========================================
     function poblarFormatos() {
-        const formatos = [...new Set(db.map(item => item.FORMATO))];
+        const formatosUnicos = [...new Set(db.map(item => item.FORMATO))].sort();
         const select = document.getElementById('formato');
-        select.innerHTML = '<option value="">Seleccione Formato</option>';
-        formatos.forEach(f => select.add(new Option(f, f)));
+        select.innerHTML = '<option value="">Seleccione Formato...</option>';
+        
+        formatosUnicos.forEach(f => {
+            select.add(new Option(f, f));
+        });
+        select.disabled = false;
     }
 
     function filtrarTexturas() {
-        const formatoSeleccionado = document.getElementById('formato').value;
-        const texturas = [...new Set(db.filter(item => item.FORMATO === formatoSeleccionado).map(item => item.TEXTURA))];
+        const formatoSelec = document.getElementById('formato').value;
+        const texturasDisponibles = [...new Set(db.filter(i => i.FORMATO === formatoSelec).map(i => i.TEXTURA))];
         
-        const select = document.getElementById('textura');
-        select.innerHTML = '<option value="">Seleccione Textura</option>';
-        texturas.forEach(t => select.add(new Option(t, t)));
-        select.disabled = false;
+        const selectTextura = document.getElementById('textura');
+        selectTextura.innerHTML = '<option value="">Seleccione Textura...</option>';
         
+        if (formatoSelec !== "") {
+            texturasDisponibles.forEach(t => selectTextura.add(new Option(t, t)));
+            selectTextura.disabled = false;
+        } else {
+            selectTextura.disabled = true;
+        }
+        
+        // Resetear Color y Presupuesto
         document.getElementById('color').innerHTML = '<option value="">Seleccione una Textura primero</option>';
         document.getElementById('color').disabled = true;
         calcularPresupuesto();
     }
 
     function filtrarColores() {
-        const formatoSeleccionado = document.getElementById('formato').value;
-        const texturaSeleccionada = document.getElementById('textura').value;
+        const formatoSelec = document.getElementById('formato').value;
+        const texturaSelec = document.getElementById('textura').value;
         
-        const colores = [...new Set(db.filter(item => item.FORMATO === formatoSeleccionado && item.TEXTURA === texturaSeleccionada).map(item => item.COLOR))];
+        const coloresDisponibles = [...new Set(db.filter(i => i.FORMATO === formatoSelec && i.TEXTURA === texturaSelec).map(i => i.COLOR))];
         
-        const select = document.getElementById('color');
-        select.innerHTML = '<option value="">Seleccione Color</option>';
-        colores.forEach(c => select.add(new Option(c, c)));
-        select.disabled = false;
+        const selectColor = document.getElementById('color');
+        selectColor.innerHTML = '<option value="">Seleccione Color...</option>';
+        
+        if (texturaSelec !== "") {
+            coloresDisponibles.forEach(c => selectColor.add(new Option(c, c)));
+            selectColor.disabled = false;
+        } else {
+            selectColor.disabled = true;
+        }
         calcularPresupuesto();
     }
 
+    // ==========================================
+    // 3. CÁLCULO DEL PRESUPUESTO
+    // ==========================================
     function calcularPresupuesto() {
         const formato = document.getElementById('formato').value;
         const textura = document.getElementById('textura').value;
@@ -130,40 +308,65 @@
         const cantidad = parseFloat(document.getElementById('cantidad').value) || 0;
         const quiereCarateo = document.getElementById('incluirCarateo').checked;
 
+        // Actualizar textos de UI
+        document.getElementById('txtMetros').innerText = cantidad;
+        document.getElementById('txtKgCarateo').innerText = cantidad; // 1kg por m2 aprox
+
         if (!formato || !textura || !color) {
-            document.getElementById('totalFinal').innerText = "$ 0.00";
+            reiniciarTotalesUI();
             return;
         }
 
-        // Buscar precio de la losa en la base de datos
+        // Buscar el precio exacto en la base de datos descargada
         const producto = db.find(item => item.FORMATO === formato && item.TEXTURA === textura && item.COLOR === color);
-        precioLosaActual = producto ? parseFloat(producto.PRECIO_USD) : 0;
         
-        let subtotalLosa = precioLosaActual * cantidad;
+        if (!producto) {
+            console.error("Combinación no encontrada en BD");
+            reiniciarTotalesUI();
+            return;
+        }
+
+        let precioUnitarioLosa = parseFloat(producto.PRECIO_USD);
+        let subtotalLosa = precioUnitarioLosa * cantidad;
+        
+        document.getElementById('precioUnitarioLosa').innerText = `$ ${precioUnitarioLosa.toFixed(2)}`;
         document.getElementById('subLosa').innerText = `$ ${subtotalLosa.toFixed(2)}`;
 
-        // Lógica de Precio de Carateo (Calculado en JS, incluye 15%)
+        // --- CÁLCULO DE CARATEO (Incluye tu 15% logístico) ---
         let subtotalCarateo = 0;
         if (quiereCarateo) {
-            let precioKiloCarateo = 5.75; // Base color vivo con 15%
+            let precioKiloCarateo = 5.75; // Precio por defecto colores (5 * 1.15)
+            
+            // Lógica de precios de carateo
             if (color === "Gris Claro") precioKiloCarateo = 3.45; // 3 * 1.15
-            else if (color === "Beige" || color === "Gris 1%") precioKiloCarateo = 4.60; // 4 * 1.15
-            else if (color === "Gris 2%") precioKiloCarateo = 5.75; // 5 * 1.15
-            else if (color === "Gris 3%") precioKiloCarateo = 6.90; // 6 * 1.15
+            else if (color === "Beige" || color.includes("Gris 1%")) precioKiloCarateo = 4.60; // 4 * 1.15
+            else if (color.includes("Gris 2%")) precioKiloCarateo = 5.75; // 5 * 1.15
+            else if (color.includes("Gris 3%")) precioKiloCarateo = 6.90; // 6 * 1.15
             else if (color === "Deep Black") precioKiloCarateo = 8.05; // 7 * 1.15
 
-            // Estimación: 1kg de carateo por m2 (Ajustable)
-            subtotalCarateo = precioKiloCarateo * cantidad;
+            subtotalCarateo = precioKiloCarateo * cantidad; // 1 m2 = 1 Kg
+            
             document.getElementById('rowCarateo').style.display = 'flex';
             document.getElementById('subCarateo').innerText = `$ ${subtotalCarateo.toFixed(2)}`;
         } else {
             document.getElementById('rowCarateo').style.display = 'none';
         }
 
-        let total = subtotalLosa + subtotalCarateo;
-        document.getElementById('totalFinal').innerText = `$ ${total.toFixed(2)}`;
+        // TOTAL GENERAL
+        let totalFinal = subtotalLosa + subtotalCarateo;
+        document.getElementById('totalFinal').innerText = `$ ${totalFinal.toFixed(2)}`;
     }
 
+    function reiniciarTotalesUI() {
+        document.getElementById('precioUnitarioLosa').innerText = "$ 0.00";
+        document.getElementById('subLosa').innerText = "$ 0.00";
+        document.getElementById('subCarateo').innerText = "$ 0.00";
+        document.getElementById('totalFinal').innerText = "$ 0.00";
+    }
+
+    // ==========================================
+    // 4. ENVÍO DE DATOS A GOOGLE SHEETS
+    // ==========================================
     function enviarSolicitud() {
         const btn = document.getElementById('btnEnviar');
         const nombre = document.getElementById('clienteNombre').value;
@@ -172,17 +375,19 @@
         const textura = document.getElementById('textura').value;
         const color = document.getElementById('color').value;
         const cantidad = document.getElementById('cantidad').value;
+        const quiereCarateo = document.getElementById('incluirCarateo').checked ? "SI" : "NO";
         const total = document.getElementById('totalFinal').innerText;
 
-        if(!nombre || !telefono || !formato || !color) {
-            alert("Por favor, completa todos los campos del formulario.");
+        // Validación básica
+        if(!nombre || !telefono || !formato || !textura || !color || cantidad <= 0) {
+            alert("Por favor, completa tus datos y configura el producto correctamente.");
             return;
         }
 
         btn.innerText = "Enviando...";
         btn.disabled = true;
 
-        // Crear los datos a enviar
+        // Construir paquete de datos para enviar
         const formData = new FormData();
         formData.append("Nombre", nombre);
         formData.append("Telefono", telefono);
@@ -190,26 +395,38 @@
         formData.append("Textura", textura);
         formData.append("Color", color);
         formData.append("Metros", cantidad);
+        formData.append("Carateo", quiereCarateo);
         formData.append("Total", total);
 
-        // Fetch hacia tu Web App
+        // Fetch API (Envío sin CORS para evitar bloqueos del navegador)
         fetch(WEB_APP_URL, {
             method: 'POST',
             body: formData,
-            mode: 'no-cors' // Vital para evitar errores de Google
+            mode: 'no-cors' 
         })
         .then(() => {
+            // El modo no-cors no devuelve respuesta legible, asumimos éxito si llega aquí
             document.getElementById('cotizadorForm').reset();
-            document.getElementById('subLosa').innerText = "$ 0.00";
-            document.getElementById('totalFinal').innerText = "$ 0.00";
+            
+            // Reiniciar selects
+            document.getElementById('textura').disabled = true;
+            document.getElementById('color').disabled = true;
+            document.getElementById('color').innerHTML = '<option value="">Seleccione una Textura primero</option>';
+            
+            reiniciarTotalesUI();
             document.getElementById('rowCarateo').style.display = 'none';
+            
+            // Mostrar mensaje
             document.getElementById('mensajeExito').style.display = 'block';
-            btn.innerText = "Enviar Solicitud a Fábrica";
-            btn.disabled = false;
-            setTimeout(() => { document.getElementById('mensajeExito').style.display = 'none'; }, 5000);
+            setTimeout(() => { 
+                document.getElementById('mensajeExito').style.display = 'none'; 
+            }, 6000);
         })
         .catch(error => {
-            alert("Hubo un error al enviar. Intenta de nuevo.");
+            console.error('Error:', error);
+            alert("Hubo un problema de conexión. Por favor, intenta de nuevo o contáctanos directamente.");
+        })
+        .finally(() => {
             btn.innerText = "Enviar Solicitud a Fábrica";
             btn.disabled = false;
         });
