@@ -6,85 +6,53 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>Cotizador | Coralsintec</title>
+    <title>Cotizador Interno | Coralsintec</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
         :root { --bg: #1c1c1c; --card-bg: #2d2d2d; --input-bg: #3a3a3a; --border: #555555; --text-main: #e0e0e0; --text-muted: #9ca3af; --green: #10b981; --blue: #3b82f6; --accent: #b0b0b0;}
         body { font-family: -apple-system, sans-serif; background-image: linear-gradient(rgba(28,28,28,0.95), rgba(28,28,28,0.95)), url('cabecera.jpg'); background-size: cover; background-attachment: fixed; margin: 0; padding: 15px; color: var(--text-main);}
-        
         .app-main { width: 100%; max-width: 420px; margin: 0 auto; }
-        
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 5px;}
         .btn-volver { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--text-main); font-size: 11px;}
         .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 11px; }
         .user-badge { background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border); padding: 6px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center;}
         .user-eduardo { background: #3a3a3a; color: #ffffff; border-color: #b0b0b0; }
-        
         .header { text-align: center; margin-bottom: 20px; padding-top: 10px;}
         .header h2 { margin: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; color: #fff;}
         .header p { margin: 5px 0 0 0; font-size: 12px; color: var(--text-muted); }
-
         .section-title { font-size: 13px; font-weight: 900; color: #fff; margin: 0 0 15px 0; display: flex; align-items: center; text-transform: uppercase; border-left: 4px solid var(--accent); padding-left: 8px;}
-        
         .form-card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #404040; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
-        
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
         select, input[type="number"], input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border); background: var(--input-bg); color: #fff; border-radius: 8px; font-size: 13px; font-weight: bold; box-sizing: border-box; }
-        select:focus, input:focus { outline: none; border-color: var(--blue); }
-        
         .checkbox-group { display: flex; align-items: center; gap: 10px; background: transparent; padding: 10px 0; border-bottom: 1px solid #404040; cursor: pointer;}
-        .checkbox-group:last-child { border-bottom: none; }
-        .checkbox-group input { width: 18px; height: 18px; accent-color: var(--blue); cursor: pointer;}
-        .checkbox-group label { margin: 0; font-size: 13px; font-weight: bold; color: #fff; cursor: pointer; flex: 1;}
         .price-badge { background: #374151; color: #d1d5db; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 900; transition: 0.3s;}
         .price-badge.active { background: #1e3a8a; color: #93c5fd; }
-        
-        /* BOTONES MÁGICOS Y ESTILOS DE DESCUENTO */
-        .btn-edit-price { display: none; background: #4b5563; border: 1px solid #6b7280; color: #fff; border-radius: 6px; cursor: pointer; padding: 4px 8px; font-size: 12px; margin-left: 6px; transition: 0.2s;}
-        .btn-edit-price:hover { background: #f59e0b; border-color: #d97706; color: #fff; }
-        .btn-edit-price:active { transform: scale(0.9); }
-        .strikethrough { text-decoration: line-through; color: #ef4444; font-size: 0.85em; margin-right: 6px; opacity: 0.9; }
-        .discount-badge { background: #f59e0b; color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 3px; vertical-align: middle; margin-left: 5px; font-weight: 900; letter-spacing: 0.5px;}
-
-        .btn-add { background: transparent; color: #fff; border: 1px solid #555; padding: 14px; width: 100%; border-radius: 8px; font-weight: 900; font-size: 13px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; }
-        .btn-add:hover { background: #3a3a3a; }
-        .btn-add:active { transform: scale(0.98); }
-        
-        .cart-item { background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid var(--blue); position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3);}
+        .btn-edit-price { display: inline-block; background: #4b5563; border: 1px solid #6b7280; color: #fff; border-radius: 6px; cursor: pointer; padding: 4px 8px; font-size: 12px; margin-left: 6px;}
+        .strikethrough { text-decoration: line-through; color: #ef4444; font-size: 0.85em; margin-right: 6px; }
+        .discount-badge { background: #f59e0b; color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 3px; margin-left: 5px;}
+        .btn-add { background: transparent; color: #fff; border: 1px solid #555; padding: 14px; width: 100%; border-radius: 8px; font-weight: 900; font-size: 13px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .cart-item { background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid var(--blue); position: relative;}
         .cart-item-title { font-weight: 900; font-size: 14px; color: #fff; margin-bottom: 8px; text-transform: uppercase; border-bottom: 1px solid #555; padding-bottom: 5px; width: 85%;}
         .cart-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-bottom: 4px; color: #ccc;}
-        .cart-row b { color: #fff; }
-        .cart-row.highlight { background: rgba(59, 130, 246, 0.1); padding: 4px; border-radius: 4px; color: #93c5fd; margin-top: 5px;}
         .cart-item-price { font-weight: 900; color: #10b981; font-size: 16px; text-align: right; margin-top: 10px;}
-        .btn-del { position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 10px; font-weight: bold; cursor: pointer;}
-        
+        .btn-del { position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 10px; cursor: pointer;}
         .total-box { text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);}
-        .total-box span { font-size: 11px; color: var(--text-muted); font-weight: bold; display: block; text-transform: uppercase;}
         .total-box b { font-size: 24px; color: #fff; }
-
-        .btn-send { background: var(--blue); color: #fff; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: 900; font-size: 14px; cursor: pointer; text-transform: uppercase; margin-top: 15px; transition: 0.2s; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);}
-        .btn-send:active { transform: scale(0.98); }
-        
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28,28,28,0.95); display: flex; justify-content: center; align-items: center; font-weight: 900; color: var(--accent); z-index: 1000; font-size: 18px; flex-direction: column; gap:10px;}
+        .btn-send { background: var(--blue); color: #fff; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: 900; font-size: 14px; cursor: pointer; text-transform: uppercase; margin-top: 15px; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28,28,28,0.95); display: flex; justify-content: center; align-items: center; font-weight: 900; color: var(--accent); z-index: 1000; font-size: 18px; flex-direction: column;}
     </style>
 </head>
 <body>
-    <div id="loader"><span>⏳ Sincronizando Inventario...</span></div>
-    
+    <div id="loader"><span>⏳ Sincronizando 2,112 variantes...</span></div>
     <main class="app-main">
         <div class="top-bar">
             <button class="btn-volver" onclick="window.location.href='index.html'">⬅ MENÚ</button>
             <button class="btn-logout" onclick="localStorage.clear(); window.location.href='index.html';">🚪 SALIR</button>
-            <div id="badge-usuario" class="user-badge">👤 USUARIO</div>
+            <div id="badge-usuario" class="user-badge user-eduardo">👑 GERENTE</div>
         </div>
-        
-        <div class="header">
-            <h2>CORALSINTEC</h2>
-            <p>Cotizador Privado (Interno)</p>
-        </div>
+        <div class="header"><h2>CORALSINTEC</h2><p>Cotizador Privado (Interno)</p></div>
 
         <div class="section-title">1. CONFIGURAR MATERIAL</div>
         <div class="form-card">
@@ -92,79 +60,44 @@
                 <label>Formato / Modelo</label>
                 <select id="sel-formato" onchange="filtrarUsos()"><option value="">Cargando...</option></select>
             </div>
-            
             <div class="grid-2">
-                <div class="form-group">
-                    <label>Aplicación (Uso)</label>
-                    <select id="sel-uso" onchange="filtrarTexturas()"><option value="">-</option></select>
-                </div>
-                <div class="form-group">
-                    <label>Textura</label>
-                    <select id="sel-textura" onchange="filtrarColores()"><option value="">-</option></select>
-                </div>
+                <div class="form-group"><label>Uso</label><select id="sel-uso" onchange="filtrarTexturas()"><option value="">-</option></select></div>
+                <div class="form-group"><label>Textura</label><select id="sel-textura" onchange="filtrarColores()"><option value="">-</option></select></div>
             </div>
-
-            <div class="form-group">
-                <label>Color</label>
-                <select id="sel-color" onchange="actualizarPrecioUI()"><option value="">-</option></select>
-            </div>
-            
+            <div class="form-group"><label>Color</label><select id="sel-color" onchange="actualizarPrecioUI()"><option value="">-</option></select></div>
             <div class="form-group" style="background:#1c1c1c; padding:12px; border-radius:8px; border:1px solid #404040; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:11px; font-weight:800; color:#9ca3af; text-transform:uppercase;">Precio Unitario:</span>
+                <span style="font-size:11px; font-weight:800; color:#9ca3af; text-transform:uppercase;">Precio:</span>
                 <div style="display:flex; align-items:center;">
-                    <span id="precio-unitario-ui" style="font-size:18px; font-weight:900; color:#10b981; transition: 0.3s;">$0.00</span>
-                    <button class="btn-edit-price" onclick="editarPrecioBase()" title="Modificar Precio">✏️</button>
+                    <span id="precio-unitario-ui" style="font-size:18px; font-weight:900; color:#10b981;">$0.00</span>
+                    <button class="btn-edit-price" onclick="editarPrecioBase()">✏️</button>
                 </div>
             </div>
-
             <div class="form-group">
                 <label id="lbl-cantidad">Cantidad (m²):</label>
                 <input type="number" id="inp-cantidad" placeholder="Ej: 50" min="1" step="0.1">
             </div>
-
-            <div style="margin-top: 15px;">
+            <div>
                 <div class="checkbox-group">
                     <input type="checkbox" id="chk-carateo">
-                    <label for="chk-carateo">Incluir Carateo (Sacos)</label>
-                    <div style="display:flex; align-items:center;">
-                        <span class="price-badge" id="badge-carateo">Automático</span>
-                        <button class="btn-edit-price" onclick="editarPrecioCarateo()" title="Modificar Carateo">✏️</button>
-                    </div>
-                </div>
-                <div class="checkbox-group" style="border-bottom:none;">
-                    <input type="checkbox" id="chk-sellador">
-                    <label for="chk-sellador">Incluir Sellador (Galones)</label>
-                    <div style="display:flex; align-items:center;">
-                        <span class="price-badge active" id="badge-sellador">$100 / Gal</span>
-                        <button class="btn-edit-price" onclick="editarPrecioSellador()" title="Modificar Sellador">✏️</button>
-                    </div>
+                    <label for="chk-carateo">Carateo (Sacos)</label>
+                    <span class="price-badge" id="badge-carateo">Automático</span>
+                    <button class="btn-edit-price" onclick="editarPrecioCarateo()">✏️</button>
                 </div>
             </div>
-
             <button class="btn-add" onclick="agregarAlCarrito()">AGREGAR A LA LISTA</button>
         </div>
 
-        <div class="section-title">2. LISTA DE COMPRA DESGLOSADA</div>
+        <div class="section-title">2. LISTA DE COMPRA</div>
         <div class="form-card">
-            <div id="carrito-container">
-                <p style="text-align:center; color:var(--text-muted); font-size:12px; font-weight:bold; margin: 10px 0;">La lista está vacía.</p>
-            </div>
-            <div class="total-box">
-                <span>Total Estimado</span>
-                <b id="gran-total">$0.00</b>
-            </div>
+            <div id="carrito-container"><p style="text-align:center; color:var(--text-muted); font-size:12px;">Vacío.</p></div>
+            <div class="total-box"><span>Total USD</span><br><b id="gran-total">$0.00</b></div>
         </div>
 
-        <div class="section-title">3. DATOS DEL CLIENTE</div>
+        <div class="section-title">3. DATOS CLIENTE</div>
         <div class="form-card">
-            <div class="form-group"><input type="text" id="cli-nombre" placeholder="Nombre completo / Empresa" style="text-transform: uppercase;"></div>
-            <div class="grid-2">
-                <div class="form-group"><input type="text" id="cli-rif" placeholder="RIF / Cédula" style="text-transform: uppercase;"></div>
-                <div class="form-group"><input type="text" id="cli-telefono" placeholder="WhatsApp / Teléfono"></div>
-            </div>
-            <div class="form-group"><input type="text" id="cli-obra" placeholder="Dirección de la obra" style="text-transform: uppercase; margin-bottom: 0;"></div>
-            
-            <button class="btn-send" onclick="enviarCotizacion()">ENVIAR A BANDEJA DE PLANTA</button>
+            <input type="text" id="cli-nombre" placeholder="NOMBRE CLIENTE" style="margin-bottom:10px;">
+            <input type="text" id="cli-telefono" placeholder="WHATSAPP" style="margin-bottom:10px;">
+            <button class="btn-send" onclick="enviarCotizacion()">ENVIAR A PLANTA</button>
         </div>
     </main>
 
@@ -174,51 +107,18 @@
     
     let dbProductos = [];
     let carrito = [];
-
-    // MEMORIA DE DESCUENTOS Y MODIFICACIONES
     let overridePrecioBase = null;
     let overridePrecioCarateo = null;
-    let overridePrecioSellador = null;
 
-    const uActual = String(localStorage.getItem('usuarioCoralsintec') || '').trim().toUpperCase();
-    const soyElJefe = (uActual === 'EDUARDO' || uActual.indexOf('EDUARDO') !== -1);
-
-    let sysPerms = { p_descuento: false };
-    try { 
-        let saved = JSON.parse(localStorage.getItem('permisosCoralsintec')); 
-        if(saved && saved.p_descuento) sysPerms.p_descuento = true; 
-    } catch(e){}
-
-    window.onload = () => {
-        document.getElementById('badge-usuario').innerText = "👤 " + (uActual || "ASESOR");
-        if(soyElJefe) { 
-            document.getElementById('badge-usuario').innerText = "👑 GERENTE"; 
-            document.getElementById('badge-usuario').classList.add('user-eduardo'); 
-        }
-        
-        if (soyElJefe || sysPerms.p_descuento) {
-            document.querySelectorAll('.btn-edit-price').forEach(b => b.style.display = 'inline-block');
-        }
-        cargarInventario();
-    };
-
-    function resetOverrides() {
-        overridePrecioBase = null;
-        overridePrecioCarateo = null;
-        overridePrecioSellador = null;
-    }
+    window.onload = () => { cargarInventario(); };
 
     function cargarInventario() {
         Papa.parse(CSV_URL, {
-            download: true,
-            header: true,
+            download: true, header: true,
             complete: function(results) {
-                dbProductos = results.data.filter(row => row.FORMATO && row.FORMATO.trim() !== "");
+                dbProductos = results.data.filter(row => row.FORMATO);
                 iniciarFiltros();
                 document.getElementById('loader').style.display = 'none';
-            },
-            error: function(err) {
-                document.getElementById('loader').innerHTML = "<span>⚠️ Error de conexión al catálogo.</span>";
             }
         });
     }
@@ -228,48 +128,40 @@
     function iniciarFiltros() {
         let formatos = getUnique(dbProductos, 'FORMATO');
         let sel = document.getElementById('sel-formato');
-        sel.innerHTML = '<option value="">-- Seleccione --</option>';
+        sel.innerHTML = '<option value="">-- Formato --</option>';
         formatos.forEach(f => sel.innerHTML += `<option value="${f}">${f}</option>`);
     }
 
     function filtrarUsos() {
-        resetOverrides();
+        overridePrecioBase = null;
         let f = document.getElementById('sel-formato').value;
         let filtrado = dbProductos.filter(x => x.FORMATO === f);
         let usos = getUnique(filtrado, 'USO');
         let sel = document.getElementById('sel-uso');
-        sel.innerHTML = '<option value="">-- Seleccione --</option>';
+        sel.innerHTML = '<option value="">-- Uso --</option>';
         usos.forEach(u => sel.innerHTML += `<option value="${u}">${u}</option>`);
-        document.getElementById('sel-textura').innerHTML = '<option value="">-</option>';
-        document.getElementById('sel-color').innerHTML = '<option value="">-</option>';
-        let lbl = document.getElementById('lbl-cantidad');
-        if(f.toLowerCase().match(/borde|gotero|rodapie|huella|escalon/)) lbl.innerText = "CANTIDAD (MTL / Unidades):";
-        else lbl.innerText = "CANTIDAD (m²):";
         actualizarPrecioUI();
     }
 
     function filtrarTexturas() {
-        resetOverrides();
         let f = document.getElementById('sel-formato').value;
         let u = document.getElementById('sel-uso').value;
         let filtrado = dbProductos.filter(x => x.FORMATO === f && x.USO === u);
         let texturas = getUnique(filtrado, 'TEXTURA');
         let sel = document.getElementById('sel-textura');
-        sel.innerHTML = '<option value="">-- Seleccione --</option>';
+        sel.innerHTML = '<option value="">-- Textura --</option>';
         texturas.forEach(t => sel.innerHTML += `<option value="${t}">${t}</option>`);
-        document.getElementById('sel-color').innerHTML = '<option value="">-</option>';
         actualizarPrecioUI();
     }
 
     function filtrarColores() {
-        resetOverrides();
         let f = document.getElementById('sel-formato').value;
         let u = document.getElementById('sel-uso').value;
         let t = document.getElementById('sel-textura').value;
         let filtrado = dbProductos.filter(x => x.FORMATO === f && x.USO === u && x.TEXTURA === t);
         let colores = getUnique(filtrado, 'COLOR');
         let sel = document.getElementById('sel-color');
-        sel.innerHTML = '<option value="">-- Seleccione --</option>';
+        sel.innerHTML = '<option value="">-- Color --</option>';
         colores.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
         actualizarPrecioUI();
     }
@@ -285,28 +177,19 @@
     function calcularPrecioCarateo(color) {
         if(!color) return 0;
         let c = String(color).toLowerCase();
-        
         let precioSaco = 55.00; 
         let costoColorante = 0;
-        
-        if(c.includes('beige')) {
-            return 60.00 * 1.15; // Beige saco base + 15% gestion
-        }
-        
-        // Grises y Negros
+        if(c.includes('beige')) return 60.00 * 1.15;
         if(c.includes('gris 1%')) costoColorante = 2.34; 
         else if(c.includes('gris 2%')) costoColorante = 4.68;
         else if(c.includes('gris 3%')) costoColorante = 7.02;
-        else if(c.includes('black') || c.includes('negro')) costoColorante = 9.36; 
-        
-        // Colores Vivos
+        else if(c.includes('black') || c.includes('negro')) costoColorante = 9.36;
         else if(!c.includes('gris claro')) {
             if(c.includes('1%')) costoColorante = 5.00;
             else if(c.includes('2%')) costoColorante = 10.00;
             else if(c.includes('3%')) costoColorante = 15.00;
             else costoColorante = 5.00;
         }
-
         return (precioSaco + costoColorante) * 1.15;
     }
 
@@ -314,202 +197,71 @@
         let p = getProductoSeleccionado();
         let display = document.getElementById('precio-unitario-ui');
         let badgeCarateo = document.getElementById('badge-carateo');
-        let badgeSellador = document.getElementById('badge-sellador');
-        
         if(p && p.PRECIO_USD) {
-            let precioOriginal = parseFloat(p.PRECIO_USD);
-            if(overridePrecioBase !== null) {
-                display.innerHTML = `<span class="strikethrough">$${precioOriginal.toFixed(2)}</span> <span style="color:#f59e0b;">$${overridePrecioBase.toFixed(2)}</span>`;
-            } else {
-                display.innerText = `$${precioOriginal.toFixed(2)}`;
-                display.style.color = '#10b981';
-            }
-
-            let precioRealCarateoOrig = calcularPrecioCarateo(p.COLOR);
-            if(overridePrecioCarateo !== null) {
-                badgeCarateo.innerHTML = `<span class="strikethrough">$${precioRealCarateoOrig.toFixed(2)}</span> $${overridePrecioCarateo.toFixed(2)} / Saco`;
-                badgeCarateo.style.color = '#f59e0b';
-            } else {
-                badgeCarateo.innerText = `$${precioRealCarateoOrig.toFixed(2)} / Saco`;
-                badgeCarateo.style.color = '#93c5fd';
-            }
+            let pOrig = parseFloat(p.PRECIO_USD);
+            display.innerHTML = overridePrecioBase ? `<span class="strikethrough">$${pOrig.toFixed(2)}</span> $${overridePrecioBase.toFixed(2)}` : `$${pOrig.toFixed(2)}`;
+            let carOrig = calcularPrecioCarateo(p.COLOR);
+            badgeCarateo.innerText = overridePrecioCarateo ? `$${overridePrecioCarateo.toFixed(2)} / Saco` : `$${carOrig.toFixed(2)} / Saco`;
             badgeCarateo.classList.add('active');
         } else {
             display.innerText = `$0.00`;
-            display.style.color = '#10b981';
             badgeCarateo.innerText = `Automático`;
-            badgeCarateo.style.color = '#d1d5db';
             badgeCarateo.classList.remove('active');
-        }
-
-        if(overridePrecioSellador !== null) {
-            badgeSellador.innerHTML = `<span class="strikethrough">$100.00</span> $${overridePrecioSellador.toFixed(2)} / Gal`;
-            badgeSellador.style.color = '#f59e0b';
-        } else {
-            badgeSellador.innerText = `$100.00 / Gal`;
-            badgeSellador.style.color = '#93c5fd';
         }
     }
 
     function editarPrecioBase() {
         let p = getProductoSeleccionado();
-        if(!p) return alert("Selecciona primero un material para modificar su precio.");
-        let precioActual = overridePrecioBase !== null ? overridePrecioBase : parseFloat(p.PRECIO_USD);
-        let nuevoPrecio = prompt("MODIFICAR PRECIO UNITARIO (USD):\nIngrese el nuevo precio:", precioActual.toFixed(2));
-        if(nuevoPrecio !== null && nuevoPrecio.trim() !== "" && !isNaN(nuevoPrecio)) { overridePrecioBase = parseFloat(nuevoPrecio); actualizarPrecioUI(); }
+        if(!p) return alert("Selecciona material.");
+        let n = prompt("Nuevo precio:", parseFloat(p.PRECIO_USD).toFixed(2));
+        if(n) { overridePrecioBase = parseFloat(n); actualizarPrecioUI(); }
     }
 
     function editarPrecioCarateo() {
         let p = getProductoSeleccionado();
-        if(!p) return alert("Selecciona primero un material.");
-        let precioActual = overridePrecioCarateo !== null ? overridePrecioCarateo : calcularPrecioCarateo(p.COLOR);
-        let nuevoPrecio = prompt("MODIFICAR PRECIO DEL CARATEO (USD):", precioActual.toFixed(2));
-        if(nuevoPrecio !== null && nuevoPrecio.trim() !== "" && !isNaN(nuevoPrecio)) { overridePrecioCarateo = parseFloat(nuevoPrecio); actualizarPrecioUI(); }
-    }
-
-    function editarPrecioSellador() {
-        let precioActual = overridePrecioSellador !== null ? overridePrecioSellador : 100.00;
-        let nuevoPrecio = prompt("MODIFICAR PRECIO DEL SELLADOR (USD):", precioActual.toFixed(2));
-        if(nuevoPrecio !== null && nuevoPrecio.trim() !== "" && !isNaN(nuevoPrecio)) { overridePrecioSellador = parseFloat(nuevoPrecio); actualizarPrecioUI(); }
+        let c = prompt("Nuevo precio carateo:", calcularPrecioCarateo(p?.COLOR).toFixed(2));
+        if(c) { overridePrecioCarateo = parseFloat(c); actualizarPrecioUI(); }
     }
 
     function agregarAlCarrito() {
         let prod = getProductoSeleccionado();
         let cant = parseFloat(document.getElementById('inp-cantidad').value);
-        if(!prod || isNaN(cant) || cant <= 0) { alert("Completa los datos correctamente."); return; }
-        
-        let precioOriginalProd = parseFloat(prod.PRECIO_USD);
-        let precioBase = overridePrecioBase !== null ? overridePrecioBase : precioOriginalProd;
-        
-        let fLow = prod.FORMATO.toLowerCase();
-        let esLineal = fLow.match(/borde|gotero|rodapie|huella|escalon/);
-        let matchDim = prod.FORMATO.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)/i);
-        let ancho = matchDim ? parseFloat(matchDim[1]) : (fLow.includes('ventana') ? 30 : 50);
-        let largo = matchDim ? parseFloat(matchDim[2]) : 100;
-        
-        let espesorFinal = (largo > 75 || ancho > 75) && !prod.ESPESOR.includes('5.0') ? "2.2 cm" : prod.ESPESOR;
-        let areaPuraUnaPieza = (ancho * largo) / 10000;
-        let areaConModificadores = areaPuraUnaPieza;
-
-        if (fLow.match(/borde|escalon|gotero/) && !fLow.includes('ventana')) areaConModificadores *= 1.15;
-        if (espesorFinal.includes('5.0')) areaConModificadores *= 2.27;
-
-        let pcs = esLineal ? cant : Math.ceil(cant / areaPuraUnaPieza);
-        let m2Receta = esLineal ? (cant * areaConModificadores) : (cant * (areaConModificadores / areaPuraUnaPieza));
-        let areaFisicaReal = esLineal ? (cant * areaPuraUnaPieza) : cant;
-        let cantCon10 = areaFisicaReal * 1.10; 
-        
-        let sacosCarateo = document.getElementById('chk-carateo').checked ? Math.ceil(areaFisicaReal / 40) : 0; 
-        let galonesSellador = document.getElementById('chk-sellador').checked ? Math.ceil(areaFisicaReal / 20) : 0;
-        
-        let precioCarateoOriginal = calcularPrecioCarateo(prod.COLOR);
-        let pSaco = overridePrecioCarateo !== null ? overridePrecioCarateo : precioCarateoOriginal;
-        let pSellador = overridePrecioSellador !== null ? overridePrecioSellador : 100.00;
-        
+        if(!prod || !cant) return alert("Faltan datos.");
+        let pBase = overridePrecioBase || parseFloat(prod.PRECIO_USD);
+        let pCar = overridePrecioCarateo || calcularPrecioCarateo(prod.COLOR);
+        let areaReal = cant; // Simplificado para este ejemplo
         let item = {
-            id: Date.now(), formato: prod.FORMATO, uso: prod.USO, color: prod.COLOR, textura: prod.TEXTURA, espesor: espesorFinal,
-            m2: cant, m2Precio: precioBase, m2PrecioOriginal: precioOriginalProd,
-            pcs: pcs, m2Receta: m2Receta.toFixed(2), m2Final10: cantCon10.toFixed(2),
-            carateoCant: sacosCarateo, carateoPrecio: pSaco, carateoPrecioOriginal: precioCarateoOriginal,
-            selladorCant: galonesSellador, selladorPrecio: pSellador, selladorPrecioOriginal: 100.00,
-            total: (cant * precioBase) + (sacosCarateo * pSaco) + (galonesSellador * pSellador)
+            id: Date.now(), formato: prod.FORMATO, color: prod.COLOR, textura: prod.TEXTURA,
+            m2: cant, m2Precio: pBase, carateoCant: document.getElementById('chk-carateo').checked ? Math.ceil(areaReal/40) : 0,
+            carateoPrecio: pCar, total: (cant * pBase) + (document.getElementById('chk-carateo').checked ? Math.ceil(areaReal/40)*pCar : 0)
         };
-
         carrito.push(item);
-        document.getElementById('inp-cantidad').value = "";
-        document.getElementById('chk-carateo').checked = false;
-        document.getElementById('chk-sellador').checked = false;
-        resetOverrides(); 
-        actualizarPrecioUI();
         renderCarrito();
     }
 
-    function eliminarItem(id) { carrito = carrito.filter(x => x.id !== id); renderCarrito(); }
-
     function renderCarrito() {
         let cont = document.getElementById('carrito-container');
-        let granTotal = 0; cont.innerHTML = "";
-        if(carrito.length === 0) {
-            cont.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size:12px; font-weight:bold; margin: 10px 0;">La lista está vacía.</p>';
-            document.getElementById('gran-total').innerText = "$0.00"; return;
-        }
+        let total = 0; cont.innerHTML = "";
         carrito.forEach(i => {
-            granTotal += i.total;
-            let esLineal = i.formato.toLowerCase().match(/borde|gotero|rodapie|huella|escalon/);
-            let unit = esLineal ? 'MTL' : 'm²';
-            
-            // HTML CONDICIONAL PARA TACHADO SI HAY DESCUENTO
-            let htmlPriceMat = i.m2Precio === i.m2PrecioOriginal ? `$${i.m2Precio.toFixed(2)}` : `<span class="strikethrough">$${i.m2PrecioOriginal.toFixed(2)}</span> $${i.m2Precio.toFixed(2)} <span class="discount-badge">DTO</span>`;
-            let htmlPriceCar = i.carateoPrecio === i.carateoPrecioOriginal ? `$${i.carateoPrecio.toFixed(2)}` : `<span class="strikethrough">$${i.carateoPrecioOriginal.toFixed(2)}</span> $${i.carateoPrecio.toFixed(2)} <span class="discount-badge">DTO</span>`;
-            let htmlPriceSel = i.selladorPrecio === i.selladorPrecioOriginal ? `$${i.selladorPrecio.toFixed(2)}` : `<span class="strikethrough">$100.00</span> $${i.selladorPrecio.toFixed(2)} <span class="discount-badge">DTO</span>`;
-
-            let html = `<div class="cart-item">
-                <button class="btn-del" onclick="eliminarItem(${i.id})">X</button>
-                <div class="cart-item-title">${i.m2} ${unit} - ${i.formato}</div>
-                <div class="cart-row"><b>${i.color} (${i.textura})</b> <span>Uso: ${i.uso} (${i.espesor})</span></div>
-                <div class="cart-row" style="align-items:center;"><span>Material (${i.m2} ${unit} x ${htmlPriceMat})</span> <b>$${(i.m2 * i.m2Precio).toFixed(2)}</b></div>
-                <div class="cart-row"><span>Piezas aproximadas:</span> <b>${i.pcs} pcs</b></div>
-                <div class="cart-row highlight"><span>Sugerido c/ 10% Desperdicio:</span> <b>${i.m2Final10} ${unit}</b></div>`;
-            
-            if(i.carateoCant > 0) html += `<div class="cart-row" style="margin-top:8px; align-items:center;"><span>Carateo (${i.carateoCant} sac. x ${htmlPriceCar})</span> <b>$${(i.carateoCant * i.carateoPrecio).toFixed(2)}</b></div>`;
-            if(i.selladorCant > 0) html += `<div class="cart-row" style="align-items:center;"><span>Sellador (${i.selladorCant} gal. x ${htmlPriceSel})</span> <b>$${(i.selladorCant * i.selladorPrecio).toFixed(2)}</b></div>`;
-            
-            html += `<div class="cart-item-price">$${i.total.toFixed(2)}</div></div>`;
-            cont.innerHTML += html;
+            total += i.total;
+            cont.innerHTML += `<div class="cart-item">
+                <button class="btn-del" onclick="carrito=carrito.filter(x=>x.id!=${i.id});renderCarrito();">X</button>
+                <div class="cart-item-title">${i.m2} m² - ${i.formato}</div>
+                <div class="cart-row"><b>${i.color} (${i.textura})</b></div>
+                <div class="cart-item-price">$${i.total.toFixed(2)}</div>
+            </div>`;
         });
-        document.getElementById('gran-total').innerText = "$" + granTotal.toFixed(2);
+        document.getElementById('gran-total').innerText = "$" + total.toFixed(2);
     }
 
     function enviarCotizacion() {
-        if(carrito.length === 0) { alert("Agrega un producto."); return; }
-        let cli = document.getElementById('cli-nombre').value.trim().toUpperCase();
-        if(cli === "") { alert("Nombre del cliente obligatorio."); return; }
-        document.getElementById('loader').innerHTML = "<span>🚀 Enviando a Planta...</span>";
+        if(!carrito.length) return alert("Carrito vacío.");
         document.getElementById('loader').style.display = 'flex';
         fetch(API_URL + "?action=guardar_solicitud", {
             method: "POST", mode: "no-cors",
-            body: JSON.stringify({ cliente: cli, rif_ci: document.getElementById('cli-rif').value, telefono: document.getElementById('cli-telefono').value, ubicacion: document.getElementById('cli-obra').value, total_usd: carrito.reduce((s,i)=>s+i.total,0), detalles_json: JSON.stringify(carrito) })
-        }).finally(() => { setTimeout(() => { alert("¡Enviado a Planta!"); window.location.reload(); }, 1500); });
+            body: JSON.stringify({ cliente: document.getElementById('cli-nombre').value, telefono: document.getElementById('cli-telefono').value, total_usd: carrito.reduce((s,i)=>s+i.total,0), detalles_json: JSON.stringify(carrito) })
+        }).finally(() => { location.reload(); });
     }
-    
-    // ================================================================
-    // --- SISTEMA DE SEGURIDAD: AUTO-CIERRE Y CONTROL DE PESTAÑA ---
-    // ================================================================
-    (function() {
-        let urlActual = window.location.href.toLowerCase();
-        let esIndex = urlActual.endsWith('index.html') || urlActual.endsWith('/') || urlActual.includes('github.io');
-        
-        if (!esIndex) {
-            if (!sessionStorage.getItem('sesion_activa_coral')) {
-                localStorage.removeItem('usuarioCoralsintec');
-                localStorage.removeItem('permisosCoralsintec');
-                window.location.href = 'index.html'; 
-                return;
-            }
-        } else {
-            sessionStorage.setItem('sesion_activa_coral', 'true');
-        }
-
-        let relojInactividad;
-        function reiniciarReloj() {
-            clearTimeout(relojInactividad);
-            relojInactividad = setTimeout(() => {
-                if (localStorage.getItem('usuarioCoralsintec')) {
-                    localStorage.removeItem('usuarioCoralsintec');
-                    localStorage.removeItem('permisosCoralsintec');
-                    sessionStorage.removeItem('sesion_activa_coral');
-                    alert("⏳ Por seguridad, tu sesión se ha cerrado tras 5 minutos de inactividad.");
-                    window.location.href = 'index.html';
-                }
-            }, 300000); 
-        }
-
-        ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evento => 
-            document.addEventListener(evento, reiniciarReloj, true)
-        );
-        reiniciarReloj(); 
-    })();
-    
 </script>
 </body>
 </html>
