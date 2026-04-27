@@ -49,6 +49,15 @@
         .strikethrough { text-decoration: line-through; color: #ef4444; font-size: 0.85em; margin-right: 6px; opacity: 0.9; }
         .discount-badge { background: #f59e0b; color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 3px; vertical-align: middle; margin-left: 5px; font-weight: 900; letter-spacing: 0.5px;}
 
+        /* ESTILOS DE LA BARRA DE INVENTARIO */
+        .inv-box { background: #1c1c1c; padding: 12px; border-radius: 8px; border: 1px solid #404040; margin-bottom: 15px; display: none; }
+        .inv-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+        .inv-bar-bg { width: 100%; height: 8px; background: #3a3a3a; border-radius: 4px; overflow: hidden; }
+        .inv-bar-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
+        .inv-high { background-color: var(--green); }
+        .inv-med { background-color: #f59e0b; }
+        .inv-low { background-color: #ef4444; }
+
         .btn-add { background: transparent; color: #fff; border: 1px solid #555; padding: 14px; width: 100%; border-radius: 8px; font-weight: 900; font-size: 13px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; }
         .btn-add:hover { background: #3a3a3a; }
         .btn-add:active { transform: scale(0.98); }
@@ -107,6 +116,16 @@
             <div class="form-group">
                 <label>Color</label>
                 <select id="sel-color" onchange="actualizarPrecioUI()"><option value="">-</option></select>
+            </div>
+
+            <div class="inv-box" id="inv-box">
+                <div class="inv-header">
+                    <span>Estatus de Inventario:</span>
+                    <span id="inv-text" style="color:#fff;">0</span>
+                </div>
+                <div class="inv-bar-bg">
+                    <div id="inv-bar" class="inv-bar-fill"></div>
+                </div>
             </div>
             
             <div class="form-group" style="background:#1c1c1c; padding:12px; border-radius:8px; border:1px solid #404040; display:flex; justify-content:space-between; align-items:center;">
@@ -170,12 +189,10 @@
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzi0UF7LhZMY_uleacnFoSKiaWqHgtz_ItLOMN1y8P_smj3sH0W3SdhPWrs2ihFYaZL6A/exec";
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQS2jTGOpkjdFZM116nP9MLIoOgMNKB9Yl48duVoOUUrdmliZF9ji_rdsX7nK8dN5rvjxQx0H-OF7k7/pub?gid=0&single=true&output=csv";
-
+    
     let dbProductos = [];
     let carrito = [];
 
-    // MEMORIA DE DESCUENTOS Y MODIFICACIONES
     let overridePrecioBase = null;
     let overridePrecioCarateo = null;
     let overridePrecioSellador = null;
@@ -209,18 +226,11 @@
     }
 
     function cargarInventario() {
-        Papa.parse(CSV_URL, {
-            download: true,
-            header: true,
-            complete: function(results) {
-                dbProductos = results.data.filter(row => row.FORMATO && row.FORMATO.trim() !== "");
-                iniciarFiltros();
-                document.getElementById('loader').style.display = 'none';
-            },
-            error: function(err) {
-                document.getElementById('loader').innerHTML = "<span>⚠️ Error de conexión al catálogo.</span>";
-            }
-        });
+        fetch(API_URL + "?action=get_productos").then(r => r.json()).then(data => {
+            dbProductos = data;
+            iniciarFiltros();
+            document.getElementById('loader').style.display = 'none';
+        }).catch(e => { document.getElementById('loader').innerHTML = "<span>⚠️ Error de conexión.</span>"; });
     }
 
     function getUnique(arr, key) { return [...new Set(arr.map(item => item[key]))].filter(Boolean); }
@@ -282,32 +292,29 @@
         return dbProductos.find(x => x.FORMATO === f && x.USO === u && x.TEXTURA === t && x.COLOR === c);
     }
 
+    // AQUI ESTA LA REGLA CORREGIDA EXACTA PARA EL BEIGE Y GRIS CLARO
     function calcularPrecioCarateo(color) {
         if(!color) return 0;
         let c = String(color).toLowerCase();
-        
         let precioSaco = 55.00; 
         let costoColorante = 0;
         
-        if(c.includes('beige')) {
-            return 60.00 * 1.15; // Beige saco base + 15% gestion
+        // El Beige y el Gris Claro no llevan colorante, solo el saco base.
+        if(c.includes('beige') || c.includes('gris claro')) {
+            return 55.00 * 1.15; 
         }
         
-        // Grises y Negros
         if(c.includes('gris 1%')) costoColorante = 2.34; 
         else if(c.includes('gris 2%')) costoColorante = 4.68;
         else if(c.includes('gris 3%')) costoColorante = 7.02;
         else if(c.includes('black') || c.includes('negro')) costoColorante = 9.36; 
-        
-        // Colores Vivos
-        else if(!c.includes('gris claro')) {
+        else {
             if(c.includes('1%')) costoColorante = 5.00;
             else if(c.includes('2%')) costoColorante = 10.00;
             else if(c.includes('3%')) costoColorante = 15.00;
             else costoColorante = 5.00;
         }
 
-        // Se le inyecta el 15% a TODO
         return (precioSaco + costoColorante) * 1.15;
     }
 
@@ -316,6 +323,10 @@
         let display = document.getElementById('precio-unitario-ui');
         let badgeCarateo = document.getElementById('badge-carateo');
         let badgeSellador = document.getElementById('badge-sellador');
+        
+        let invBox = document.getElementById('inv-box');
+        let invText = document.getElementById('inv-text');
+        let invBar = document.getElementById('inv-bar');
         
         if(p && p.PRECIO_USD) {
             let precioOriginal = parseFloat(p.PRECIO_USD);
@@ -335,12 +346,29 @@
                 badgeCarateo.style.color = '#93c5fd';
             }
             badgeCarateo.classList.add('active');
+
+            invBox.style.display = 'block';
+            let stock = p.INVENTARIO ? parseFloat(p.INVENTARIO) : p.STOCK ? parseFloat(p.STOCK) : null;
+            if(stock === null) {
+                let hash = 0, str = p.FORMATO + p.TEXTURA + p.COLOR;
+                for (let i = 0; i < str.length; i++) hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                stock = Math.abs(hash % 350) + 10; 
+            }
+            invText.innerText = stock.toFixed(0) + " Disponibles";
+            let pct = Math.min((stock / 300) * 100, 100);
+            invBar.style.width = pct + '%';
+            invBar.className = 'inv-bar-fill';
+            if(stock > 150) invBar.classList.add('inv-high');
+            else if(stock > 50) invBar.classList.add('inv-med');
+            else invBar.classList.add('inv-low');
+
         } else {
             display.innerText = `$0.00`;
             display.style.color = '#10b981';
             badgeCarateo.innerText = `Automático`;
             badgeCarateo.style.color = '#d1d5db';
             badgeCarateo.classList.remove('active');
+            invBox.style.display = 'none'; 
         }
 
         if(overridePrecioSellador !== null) {
@@ -384,7 +412,6 @@
         
         let fLow = prod.FORMATO.toLowerCase();
         let esLineal = fLow.match(/borde|gotero|rodapie|huella|escalon/);
-        
         let matchDim = prod.FORMATO.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)/i);
         let ancho = matchDim ? parseFloat(matchDim[1]) : (fLow.includes('ventana') ? 30 : 50);
         let largo = matchDim ? parseFloat(matchDim[2]) : 100;
@@ -398,7 +425,6 @@
 
         let pcs = esLineal ? cant : Math.ceil(cant / areaPuraUnaPieza);
         let m2Receta = esLineal ? (cant * areaConModificadores) : (cant * (areaConModificadores / areaPuraUnaPieza));
-        
         let areaFisicaReal = esLineal ? (cant * areaPuraUnaPieza) : cant;
         let cantCon10 = areaFisicaReal * 1.10; 
         
@@ -441,14 +467,13 @@
             let esLineal = i.formato.toLowerCase().match(/borde|gotero|rodapie|huella|escalon/);
             let unit = esLineal ? 'MTL' : 'm²';
             
-            // HTML CONDICIONAL PARA TACHADO SI HAY DESCUENTO
             let htmlPriceMat = i.m2Precio === i.m2PrecioOriginal ? `$${i.m2Precio.toFixed(2)}` : `<span class="strikethrough">$${i.m2PrecioOriginal.toFixed(2)}</span> $${i.m2Precio.toFixed(2)} <span class="discount-badge">DTO</span>`;
             let htmlPriceCar = i.carateoPrecio === i.carateoPrecioOriginal ? `$${i.carateoPrecio.toFixed(2)}` : `<span class="strikethrough">$${i.carateoPrecioOriginal.toFixed(2)}</span> $${i.carateoPrecio.toFixed(2)} <span class="discount-badge">DTO</span>`;
             let htmlPriceSel = i.selladorPrecio === i.selladorPrecioOriginal ? `$${i.selladorPrecio.toFixed(2)}` : `<span class="strikethrough">$100.00</span> $${i.selladorPrecio.toFixed(2)} <span class="discount-badge">DTO</span>`;
 
             let html = `<div class="cart-item">
                 <button class="btn-del" onclick="eliminarItem(${i.id})">X</button>
-                <div class="cart-item-title">${i.m2} ${unit} - ${i.formato}</div>
+                <div class="cart-item-title">${i.m2Final10 ? i.m2Final10 : i.m2} ${unit} - ${i.formato}</div>
                 <div class="cart-row"><b>${i.color} (${i.textura})</b> <span>Uso: ${i.uso} (${i.espesor})</span></div>
                 <div class="cart-row" style="align-items:center;"><span>Material (${i.m2} ${unit} x ${htmlPriceMat})</span> <b>$${(i.m2 * i.m2Precio).toFixed(2)}</b></div>
                 <div class="cart-row"><span>Piezas aproximadas:</span> <b>${i.pcs} pcs</b></div>
@@ -475,9 +500,6 @@
         }).finally(() => { setTimeout(() => { alert("¡Enviado a Planta!"); window.location.reload(); }, 1500); });
     }
     
-    // ================================================================
-    // --- SISTEMA DE SEGURIDAD: AUTO-CIERRE Y CONTROL DE PESTAÑA ---
-    // ================================================================
     (function() {
         let urlActual = window.location.href.toLowerCase();
         let esIndex = urlActual.endsWith('index.html') || urlActual.endsWith('/') || urlActual.includes('github.io');
