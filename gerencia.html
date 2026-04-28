@@ -102,7 +102,8 @@
 
             document.getElementById('l-n').innerHTML = rN.filter(n => n.CATEGORIA === 'Nomina').map(n => `<div class="card" style="border-left-color:var(--blue);"><div class="card-row"><div class="info"><b ${canEdit ? `onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 1, '${n.NOMBRE}')" style="cursor:pointer;"` : ''}>${n.NOMBRE} ${canEdit ? '✏️' : ''}</b><span>Ingreso: <i ${canEdit ? `onclick="editar('NOMINA_FIJOS', 'NOMBRE', '${n.NOMBRE}', 3, '${n.FECHA_INGRESO || '-'}')"` : ''}>${n.FECHA_INGRESO || '-'} ${canEdit ? '✏️' : ''}</i></span></div><div style="display:flex;align-items:center;"><div class="price">$${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}</div>${canEdit ? `<button class="btn-edit" onclick="editar('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}')">💰</button>` : ''}</div></div></div>`).join('');
 
-            document.getElementById('l-g').innerHTML = rN.filter(n => n.CATEGORIA === 'Operativo').map(n => `<div class="card" style="border-left-color:var(--red);"><div class="card-row"><div class="info"><b>🏢 ${n.NOMBRE}</b><span>Servicio Fijo</span></div><div style="display:flex;align-items:center;"><div class="price">$${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}</div>${canEdit ? `<button class="btn-edit" onclick="editar('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}')">✏️</button>` : ''}</div></div></div>`).join('');
+            // AJUSTE: Ahora lee Operativo y Oficina, y les pone iconos diferentes
+            document.getElementById('l-g').innerHTML = rN.filter(n => n.CATEGORIA === 'Operativo' || n.CATEGORIA === 'Oficina').map(n => `<div class="card" style="border-left-color:${n.CATEGORIA === 'Oficina' ? 'var(--green)' : 'var(--red)'};"><div class="card-row"><div class="info"><b>${n.CATEGORIA === 'Oficina' ? '📝' : '🏢'} ${n.NOMBRE}</b><span>Servicio ${n.CATEGORIA}</span></div><div style="display:flex;align-items:center;"><div class="price">$${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}</div>${canEdit ? `<button class="btn-edit" onclick="editar('NOMINA_FIJOS','NOMBRE','${n.NOMBRE}',2,'${cleanNum(n.MONTO_MENSUAL_USD || Object.values(n)[2])}')">✏️</button>` : ''}</div></div></div>`).join('');
 
             document.getElementById('l-m').innerHTML = rI.map(m => {
                 let stock = cleanNum(m.STOCK_ACTUAL || Object.values(m)[3]); let alerta = cleanNum(m.PUNTO_ALERTA || Object.values(m)[4]); let color = stock <= alerta ? 'var(--red)' : 'var(--green)';
@@ -121,24 +122,20 @@
     // --- SISTEMA DE SEGURIDAD: AUTO-CIERRE Y CONTROL DE PESTAÑA ---
     // ================================================================
     (function() {
-        // 1. Control de cierre de pestaña/navegador (Usa sessionStorage que muere al cerrar)
         let urlActual = window.location.href.toLowerCase();
         let esIndex = urlActual.endsWith('index.html') || urlActual.endsWith('/') || urlActual.includes('github.io');
         
         if (!esIndex) {
-            // Si el usuario intentó entrar a Planta o Cotizador con una pestaña nueva o el navegador recién abierto
             if (!sessionStorage.getItem('sesion_activa_coral')) {
                 localStorage.removeItem('usuarioCoralsintec');
                 localStorage.removeItem('permisosCoralsintec');
-                window.location.href = 'index.html'; // Lo bota al login
+                window.location.href = 'index.html'; 
                 return;
             }
         } else {
-            // Si está en el Menú Principal (Index), marcamos esta pestaña como autorizada
             sessionStorage.setItem('sesion_activa_coral', 'true');
         }
 
-        // 2. Control de 5 minutos de Inactividad (300,000 milisegundos)
         let relojInactividad;
         function reiniciarReloj() {
             clearTimeout(relojInactividad);
@@ -150,14 +147,13 @@
                     alert("⏳ Por seguridad, tu sesión se ha cerrado tras 5 minutos de inactividad.");
                     window.location.href = 'index.html';
                 }
-            }, 300000); // 300000 ms = 5 minutos
+            }, 300000); 
         }
 
-        // Escucha cualquier movimiento del ratón, toque en pantalla, teclado o scroll para saber que el usuario sigue ahí
         ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evento => 
             document.addEventListener(evento, reiniciarReloj, true)
         );
-        reiniciarReloj(); // Arranca el reloj apenas carga la página
+        reiniciarReloj(); 
     })();
     
 </script>
